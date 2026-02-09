@@ -74,6 +74,7 @@ export const EmployeeMultiSelectModal: React.FC<MultiSelectModalProps> = ({ isOp
     setIsClosing(true);
     setTimeout(() => {
       onApply(Array.from(currentSelectedIds));
+      onClose();
     }, 300);
   };
 
