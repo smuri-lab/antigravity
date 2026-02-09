@@ -1,6 +1,29 @@
 import { Employee, ContractDetails, AbsenceRequest, TimeEntry, TimeBalanceAdjustment, HolidaysByYear, AbsenceType, EmploymentType } from '../types';
 
 /**
+ * Applies legal break deductions based on shift duration if enabled for the employee.
+ */
+export const applyAutomaticBreaks = (entryData: Omit<TimeEntry, 'id' | 'employeeId'> | TimeEntry, employee: Employee): Omit<TimeEntry, 'id' | 'employeeId'> | TimeEntry => {
+    if (!employee.automaticBreakDeduction) {
+        return entryData;
+    }
+
+    const durationMs = new Date(entryData.end).getTime() - new Date(entryData.start).getTime();
+    const durationHours = durationMs / (1000 * 60 * 60);
+
+    let requiredBreak = 0;
+    if (durationHours > 9) {
+        requiredBreak = 45;
+    } else if (durationHours > 6) {
+        requiredBreak = 30;
+    }
+
+    const newBreakDuration = Math.max(entryData.breakDurationMinutes || 0, requiredBreak);
+
+    return { ...entryData, breakDurationMinutes: newBreakDuration };
+};
+
+/**
  * Finds the currently active contract details for an employee based on a specific date.
  */
 export const getContractDetailsForDate = (employee: Employee, date: Date): ContractDetails => {

@@ -20,6 +20,7 @@ import { ManualEntryFormModal } from './components/ManualEntryFormModal';
 import { UserCircleIcon } from './components/icons/UserCircleIcon';
 import { CogIcon } from './components/icons/CogIcon';
 import { OverviewView } from './components/OverviewView';
+import { useStore } from './store/useStore';
 
 // --- PERSISTENCE HOOK ---
 function useLocalStorage<T>(key: string, initialValue: T) {
@@ -198,96 +199,57 @@ const generateDemoData = () => {
   return { timeEntries, absenceRequests, shifts };
 };
 
-const applyAutomaticBreaks = (entryData: Omit<TimeEntry, 'id' | 'employeeId'> | TimeEntry, employee: Employee): Omit<TimeEntry, 'id' | 'employeeId'> | TimeEntry => {
-  if (!employee.automaticBreakDeduction) {
-    return entryData;
-  }
-
-  const durationMs = new Date(entryData.end).getTime() - new Date(entryData.start).getTime();
-  const durationHours = durationMs / (1000 * 60 * 60);
-
-  let requiredBreak = 0;
-  if (durationHours > 9) {
-    requiredBreak = 45;
-  } else if (durationHours > 6) {
-    requiredBreak = 30;
-  }
-
-  const newBreakDuration = Math.max(entryData.breakDurationMinutes || 0, requiredBreak);
-
-  return { ...entryData, breakDurationMinutes: newBreakDuration };
-};
 
 
 const DEMO_DATA = generateDemoData();
 const MOCK_CURRENT_YEAR = 2026;
 
 const App: React.FC = () => {
-  const [loggedInUser, setLoggedInUser] = useLocalStorage<Employee | null>('timepro-loggedInUser', null);
-  const [currentView, setCurrentView] = useState<View>(View.Dashboard);
-  const [adminViewMode, setAdminViewMode] = useState<'admin' | 'employee'>('admin');
-  const [adminActiveView, setAdminActiveView] = useState<AdminViewType>(AdminViewType.Planner);
-  const [timeEntries, setTimeEntries] = useLocalStorage<TimeEntry[]>('timepro-timeEntries', DEMO_DATA.timeEntries);
-  const [absenceRequests, setAbsenceRequests] = useLocalStorage<AbsenceRequest[]>('timepro-absenceRequests', DEMO_DATA.absenceRequests);
-  const [shifts, setShifts] = useLocalStorage<Shift[]>('timepro-shifts', DEMO_DATA.shifts);
-  const [shiftTemplates, setShiftTemplates] = useLocalStorage<ShiftTemplate[]>('timepro-shiftTemplates', INITIAL_SHIFT_TEMPLATES);
-  const [timeBalanceAdjustments, setTimeBalanceAdjustments] = useLocalStorage<TimeBalanceAdjustment[]>('timepro-adjustments', []);
-  const [userAccount, setUserAccount] = useLocalStorage<UserAccount>('timepro-userAccount', INITIAL_USER_ACCOUNT);
-  const [employees, setEmployees] = useLocalStorage<Employee[]>('timepro-employees', INITIAL_EMPLOYEES);
-  const [customers, setCustomers] = useLocalStorage<Customer[]>('timepro-customers', INITIAL_CUSTOMERS);
-  const [activities, setActivities] = useLocalStorage<Activity[]>('timepro-activities', INITIAL_ACTIVITIES);
-  const [companySettings, setCompanySettings] = useLocalStorage<CompanySettings>('timepro-settings', {
-    companyName: 'Musterfirma GmbH',
-    street: 'Hauptstraße',
-    houseNumber: '1',
-    postalCode: '10115',
-    city: 'Berlin',
-    email: 'admin@musterfirma.de',
-    editLockRule: 'currentMonth',
-    employeeCanExport: true,
-    allowHalfDayVacations: true,
-    customerLabel: 'Zeitkategorie 1',
-    activityLabel: 'Zeitkategorie 2',
-    adminTimeFormat: 'hoursMinutes',
-    employeeTimeFormat: 'hoursMinutes',
-    shiftPlannerStartHour: 0,
-    shiftPlannerEndHour: 24,
-  });
-  const [authView, setAuthView] = useState<'login' | 'register'>('login');
-  const [isActionSheetOpen, setIsActionSheetOpen] = useState(false);
-  const [isAbsenceRequestModalOpen, setIsAbsenceRequestModalOpen] = useState(false);
-  const [isManualEntryModalOpen, setIsManualEntryModalOpen] = useState(false);
-  const [showAbsenceSuccess, setShowAbsenceSuccess] = useState(false);
-  const [showTimeEntrySuccess, setShowTimeEntrySuccess] = useState(false);
-  const [showNfcSuccess, setShowNfcSuccess] = useState(false);
-  const [nfcSuccessMessage, setNfcSuccessMessage] = useState('');
+  const {
+    loggedInUser, setLoggedInUser,
+    currentView, setCurrentView,
+    adminViewMode, setAdminViewMode,
+    adminActiveView, setAdminActiveView,
+    timeEntries, setTimeEntries,
+    absenceRequests, setAbsenceRequests,
+    shifts, setShifts,
+    shiftTemplates, setShiftTemplates,
+    timeBalanceAdjustments, setTimeBalanceAdjustments,
+    employees, setEmployees,
+    customers, setCustomers,
+    activities, setActivities,
+    companySettings, setCompanySettings,
+    authView, setAuthView,
+    isActionSheetOpen, setIsActionSheetOpen,
+    isAbsenceRequestModalOpen, setIsAbsenceRequestModalOpen,
+    isManualEntryModalOpen, setIsManualEntryModalOpen,
+    showAbsenceSuccess, setShowAbsenceSuccess,
+    showTimeEntrySuccess, setShowTimeEntrySuccess,
+    showNfcSuccess, setShowNfcSuccess,
+    nfcSuccessMessage, setNfcSuccessMessage,
+    selectedState, setSelectedState,
+    holidaysByYear, setHolidaysByYear,
+    isRunning, setIsRunning,
+    startTime, setStartTime,
+    stopTime, setStopTime,
+    elapsedTime, setElapsedTime,
+    stopwatchCustomerId, setStopwatchCustomerId,
+    stopwatchActivityId, setStopwatchActivityId,
+    stopwatchComment, setStopwatchComment,
+    isBreakModalOpen, setIsBreakModalOpen,
+    resetStopwatch,
+    addTimeEntry, updateTimeEntry, deleteTimeEntry,
+    addAbsenceRequest, updateAbsenceRequest, deleteAbsenceRequest,
+    updateAbsenceRequestStatus,
+    addTimeBalanceAdjustment, updateTimeBalanceAdjustment, deleteTimeBalanceAdjustment,
+    addShift, updateShift, deleteShift,
+    addShiftTemplate, updateShiftTemplate, deleteShiftTemplate,
+  } = useStore();
 
-  // Settings state
-  const [selectedState, setSelectedState] = useLocalStorage<GermanState>('timepro-state', 'BW'); // Default: Baden-Württemberg
   const [timeTrackingMethod, setTimeTrackingMethod] = useLocalStorage<'all' | 'manual'>('timepro-method', 'all');
-  const [holidaysByYear, setHolidaysByYear] = useLocalStorage<HolidaysByYear>('timepro-holidays', {});
-
-  // Stopwatch state (lifted up)
-  const [isRunning, setIsRunning] = useLocalStorage<boolean>('timepro-stopwatch-isRunning', false);
-  const [startTime, setStartTime] = useLocalStorage<Date | null>('timepro-stopwatch-startTime', null);
-  const [stopTime, setStopTime] = useLocalStorage<Date | null>('timepro-stopwatch-stopTime', null);
-  const [elapsedTime, setElapsedTime] = useLocalStorage<number>('timepro-stopwatch-elapsedTime', 0);
-  const [stopwatchCustomerId, setStopwatchCustomerId] = useLocalStorage<string>('timepro-stopwatch-customerId', '');
-  const [stopwatchActivityId, setStopwatchActivityId] = useLocalStorage<string>('timepro-stopwatch-activityId', '');
-  const [stopwatchComment, setStopwatchComment] = useLocalStorage<string>('timepro-stopwatch-comment', '');
-  const [isBreakModalOpen, setIsBreakModalOpen] = useLocalStorage<boolean>('timepro-stopwatch-breakModalOpen', false);
+  const [userAccount] = useState<UserAccount>(INITIAL_USER_ACCOUNT); // Keep as local since it's derived/initial
   const intervalRef = React.useRef<number | null>(null);
   const mainScrollRef = useRef<HTMLDivElement>(null);
-
-  // Restore Date objects from LocalStorage strings
-  useEffect(() => {
-    if (startTime && typeof startTime === 'string') {
-      setStartTime(new Date(startTime));
-    }
-    if (stopTime && typeof stopTime === 'string') {
-      setStopTime(new Date(stopTime));
-    }
-  }, []);
 
   // SCROLL RESET - Targeted at the internal container
   useLayoutEffect(() => {
@@ -484,7 +446,7 @@ const App: React.FC = () => {
 
     setLoggedInUser(user);
     return null;
-  }, [employees]);
+  }, [employees, setLoggedInUser]);
 
   const handleRegister = useCallback((
     employeeData: Omit<Employee, 'id' | 'lastModified' | 'contractHistory' | 'role' | 'isActive'>,
@@ -519,147 +481,55 @@ const App: React.FC = () => {
       shiftPlannerEndHour: 24,
     });
     setLoggedInUser(newAdmin);
-  }, []);
+  }, [setEmployees, setCompanySettings, setLoggedInUser]);
 
   const handleLogout = () => {
     if (isRunning) {
-      setIsRunning(false);
-      setElapsedTime(0);
-      setStartTime(null);
-      setStopTime(null);
-      setStopwatchComment('');
+      resetStopwatch();
     }
     setLoggedInUser(null);
     setCurrentView(View.Dashboard);
     setAdminViewMode('admin');
   };
 
-  const addTimeEntry = useCallback((entry: Omit<TimeEntry, 'id' | 'employeeId'>) => {
-    if (loggedInUser) {
-      const finalEntry = applyAutomaticBreaks(entry, loggedInUser);
-      setTimeEntries(prev => [...prev, { ...finalEntry, id: Date.now(), employeeId: loggedInUser.id }]);
-    }
-  }, [loggedInUser]);
-
-  const adminAddTimeEntry = useCallback((entry: Omit<TimeEntry, 'id' | 'employeeId'>, employeeId: number) => {
-    const employee = employees.find(e => e.id === employeeId);
-    if (employee) {
-      const finalEntry = applyAutomaticBreaks(entry, employee);
-      setTimeEntries(prev => [...prev, { ...finalEntry, id: Date.now(), employeeId: employeeId }]);
-    } else {
-      setTimeEntries(prev => [...prev, { ...entry, id: Date.now(), employeeId: employeeId }]);
-    }
-  }, [employees]);
-
-  const updateTimeEntry = useCallback((updatedEntry: TimeEntry) => {
-    const employee = employees.find(e => e.id === updatedEntry.employeeId);
-    if (employee) {
-      const finalEntry = applyAutomaticBreaks(updatedEntry, employee) as TimeEntry;
-      setTimeEntries(prev => prev.map(entry => entry.id === finalEntry.id ? finalEntry : entry));
-    } else {
-      setTimeEntries(prev => prev.map(entry => entry.id === updatedEntry.id ? updatedEntry : entry));
-    }
-  }, [employees]);
-
-  const deleteTimeEntry = useCallback((id: number) => {
-    setTimeEntries(prev => prev.filter(entry => entry.id !== id));
-  }, []);
-
-  const addAbsenceRequest = useCallback((request: Omit<AbsenceRequest, 'id' | 'status'>, status: AbsenceRequest['status'] = 'pending') => {
-    setAbsenceRequests(prev => [...prev, { ...request, id: Date.now(), status }]);
-    setShowAbsenceSuccess(true);
-  }, []);
-
-  const updateAbsenceRequest = useCallback((updatedRequest: AbsenceRequest) => {
-    setAbsenceRequests(prev => prev.map(req => req.id === updatedRequest.id ? updatedRequest : req));
-  }, []);
-
-  const retractAbsenceRequest = useCallback((id: number) => {
-    setAbsenceRequests(prev => prev.filter(req => req.id !== id));
-  }, []);
-
-  const updateAbsenceRequestStatus = useCallback((id: number, status: 'approved' | 'rejected', comment?: string) => {
-    setAbsenceRequests(prev => prev.map(req => req.id === id ? { ...req, status, adminComment: comment } : req));
-  }, []);
-
-  const deleteAbsenceRequest = useCallback((id: number) => {
-    setAbsenceRequests(prev => prev.filter(req => req.id !== id));
-  }, []);
-
-  const addTimeBalanceAdjustment = useCallback((adjustment: Omit<TimeBalanceAdjustment, 'id'>) => {
-    setTimeBalanceAdjustments(prev => [...prev, { ...adjustment, id: Date.now() }]);
-  }, []);
-
-  const updateTimeBalanceAdjustment = useCallback((updatedAdjustment: TimeBalanceAdjustment) => {
-    setTimeBalanceAdjustments(prev => prev.map(adj => adj.id === updatedAdjustment.id ? updatedAdjustment : adj));
-  }, []);
-
-  const deleteTimeBalanceAdjustment = useCallback((id: number) => {
-    setTimeBalanceAdjustments(prev => prev.filter(adj => adj.id !== id));
-  }, []);
-
-  const addShift = useCallback((shift: Omit<Shift, 'id'>) => {
-    setShifts(prev => [...prev, { ...shift, id: `shift-${Date.now()}` }]);
-  }, []);
-
-  const updateShift = useCallback((updatedShift: Shift) => {
-    setShifts(prev => prev.map(s => s.id === updatedShift.id ? updatedShift : s));
-  }, []);
-
-  const deleteShift = useCallback((id: string) => {
-    setShifts(prev => prev.filter(s => s.id !== id));
-  }, []);
-
-  const addShiftTemplate = useCallback((template: Omit<ShiftTemplate, 'id'>) => {
-    setShiftTemplates(prev => [...prev, { ...template, id: `t${Date.now()}` }]);
-  }, []);
-
-  const updateShiftTemplate = useCallback((updatedTemplate: ShiftTemplate) => {
-    setShiftTemplates(prev => prev.map(t => t.id === updatedTemplate.id ? updatedTemplate : t));
-  }, []);
-
-  const deleteShiftTemplate = useCallback((id: string) => {
-    setShiftTemplates(prev => prev.filter(t => t.id !== id));
-  }, []);
-
   const addEmployee = useCallback((employee: Omit<Employee, 'id'>) => {
     setEmployees(prev => [...prev, { ...employee, id: Date.now() }]);
-  }, []);
+  }, [setEmployees]);
 
   const updateEmployee = useCallback((updatedEmployee: Employee) => {
     setEmployees(prev => prev.map(emp => emp.id === updatedEmployee.id ? updatedEmployee : emp));
     if (loggedInUser && loggedInUser.id === updatedEmployee.id) {
       setLoggedInUser(updatedEmployee);
     }
-  }, [loggedInUser]);
+  }, [loggedInUser, setEmployees, setLoggedInUser]);
 
   const deleteEmployee = useCallback((id: number) => {
     setEmployees(prev => prev.filter(emp => emp.id !== id));
-  }, []);
+  }, [setEmployees]);
 
   const addCustomer = useCallback((customer: Omit<Customer, 'id'>) => {
     setCustomers(prev => [...prev, { ...customer, id: `c${Date.now()}` }]);
-  }, []);
+  }, [setCustomers]);
 
   const updateCustomer = useCallback((updatedCustomer: Customer) => {
     setCustomers(prev => prev.map(c => c.id === updatedCustomer.id ? updatedCustomer : c));
-  }, []);
+  }, [setCustomers]);
 
   const deleteCustomer = useCallback((id: string) => {
     setCustomers(prev => prev.filter(c => c.id !== id));
-  }, []);
+  }, [setCustomers]);
 
   const addActivity = useCallback((activity: Omit<Activity, 'id'>) => {
     setActivities(prev => [...prev, { ...activity, id: `a${Date.now()}` }]);
-  }, []);
+  }, [setActivities]);
 
   const updateActivity = useCallback((updatedActivity: Activity) => {
     setActivities(prev => prev.map(a => a.id === updatedActivity.id ? updatedActivity : a));
-  }, []);
+  }, [setActivities]);
 
   const deleteActivity = useCallback((id: string) => {
     setActivities(prev => prev.filter(a => a.id !== id));
-  }, []);
+  }, [setActivities]);
 
   useEffect(() => {
     // ... (Carryover logic remains same)
@@ -771,7 +641,12 @@ const App: React.FC = () => {
 
     const dashboardProps = {
       currentUser: currentUser,
-      addTimeEntry: addTimeEntry,
+      addTimeEntry: (entry: Omit<TimeEntry, 'id' | 'employeeId'>) => {
+        if (currentUser) {
+          addTimeEntry(entry, currentUser.id);
+          setShowTimeEntrySuccess(true);
+        }
+      },
       timeEntries: timeEntries,
       customers: customers,
       activities: activities,
@@ -841,7 +716,7 @@ const App: React.FC = () => {
           holidaysByYear={holidaysByYear}
           companySettings={companySettings}
           onEnsureHolidaysForYear={ensureHolidaysForYear}
-          onRetractAbsenceRequest={retractAbsenceRequest}
+          onRetractAbsenceRequest={deleteAbsenceRequest}
           userAccount={{ ...userAccount, timeBalanceHours, ...vacationInfo }}
           selectedState={selectedState}
         />;
@@ -917,7 +792,7 @@ const App: React.FC = () => {
                   onUpdateAbsenceRequest={updateAbsenceRequest}
                   onDeleteAbsenceRequest={deleteAbsenceRequest}
                   timeEntries={timeEntries}
-                  onAddTimeEntry={adminAddTimeEntry}
+                  onAddTimeEntry={addTimeEntry}
                   onUpdateTimeEntry={updateTimeEntry}
                   onDeleteTimeEntry={deleteTimeEntry}
                   employees={employees}
@@ -989,7 +864,10 @@ const App: React.FC = () => {
               <AbsenceRequestModal
                 isOpen={isAbsenceRequestModalOpen}
                 onClose={() => setIsAbsenceRequestModalOpen(false)}
-                onSubmit={addAbsenceRequest}
+                onSubmit={(req) => {
+                  addAbsenceRequest(req);
+                  setShowAbsenceSuccess(true);
+                }}
                 currentUser={currentUser}
                 existingAbsences={absenceRequests.filter(r => r.employeeId === currentUser.id)}
                 timeEntries={timeEntries.filter(entry => entry.employeeId === currentUser.id)}
@@ -1004,7 +882,7 @@ const App: React.FC = () => {
               <ManualEntryFormModal
                 isOpen={isManualEntryModalOpen}
                 onClose={() => setIsManualEntryModalOpen(false)}
-                addTimeEntry={addTimeEntry}
+                addTimeEntry={(entry) => addTimeEntry(entry, currentUser.id)}
                 onSuccess={() => setShowTimeEntrySuccess(true)}
                 timeEntries={timeEntries.filter(entry => entry.employeeId === currentUser.id)}
                 customers={customers}
