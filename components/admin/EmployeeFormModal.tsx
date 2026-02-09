@@ -500,12 +500,28 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
                                             onClick={() => setOpenDatePicker('firstWorkDay')}
                                             placeholder="Auswählen..."
                                         />
-                                        <Select name="employmentType" label="Anstellungsart" value={formData.employmentType || ''} onChange={handleChange}>
-                                            <option value={EmploymentType.FullTime}>Vollzeit</option>
-                                            <option value={EmploymentType.PartTime}>Teilzeit</option>
-                                            <option value={EmploymentType.MiniJob}>Minijob</option>
-                                        </Select>
-
+                                        <div>
+                                            <label className="block text-sm font-medium text-gray-700 mb-2">Anstellungsart</label>
+                                            <div className="grid grid-cols-3 gap-2">
+                                                {[
+                                                    { id: EmploymentType.FullTime, label: 'Vollzeit' },
+                                                    { id: EmploymentType.PartTime, label: 'Teilzeit' },
+                                                    { id: EmploymentType.MiniJob, label: 'Minijob' }
+                                                ].map((type) => (
+                                                    <button
+                                                        key={type.id}
+                                                        type="button"
+                                                        onClick={() => setFormData(prev => ({ ...prev, employmentType: type.id }))}
+                                                        className={`py-2 px-3 text-sm font-medium rounded-md border transition-all duration-200 ${formData.employmentType === type.id
+                                                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                                            }`}
+                                                    >
+                                                        {type.label}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
                                         {formData.employmentType !== EmploymentType.FullTime && (
                                             <Select name="targetHoursModel" label="Soll-Stunden Modell" value={formData.targetHoursModel || ''} onChange={handleChange}>
                                                 <option value={TargetHoursModel.Monthly}>Monatliches Soll (Pauschal)</option>
