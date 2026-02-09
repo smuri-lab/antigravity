@@ -12,39 +12,40 @@ interface BreakModalProps {
 export const BreakModal: React.FC<BreakModalProps> = ({ onClose, onSave }) => {
   const [breakMinutes, setBreakMinutes] = useState('');
   const [isClosing, setIsClosing] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
-    // This effect is only to handle the initial mount state,
-    // which is now implicitly handled by useState.
-    // If we re-open, the component re-mounts and isClosing is false again.
+    setIsClosing(false);
+    const timer = setTimeout(() => setIsVisible(true), 10);
+    return () => clearTimeout(timer);
   }, []);
 
   const handleClose = () => {
     setIsClosing(true);
     setTimeout(onClose, 300);
   };
-  
+
   const handleSaveClick = () => {
     setIsClosing(true);
     setTimeout(() => onSave(Number(breakMinutes) || 0), 300);
   };
 
   return (
-    <div className={`fixed inset-0 bg-black flex items-center justify-center z-30 p-4 ${isClosing ? 'animate-modal-fade-out' : 'animate-modal-fade-in'}`} onClick={handleClose}>
-      <Card className={`w-full max-w-sm relative ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`} onClick={(e) => e.stopPropagation()}>
+    <div className={`fixed inset-0 bg-black flex items-center justify-center z-30 p-4 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`} onClick={handleClose}>
+      <Card className={`w-full max-w-sm relative ${isClosing ? 'animate-modal-slide-down' : (isVisible ? 'animate-modal-slide-up' : 'opacity-0 translate-y-4')}`} onClick={(e) => e.stopPropagation()}>
         <button onClick={handleClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
           <XIcon className="h-6 w-6" />
         </button>
         <div className="space-y-4">
           <h2 className="text-xl font-bold text-center">Pause eintragen</h2>
-          <Input 
-            label="Pause (m)" 
-            type="number" 
-            value={breakMinutes} 
-            onChange={(e) => setBreakMinutes(e.target.value)} 
+          <Input
+            label="Pause (m)"
+            type="number"
+            value={breakMinutes}
+            onChange={(e) => setBreakMinutes(e.target.value)}
             min="0"
             placeholder="0"
-            autoFocus 
+            autoFocus
           />
           <div className="flex gap-4 pt-2">
             <Button type="button" onClick={handleClose} className="w-full bg-gray-500 hover:bg-gray-600">
