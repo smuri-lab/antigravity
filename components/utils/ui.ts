@@ -1,4 +1,4 @@
-import { AbsenceType } from '../types';
+import { AbsenceType } from '../../types';
 
 /**
  * Returns UI details (label, colors) for a given absence type.

@@ -1,4 +1,4 @@
-import { Employee, ContractDetails, AbsenceRequest, TimeEntry, TimeBalanceAdjustment, HolidaysByYear, AbsenceType, EmploymentType } from '../types';
+import { Employee, ContractDetails, AbsenceRequest, TimeEntry, TimeBalanceAdjustment, HolidaysByYear, AbsenceType, EmploymentType } from '../../types';
 
 /**
  * Applies legal break deductions based on shift duration if enabled for the employee.

@@ -1,4 +1,4 @@
-import { Employee, TimeEntry, AbsenceRequest, Customer, Activity, CompanySettings, Holiday, HolidaysByYear } from '../types';
+import { Employee, TimeEntry, AbsenceRequest, Customer, Activity, CompanySettings, Holiday, HolidaysByYear } from '../../types';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';

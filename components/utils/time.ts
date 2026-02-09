@@ -1,4 +1,4 @@
-import { TimeEntry } from '../types';
+import { TimeEntry } from '../../types';
 
 /**
  * Calculates the distance between two coordinates in meters using the Haversine formula.
