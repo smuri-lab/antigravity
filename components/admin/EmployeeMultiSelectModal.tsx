@@ -24,12 +24,13 @@ interface MultiSelectModalProps {
 }
 
 export const EmployeeMultiSelectModal: React.FC<MultiSelectModalProps> = ({ isOpen, onClose, onApply, employees, items, selectedEmployeeIds, selectedItemIds, title = "Mitarbeiter auswählen" }) => {
-  const [currentSelectedIds, setCurrentSelectedIds] = useState(new Set<string|number>());
+  const [currentSelectedIds, setCurrentSelectedIds] = useState(new Set<string | number>());
   const [searchTerm, setSearchTerm] = useState('');
   const [isClosing, setIsClosing] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   const dataItems = useMemo(() => {
-    if (employees) return employees.filter(e => e.isActive).map(e => ({id: e.id, name: `${e.firstName} ${e.lastName}`}));
+    if (employees) return employees.filter(e => e.isActive).map(e => ({ id: e.id, name: `${e.firstName} ${e.lastName}` }));
     if (items) return items;
     return [];
   }, [employees, items]);
@@ -39,6 +40,11 @@ export const EmployeeMultiSelectModal: React.FC<MultiSelectModalProps> = ({ isOp
       const idsToSet = selectedItemIds || selectedEmployeeIds || [];
       setCurrentSelectedIds(new Set(idsToSet));
       setSearchTerm('');
+      setIsClosing(false);
+      const timer = setTimeout(() => setIsVisible(true), 10);
+      return () => clearTimeout(timer);
+    } else {
+      setIsVisible(false);
       setIsClosing(false);
     }
   }, [isOpen, selectedEmployeeIds, selectedItemIds]);
@@ -67,13 +73,13 @@ export const EmployeeMultiSelectModal: React.FC<MultiSelectModalProps> = ({ isOp
   const handleApply = () => {
     setIsClosing(true);
     setTimeout(() => {
-        onApply(Array.from(currentSelectedIds));
+      onApply(Array.from(currentSelectedIds));
     }, 300);
   };
 
   return ReactDOM.createPortal(
-    <div className={`fixed inset-0 bg-black flex items-center justify-center z-40 p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : 'animate-modal-fade-in'}`} onClick={handleClose}>
-      <Card className={`w-full max-w-lg ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`} onClick={e => e.stopPropagation()}>
+    <div className={`fixed inset-0 flex items-center justify-center z-40 p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`} onClick={handleClose}>
+      <Card className={`w-full max-w-lg ${isClosing ? 'animate-modal-slide-down' : (isVisible ? 'animate-modal-slide-up' : 'opacity-0 translate-y-4')}`} onClick={e => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">{title}</h2>
           <button onClick={handleClose} className="p-1 rounded-full hover:bg-gray-100"><XIcon className="h-6 w-6" /></button>
@@ -84,19 +90,19 @@ export const EmployeeMultiSelectModal: React.FC<MultiSelectModalProps> = ({ isOp
 
           <fieldset>
             <div className="flex justify-between items-center mb-2">
-                <legend className="text-base font-semibold text-gray-800">Elemente</legend>
-                <div>
-                    <button type="button" onClick={handleSelectAll} className="text-sm font-semibold text-blue-600 hover:underline mr-4">Alle auswählen</button>
-                    <button type="button" onClick={handleDeselectAll} className="text-sm font-semibold text-blue-600 hover:underline">Alle abwählen</button>
-                </div>
+              <legend className="text-base font-semibold text-gray-800">Elemente</legend>
+              <div>
+                <button type="button" onClick={handleSelectAll} className="text-sm font-semibold text-blue-600 hover:underline mr-4">Alle auswählen</button>
+                <button type="button" onClick={handleDeselectAll} className="text-sm font-semibold text-blue-600 hover:underline">Alle abwählen</button>
+              </div>
             </div>
 
             <div className="max-h-60 overflow-y-auto border rounded-md p-2 space-y-1">
               {filteredItems.length > 0 ? filteredItems.map((item) => (
-                  <label key={item.id} className="flex items-center space-x-3 p-2 rounded hover:bg-gray-50 cursor-pointer">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked={currentSelectedIds.has(item.id)} onChange={() => handleSelectionChange(item.id)} />
-                    <span>{item.name}</span>
-                  </label>
+                <label key={item.id} className="flex items-center space-x-3 p-2 rounded hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked={currentSelectedIds.has(item.id)} onChange={() => handleSelectionChange(item.id)} />
+                  <span>{item.name}</span>
+                </label>
               )) : <p className="text-center text-gray-500 py-4">Keine Elemente gefunden.</p>}
             </div>
           </fieldset>

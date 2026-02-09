@@ -17,6 +17,7 @@ interface ActivityFormModalProps {
 export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({ isOpen, onClose, onSave, initialData, companySettings }) => {
   const [name, setName] = useState('');
   const [isClosing, setIsClosing] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   const activityLabel = companySettings.activityLabel || 'Tätigkeit';
 
@@ -27,6 +28,12 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({ isOpen, on
       } else {
         setName('');
       }
+      setIsClosing(false);
+      const timer = setTimeout(() => setIsVisible(true), 10);
+      return () => clearTimeout(timer);
+    } else {
+      setIsVisible(false);
+      setIsClosing(false);
     }
   }, [initialData, isOpen]);
 
@@ -38,39 +45,39 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({ isOpen, on
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-        alert(`Der Name für ${activityLabel} darf nicht leer sein.`);
-        return;
+      alert(`Der Name für ${activityLabel} darf nicht leer sein.`);
+      return;
     }
     setIsClosing(true);
     setTimeout(() => {
-        if (initialData) {
-            onSave({ ...initialData, name });
-        } else {
-            onSave({ name });
-        }
+      if (initialData) {
+        onSave({ ...initialData, name });
+      } else {
+        onSave({ name });
+      }
     }, 300);
   };
 
-  if (!isOpen) return null;
+  if (!isOpen && !isClosing) return null;
 
   return ReactDOM.createPortal(
-    <div className={`fixed inset-0 bg-black flex items-center justify-center z-30 p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : 'animate-modal-fade-in'}`} onClick={handleClose}>
-      <Card className={`w-full max-w-lg relative ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`} onClick={(e) => e.stopPropagation()}>
+    <div className={`fixed inset-0 flex items-center justify-center z-30 p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`} onClick={handleClose}>
+      <Card className={`w-full max-w-lg relative ${isClosing ? 'animate-modal-slide-down' : (isVisible ? 'animate-modal-slide-up' : 'opacity-0 translate-y-4')}`} onClick={(e) => e.stopPropagation()}>
         <button onClick={handleClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
           <XIcon className="h-6 w-6" />
         </button>
 
         <form onSubmit={handleSubmit}>
           <h2 className="text-xl font-bold mb-4">{initialData ? `${activityLabel} bearbeiten` : `Neue ${activityLabel} anlegen`}</h2>
-          
+
           <div className="space-y-4 pt-4 border-t">
-            <Input 
-                name="name" 
-                label={`Name für ${activityLabel}`} 
-                value={name} 
-                onChange={(e) => setName(e.target.value)} 
-                required 
-                autoFocus
+            <Input
+              name="name"
+              label={`Name für ${activityLabel}`}
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              required
+              autoFocus
             />
           </div>
 
