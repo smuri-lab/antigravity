@@ -268,16 +268,26 @@ const App: React.FC = () => {
   const [holidaysByYear, setHolidaysByYear] = useLocalStorage<HolidaysByYear>('timepro-holidays', {});
 
   // Stopwatch state (lifted up)
-  const [isRunning, setIsRunning] = useState(false);
-  const [startTime, setStartTime] = useState<Date | null>(null);
-  const [stopTime, setStopTime] = useState<Date | null>(null);
-  const [elapsedTime, setElapsedTime] = useState(0);
-  const [stopwatchCustomerId, setStopwatchCustomerId] = useState('');
-  const [stopwatchActivityId, setStopwatchActivityId] = useState('');
-  const [stopwatchComment, setStopwatchComment] = useState('');
-  const [isBreakModalOpen, setIsBreakModalOpen] = useState(false);
+  const [isRunning, setIsRunning] = useLocalStorage<boolean>('timepro-stopwatch-isRunning', false);
+  const [startTime, setStartTime] = useLocalStorage<Date | null>('timepro-stopwatch-startTime', null);
+  const [stopTime, setStopTime] = useLocalStorage<Date | null>('timepro-stopwatch-stopTime', null);
+  const [elapsedTime, setElapsedTime] = useLocalStorage<number>('timepro-stopwatch-elapsedTime', 0);
+  const [stopwatchCustomerId, setStopwatchCustomerId] = useLocalStorage<string>('timepro-stopwatch-customerId', '');
+  const [stopwatchActivityId, setStopwatchActivityId] = useLocalStorage<string>('timepro-stopwatch-activityId', '');
+  const [stopwatchComment, setStopwatchComment] = useLocalStorage<string>('timepro-stopwatch-comment', '');
+  const [isBreakModalOpen, setIsBreakModalOpen] = useLocalStorage<boolean>('timepro-stopwatch-breakModalOpen', false);
   const intervalRef = React.useRef<number | null>(null);
   const mainScrollRef = useRef<HTMLDivElement>(null);
+
+  // Restore Date objects from LocalStorage strings
+  useEffect(() => {
+    if (startTime && typeof startTime === 'string') {
+      setStartTime(new Date(startTime));
+    }
+    if (stopTime && typeof stopTime === 'string') {
+      setStopTime(new Date(stopTime));
+    }
+  }, []);
 
   // SCROLL RESET - Targeted at the internal container
   useLayoutEffect(() => {
@@ -841,7 +851,7 @@ const App: React.FC = () => {
   };
 
   return (
-    <div className="fixed inset-0 w-full h-full flex flex-row overflow-hidden bg-gray-50">
+    <div className="fixed inset-0 w-full h-full flex flex-row overflow-hidden bg-gray-50 animate-fade-in">
       <div className="flex-1 flex flex-col relative h-full w-full min-w-0">
         {!loggedInUser ? (
           // ... (Login/Reg screens)

@@ -21,12 +21,12 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSwitchToReg
     e.preventDefault();
     setError(null); // Reset error on new submission
     if (!username) {
-        setError("Bitte geben Sie einen Benutznamen ein.");
-        return;
+      setError("Bitte geben Sie einen Benutznamen ein.");
+      return;
     }
     if (!password) {
-        setError("Bitte geben Sie ein Passwort ein.");
-        return;
+      setError("Bitte geben Sie ein Passwort ein.");
+      return;
     }
     const errorMsg = onLogin(username, password);
     if (errorMsg) {
@@ -37,7 +37,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSwitchToReg
   const handleForgotPassword = (username: string): string | null => {
     const user = employees.find(e => e.username.toLowerCase() === username.toLowerCase());
     if (user && user.role === 'admin') {
-        return user.password || 'Kein Passwort für diesen Admin-Account hinterlegt.';
+      return user.password || 'Kein Passwort für diesen Admin-Account hinterlegt.';
     }
     return null;
   };
@@ -46,11 +46,11 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSwitchToReg
 
   return (
     <>
-      <div className="min-h-screen bg-gray-100 flex items-start sm:items-center justify-center p-4 pt-16 sm:pt-4 relative z-50">
+      <div className="min-h-screen bg-gray-100 flex items-start sm:items-center justify-center p-4 pt-16 sm:pt-4 relative z-50 animate-fade-in">
         <Card className="w-full max-w-sm">
           <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Willkommen bei TimePro</h1>
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
-            <Input 
+            <Input
               label="Benutzername"
               id="username"
               name="username"
@@ -59,7 +59,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSwitchToReg
               onChange={(e) => setUsername(e.target.value)}
               autoFocus
             />
-            <Input 
+            <Input
               label="Passwort"
               id="password"
               name="password"
@@ -67,7 +67,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSwitchToReg
               value={password}
               onChange={(e) => setPassword(e.target.value)}
             />
-            
+
             <div className="pt-2">
               <p className="text-sm text-red-600 text-center h-10 flex items-center justify-center">
                 {error || '\u00A0'}
@@ -79,17 +79,17 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSwitchToReg
           </form>
           <div className="mt-4 text-center text-sm">
             <button onClick={() => setIsForgotModalOpen(true)} className="font-medium text-blue-600 hover:text-blue-500">
-                Passwort vergessen?
+              Passwort vergessen?
             </button>
           </div>
           {!hasAdminAccount && (
             <div className="mt-6 pt-4 border-t text-center text-sm">
-                <p className="text-gray-600">
-                    Noch kein Konto?{' '}
-                    <button onClick={onSwitchToRegister} className="font-medium text-blue-600 hover:text-blue-500">
-                        Jetzt registrieren
-                    </button>
-                </p>
+              <p className="text-gray-600">
+                Noch kein Konto?{' '}
+                <button onClick={onSwitchToRegister} className="font-medium text-blue-600 hover:text-blue-500">
+                  Jetzt registrieren
+                </button>
+              </p>
             </div>
           )}
         </Card>

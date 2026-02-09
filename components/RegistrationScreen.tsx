@@ -5,12 +5,12 @@ import { Button } from './ui/Button';
 import { Input } from './ui/Input';
 
 interface RegistrationScreenProps {
-  onRegister: (
-      employeeData: Omit<Employee, 'id' | 'lastModified' | 'contractHistory' | 'role' | 'isActive'>,
-      companyData: Omit<CompanySettings, 'adminTimeFormat' | 'employeeTimeFormat'>
-  ) => void;
-  onSwitchToLogin: () => void;
-  hasAdminAccount?: boolean;
+    onRegister: (
+        employeeData: Omit<Employee, 'id' | 'lastModified' | 'contractHistory' | 'role' | 'isActive'>,
+        companyData: Omit<CompanySettings, 'adminTimeFormat' | 'employeeTimeFormat'>
+    ) => void;
+    onSwitchToLogin: () => void;
+    hasAdminAccount?: boolean;
 }
 
 export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegister, onSwitchToLogin, hasAdminAccount }) => {
@@ -37,24 +37,24 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
 
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
-        
-        const { 
+
+        const {
             firstName, lastName, username, password, confirmPassword,
             companyName, street, houseNumber, postalCode, city, email
         } = formData;
-        
+
         if (password !== confirmPassword) {
             alert("Die Passwörter stimmen nicht überein.");
             return;
         }
 
-        const employeeData = { 
-            firstName, 
-            lastName, 
+        const employeeData = {
+            firstName,
+            lastName,
             dateOfBirth: '', // Set to empty as it's removed from form
-            username, 
-            password, 
-            firstWorkDay: new Date().toLocaleDateString('sv-SE') 
+            username,
+            password,
+            firstWorkDay: new Date().toLocaleDateString('sv-SE')
         };
         const companyData = { companyName, street, houseNumber, postalCode, city, email };
 
@@ -62,7 +62,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
     };
 
     return (
-        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 relative z-50">
+        <div className="min-h-screen bg-gray-100 flex items-center justify-center p-4 relative z-50 animate-fade-in">
             <Card className="w-full max-w-2xl">
                 <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Neues Unternehmen registrieren</h1>
                 <form onSubmit={handleSubmit} className="space-y-6">
@@ -92,14 +92,14 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
                             <Input name="confirmPassword" label="Passwort wiederholen" type="password" value={formData.confirmPassword} onChange={handleChange} required minLength={6} />
                         </div>
                     </fieldset>
-                    
+
                     <div className="pt-2">
                         <Button type="submit" className="w-full bg-blue-600 hover:bg-blue-700">
                             Registrierung abschließen
                         </Button>
                     </div>
                 </form>
-                 {hasAdminAccount && (
+                {hasAdminAccount && (
                     <div className="mt-6 pt-4 border-t text-center text-sm">
                         <p className="text-gray-600">
                             Bereits registriert?{' '}
@@ -108,7 +108,7 @@ export const RegistrationScreen: React.FC<RegistrationScreenProps> = ({ onRegist
                             </button>
                         </p>
                     </div>
-                 )}
+                )}
             </Card>
         </div>
     );
