@@ -19,25 +19,25 @@ interface CalendarModalProps {
 }
 
 const DayOfWeekHeader: React.FC = () => {
-    const days = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
-    return (
-        <div className="grid grid-cols-7 text-center font-semibold text-gray-500 text-xs">
-            {days.map(day => <div key={day} className="py-2">{day}</div>)}
-        </div>
-    );
+  const days = ['Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa', 'So'];
+  return (
+    <div className="grid grid-cols-7 text-center font-semibold text-gray-500 text-xs">
+      {days.map(day => <div key={day} className="py-2">{day}</div>)}
+    </div>
+  );
 };
 
-export const CalendarModal: React.FC<CalendarModalProps> = ({ 
-    isOpen, 
-    onClose, 
-    onSelectDate,
-    onSelectRange,
-    title, 
-    selectionMode = 'single',
-    initialStartDate,
-    initialEndDate, 
-    minDate,
-    isRotated = false
+export const CalendarModal: React.FC<CalendarModalProps> = ({
+  isOpen,
+  onClose,
+  onSelectDate,
+  onSelectRange,
+  title,
+  selectionMode = 'single',
+  initialStartDate,
+  initialEndDate,
+  minDate,
+  isRotated = false
 }) => {
   const [currentMonthDate, setCurrentMonthDate] = useState(new Date());
   const [range, setRange] = useState<{ start: Date | null, end: Date | null }>({ start: null, end: null });
@@ -49,7 +49,7 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({
     if (isOpen) {
       // Opening animation
       const timer = setTimeout(() => setIsVisible(true), 10);
-      
+
       const start = initialStartDate ? new Date(initialStartDate) : null;
       let end = initialEndDate ? new Date(initialEndDate) : null;
       if (selectionMode === 'single' && start) {
@@ -59,7 +59,7 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({
       if (end) end.setHours(12, 0, 0, 0);
       setRange({ start, end });
       setCurrentMonthDate(start || new Date());
-      
+
       return () => clearTimeout(timer);
     } else {
       // Reset state immediately when closed
@@ -74,7 +74,7 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({
   const endOfMonth = new Date(currentMonthDate.getFullYear(), currentMonthDate.getMonth() + 1, 0);
   const today = new Date();
   today.setHours(0, 0, 0, 0);
-  if(minDate) minDate.setHours(0,0,0,0);
+  if (minDate) minDate.setHours(0, 0, 0, 0);
 
   const daysInMonth = [];
   const startDayOfWeek = (startOfMonth.getDay() + 6) % 7;
@@ -91,7 +91,7 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({
   const changeMonth = (offset: number) => {
     setCurrentMonthDate(prev => new Date(prev.getFullYear(), prev.getMonth() + offset, 1));
   };
-  
+
   const handleClose = () => {
     setIsClosing(true);
     setTimeout(onClose, 300);
@@ -99,8 +99,8 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({
 
   const handleDayClick = (day: Date) => {
     if (selectionMode === 'single') {
-        setRange({ start: day, end: day });
-        return;
+      setRange({ start: day, end: day });
+      return;
     }
 
     if (!range.start || range.end) {
@@ -113,22 +113,22 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({
       setHoverDate(null);
     }
   };
-  
+
   const handleConfirm = () => {
-      if (selectionMode === 'range' && range.start && range.end && onSelectRange) {
-        onSelectRange({
-            start: range.start.toLocaleDateString('sv-SE'),
-            end: range.end.toLocaleDateString('sv-SE'),
-        });
-      } else if (selectionMode === 'single' && range.start && onSelectDate) {
-          onSelectDate(range.start);
-      }
-      handleClose();
+    if (selectionMode === 'range' && range.start && range.end && onSelectRange) {
+      onSelectRange({
+        start: range.start.toLocaleDateString('sv-SE'),
+        end: range.end.toLocaleDateString('sv-SE'),
+      });
+    } else if (selectionMode === 'single' && range.start && onSelectDate) {
+      onSelectDate(range.start);
+    }
+    handleClose();
   }
 
   const containerClass = isRotated
     ? `fixed top-0 left-0 w-[100vh] h-[100vw] origin-top-left rotate-90 translate-x-[100vw] flex items-center justify-center z-[260] p-1 sm:p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`
-    : `fixed inset-0 bg-black flex items-center justify-center z-[260] p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`;
+    : `fixed inset-0 flex items-center justify-center z-[260] p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`;
 
   const cardClasses = `w-full max-w-sm ${isRotated ? '!p-3' : ''} ${isClosing ? 'animate-modal-slide-down' : (isVisible ? 'animate-modal-slide-up' : 'opacity-0 translate-y-4')}`;
 
@@ -150,7 +150,7 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({
           <div className="grid grid-cols-7">
             {daysInMonth.map((day, index) => {
               if (!day) return <div key={`empty-${index}`} />;
-              
+
               const dayTime = day.getTime();
               const isToday = day.toDateString() === today.toDateString();
               const isDisabled = minDate ? day < minDate : false;
@@ -158,46 +158,46 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({
               const rangeStart = range.start?.getTime();
               const rangeEnd = range.end?.getTime();
               const hoverTime = hoverDate?.getTime();
-              
+
               const effectiveEnd = rangeEnd || (rangeStart && hoverTime && hoverTime > rangeStart ? hoverTime : null);
 
               const isStartDate = rangeStart && dayTime === rangeStart;
               const isEndDate = effectiveEnd && dayTime === effectiveEnd;
               const isInRange = rangeStart && effectiveEnd && dayTime > rangeStart && dayTime < effectiveEnd;
               const isHovered = !rangeEnd && isInRange;
-              
+
               let dayClasses = `h-10 w-10 flex items-center justify-center rounded-full text-sm transition-colors z-10 relative `;
               let containerClasses = `flex justify-center items-center h-10`;
-              
+
               if (!isDisabled) dayClasses += 'cursor-pointer ';
-              
+
               // Range background
               if (isStartDate && isEndDate) {
-                 // single day selection
+                // single day selection
               } else if (isStartDate) {
-                  containerClasses += ` bg-blue-100 rounded-l-full ${isHovered ? 'bg-opacity-75' : ''}`;
+                containerClasses += ` bg-blue-100 rounded-l-full ${isHovered ? 'bg-opacity-75' : ''}`;
               } else if (isEndDate) {
-                  containerClasses += ` bg-blue-100 rounded-r-full ${isHovered ? 'bg-opacity-75' : ''}`;
+                containerClasses += ` bg-blue-100 rounded-r-full ${isHovered ? 'bg-opacity-75' : ''}`;
               } else if (isInRange) {
-                  containerClasses += ` bg-blue-100 w-full ${isHovered ? 'bg-opacity-75' : ''}`;
+                containerClasses += ` bg-blue-100 w-full ${isHovered ? 'bg-opacity-75' : ''}`;
               }
-              
+
               // Day number circle
               if (isStartDate || isEndDate) {
-                  dayClasses += `bg-blue-600 text-white font-bold`;
+                dayClasses += `bg-blue-600 text-white font-bold`;
               } else if (isInRange) {
-                   dayClasses += 'bg-transparent text-blue-800 font-bold';
+                dayClasses += 'bg-transparent text-blue-800 font-bold';
               } else if (isDisabled) {
-                  dayClasses += 'text-gray-300 cursor-not-allowed';
+                dayClasses += 'text-gray-300 cursor-not-allowed';
               } else {
-                  dayClasses += 'hover:bg-gray-100 ';
-                  if (isToday) dayClasses += 'text-blue-600 font-bold';
-                  else dayClasses += 'text-gray-700';
+                dayClasses += 'hover:bg-gray-100 ';
+                if (isToday) dayClasses += 'text-blue-600 font-bold';
+                else dayClasses += 'text-gray-700';
               }
 
               return (
-                <div 
-                  key={index} 
+                <div
+                  key={index}
                   className={containerClasses}
                   onMouseEnter={() => !isDisabled && selectionMode === 'range' && setHoverDate(day)}
                   onMouseLeave={() => setHoverDate(null)}

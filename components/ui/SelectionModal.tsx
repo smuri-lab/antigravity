@@ -23,7 +23,7 @@ export const SelectionModal: React.FC<SelectionModalProps> = ({ isOpen, onClose,
   const [searchTerm, setSearchTerm] = useState('');
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
-  
+
   useEffect(() => {
     if (isOpen) {
       setSearchTerm('');
@@ -58,7 +58,7 @@ export const SelectionModal: React.FC<SelectionModalProps> = ({ isOpen, onClose,
 
   const containerClass = isRotated
     ? `fixed top-0 left-0 w-[100vh] h-[100vw] origin-top-left rotate-90 translate-x-[100vw] flex items-center justify-center z-[260] p-1 sm:p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`
-    : `fixed inset-0 bg-black flex items-center justify-center z-[260] p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`;
+    : `fixed inset-0 flex items-center justify-center z-[260] p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`;
 
   const cardClasses = `w-full max-w-lg relative flex flex-col ${isRotated ? 'max-h-[98vh] !p-3' : 'max-h-[90vh]'} ${isClosing ? 'animate-modal-slide-down' : (isVisible ? 'animate-modal-slide-up' : 'opacity-0 translate-y-4')}`;
 
@@ -86,11 +86,10 @@ export const SelectionModal: React.FC<SelectionModalProps> = ({ isOpen, onClose,
               <button
                 key={item.id}
                 onClick={() => handleSelect(item)}
-                className={`w-full text-left p-3 rounded-lg transition-colors flex justify-between items-center ${
-                  selectedValue === item.id
-                    ? 'bg-blue-50 text-blue-700 font-semibold'
-                    : 'hover:bg-gray-100'
-                }`}
+                className={`w-full text-left p-3 rounded-lg transition-colors flex justify-between items-center ${selectedValue === item.id
+                  ? 'bg-blue-50 text-blue-700 font-semibold'
+                  : 'hover:bg-gray-100'
+                  }`}
               >
                 <span>{item.name}</span>
                 {selectedValue === item.id && <CheckIcon className="h-5 w-5 text-blue-700" />}
