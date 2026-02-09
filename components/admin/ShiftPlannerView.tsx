@@ -30,19 +30,19 @@ import { ClockIcon } from '../icons/ClockIcon';
 import { CalendarIcon } from '../icons/CalendarIcon';
 
 interface ShiftPlannerViewProps {
-  employees: Employee[];
-  shifts: Shift[];
-  customers: Customer[];
-  activities: Activity[];
-  companySettings: CompanySettings;
-  absenceRequests: AbsenceRequest[];
-  addShift: (shift: Omit<Shift, 'id'>) => void;
-  updateShift: (shift: Shift) => void;
-  deleteShift: (id: string) => void;
-  shiftTemplates: ShiftTemplate[];
-  addShiftTemplate: (template: Omit<ShiftTemplate, 'id'>) => void;
-  updateShiftTemplate: (template: ShiftTemplate) => void;
-  deleteShiftTemplate: (id: string) => void;
+    employees: Employee[];
+    shifts: Shift[];
+    customers: Customer[];
+    activities: Activity[];
+    companySettings: CompanySettings;
+    absenceRequests: AbsenceRequest[];
+    addShift: (shift: Omit<Shift, 'id'>) => void;
+    updateShift: (shift: Shift) => void;
+    deleteShift: (id: string) => void;
+    shiftTemplates: ShiftTemplate[];
+    addShiftTemplate: (template: Omit<ShiftTemplate, 'id'>) => void;
+    updateShiftTemplate: (template: ShiftTemplate) => void;
+    deleteShiftTemplate: (id: string) => void;
 }
 
 // Helper to check if a shift overlaps with the visible time window
@@ -62,12 +62,12 @@ const formatDate = (date: Date) => date.toLocaleDateString('de-DE', { day: '2-di
 
 type ViewMode = 'timeline' | 'week' | 'month';
 
-export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({ 
+export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     employees, shifts, customers, activities, companySettings, absenceRequests, addShift, updateShift, deleteShift,
-    shiftTemplates = [], 
-    addShiftTemplate = () => {}, 
-    updateShiftTemplate = () => {}, 
-    deleteShiftTemplate = () => {}
+    shiftTemplates = [],
+    addShiftTemplate = () => { },
+    updateShiftTemplate = () => { },
+    deleteShiftTemplate = () => { }
 }) => {
     // --- GENERAL STATE ---
     const [activeTab, setActiveTab] = useState<'planner' | 'report'>('planner');
@@ -75,17 +75,17 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     // --- PLANNER TAB STATE ---
     const settingStartHour = companySettings.shiftPlannerStartHour ?? 6;
     const settingEndHour = companySettings.shiftPlannerEndHour ?? 22;
-    
+
     // View Mode State
     const [viewMode, setViewMode] = useState<ViewMode>('week'); // Default to Week view for better overview
 
     const visibleDurationHours = useMemo(() => {
         let duration = settingEndHour - settingStartHour;
-        if (duration <= 0) duration += 24; 
-        return duration || 12; 
+        if (duration <= 0) duration += 24;
+        return duration || 12;
     }, [settingStartHour, settingEndHour]);
 
-    const NAVIGATION_STEP_HOURS = 3; 
+    const NAVIGATION_STEP_HOURS = 3;
 
     // Current Reference Date (Start of View)
     const [viewStartDateTime, setViewStartDateTime] = useState(() => {
@@ -114,14 +114,14 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
     const [isGeneratorModalOpen, setIsGeneratorModalOpen] = useState(false);
-    
+
     // "Paint Mode" State
     const [activeTemplate, setActiveTemplate] = useState<ShiftTemplate | null>(null);
-    
+
     const [modalInitialData, setModalInitialData] = useState<Partial<Shift> | null>(null);
     const [modalDefaultDate, setModalDefaultDate] = useState<string | undefined>(undefined);
     const [modalDefaultEmployeeId, setModalDefaultEmployeeId] = useState<number | undefined>(undefined);
-    
+
     const [plannerVisibleEmployeeIds, setPlannerVisibleEmployeeIds] = useState<number[]>(() => employees.filter(e => e.isActive).map(e => e.id));
     const [isInputDisabled, setIsInputDisabled] = useState(false);
 
@@ -139,7 +139,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
 
     // --- PLANNER HELPERS ---
-    
+
     // TIMELINE Helpers
     const timelineEndDateTime = useMemo(() => {
         const d = new Date(viewStartDateTime);
@@ -161,7 +161,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const gridDays = useMemo(() => {
         const days = [];
         const current = new Date(viewStartDateTime);
-        
+
         let count = 7;
         if (viewMode === 'month') {
             // Days in month
@@ -185,7 +185,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
     const shiftView = (direction: 1 | -1) => {
         const newStart = new Date(viewStartDateTime);
-        
+
         if (viewMode === 'timeline') {
             newStart.setHours(newStart.getHours() + (direction * NAVIGATION_STEP_HOURS));
         } else if (viewMode === 'week') {
@@ -193,7 +193,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
         } else if (viewMode === 'month') {
             newStart.setMonth(newStart.getMonth() + direction);
         }
-        
+
         setViewStartDateTime(newStart);
     };
 
@@ -218,10 +218,10 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
             const day = newStart.getDay();
             const diff = newStart.getDate() - day + (day === 0 ? -6 : 1);
             newStart.setDate(diff);
-            newStart.setHours(0,0,0,0);
+            newStart.setHours(0, 0, 0, 0);
         } else {
             newStart.setDate(1);
-            newStart.setHours(0,0,0,0);
+            newStart.setHours(0, 0, 0, 0);
         }
         setViewStartDateTime(newStart);
         unlockInput();
@@ -262,11 +262,11 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
         setIsInputDisabled(true);
         setModalDefaultDate(slotDate.toLocaleDateString('sv-SE'));
         setModalDefaultEmployeeId(employeeId);
-        
+
         if (viewMode === 'timeline') {
             const startStr = slotDate.toISOString();
-            const endD = new Date(slotDate); 
-            endD.setHours(endD.getHours() + 4); 
+            const endD = new Date(slotDate);
+            endD.setHours(endD.getHours() + 4);
             const endStr = endD.toISOString();
             setModalInitialData({ start: startStr, end: endStr });
         } else {
@@ -277,7 +277,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
             end.setHours(16, 0, 0, 0);
             setModalInitialData({ start: start.toISOString(), end: end.toISOString() });
         }
-        
+
         setIsModalOpen(true);
     };
 
@@ -296,7 +296,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
         unlockInput();
         setIsModalOpen(false);
     };
-    
+
     const handleDelete = (id: string) => {
         deleteShift(id);
         unlockInput();
@@ -360,7 +360,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
         } else if (viewMode === 'week') {
             const endWeek = new Date(viewStartDateTime);
             endWeek.setDate(endWeek.getDate() + 6);
-            return `KW ${getWeekNumber(viewStartDateTime)} (${viewStartDateTime.toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit'})} - ${endWeek.toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit'})})`;
+            return `KW ${getWeekNumber(viewStartDateTime)} (${viewStartDateTime.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })} - ${endWeek.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit' })})`;
         } else {
             return viewStartDateTime.toLocaleString('de-DE', { month: 'long', year: 'numeric' });
         }
@@ -388,14 +388,14 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const reportData = useMemo(() => {
         const selectedEmployees = employees.filter(e => reportEmployeeIds.includes(e.id))
             .sort((a, b) => a.lastName.localeCompare(b.lastName));
-        
+
         return selectedEmployees.map(emp => {
             const empShifts = shifts.filter(s => {
                 if (s.employeeId !== emp.id) return false;
                 const sStart = new Date(s.start);
                 // Check if shift falls within range (even partially)
                 return sStart >= reportStartDate && sStart <= reportEndDate;
-            }).sort((a,b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+            }).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
             // Generate Calendar Days for this employee
             const weeks = [];
@@ -404,7 +404,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
             const day = current.getDay();
             const diff = current.getDate() - day + (day === 0 ? -6 : 1);
             current.setDate(diff);
-            
+
             const end = new Date(reportEndDate);
 
             while (current <= end) {
@@ -415,7 +415,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                         const shiftDate = new Date(s.start).toLocaleDateString('sv-SE');
                         return shiftDate === dayDate.toLocaleDateString('sv-SE');
                     });
-                    
+
                     weekRow.push({
                         date: dayDate,
                         shifts: dayShifts
@@ -463,29 +463,27 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                 <nav className="-mb-px flex space-x-6" aria-label="Tabs">
                     <button
                         onClick={() => setActiveTab('planner')}
-                        className={`${
-                            activeTab === 'planner'
+                        className={`${activeTab === 'planner'
                                 ? 'border-blue-500 text-blue-600'
                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                        } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
+                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
                     >
                         <CalendarDaysIcon className="h-5 w-5" />
                         Interaktiver Planer
                     </button>
                     <button
                         onClick={() => setActiveTab('report')}
-                        className={`${
-                            activeTab === 'report'
+                        className={`${activeTab === 'report'
                                 ? 'border-blue-500 text-blue-600'
                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                        } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
+                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
                     >
                         <DocumentTextIcon className="h-5 w-5" />
                         Bericht & Export
                     </button>
                 </nav>
             </div>
-            
+
             {activeTab === 'planner' && (
                 <div className="animate-fade-in space-y-4">
                     <Card className="overflow-hidden flex flex-col h-full !p-0">
@@ -498,17 +496,16 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                 {shiftTemplates.map(t => {
                                     const isActive = activeTemplate?.id === t.id;
                                     return (
-                                        <button 
+                                        <button
                                             key={t.id}
                                             onClick={() => setActiveTemplate(isActive ? null : t)}
-                                            className={`px-3 py-1.5 text-xs font-semibold rounded-full border shadow-sm transition-all flex items-center gap-2 whitespace-nowrap ${
-                                                isActive 
-                                                    ? 'ring-2 ring-offset-1 scale-105' 
+                                            className={`px-3 py-1.5 text-xs font-semibold rounded-full border shadow-sm transition-all flex items-center gap-2 whitespace-nowrap ${isActive
+                                                    ? 'ring-2 ring-offset-1 scale-105'
                                                     : 'hover:bg-white hover:shadow-md opacity-80 hover:opacity-100'
-                                            }`}
-                                            style={{ 
-                                                backgroundColor: t.color + (isActive ? '' : '20'), 
-                                                color: isActive ? '#fff' : t.color, 
+                                                }`}
+                                            style={{
+                                                backgroundColor: t.color + (isActive ? '' : '20'),
+                                                color: isActive ? '#fff' : t.color,
                                                 borderColor: t.color,
                                                 ringColor: t.color
                                             }}
@@ -520,7 +517,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                     );
                                 })}
                                 {activeTemplate && (
-                                    <button 
+                                    <button
                                         onClick={() => setActiveTemplate(null)}
                                         className="ml-auto text-xs text-gray-500 hover:text-red-600 flex items-center gap-1 bg-white px-2 py-1 rounded border border-gray-200 shadow-sm"
                                     >
@@ -539,7 +536,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                     <span className="hidden sm:inline">Vorlagen</span>
                                     <span className="sm:hidden">Vorlagen</span>
                                 </Button>
-                                
+
                                 <Button onClick={() => setIsGeneratorModalOpen(true)} className="bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 flex items-center gap-2 text-sm px-3 py-2 flex-1 xl:flex-initial justify-center">
                                     <SparklesIcon className="h-4 w-4" />
                                     <span>Automatik</span>
@@ -550,7 +547,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                 <button onClick={() => shiftView(-1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Zurück">
                                     <ChevronLeftIcon className="h-6 w-6 text-gray-600" />
                                 </button>
-                                
+
                                 <button onClick={() => setIsDatePickModalOpen(true)} className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                                     <CalendarDaysIcon className="h-6 w-6 text-gray-400 group-hover:text-blue-600" />
                                     <h2 className="text-xl sm:text-2xl font-bold text-gray-800 whitespace-nowrap">
@@ -562,7 +559,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                     <ChevronRightIcon className="h-6 w-6 text-gray-600" />
                                 </button>
                             </div>
-                            
+
                             {/* VIEW MODE SWITCHER */}
                             <div className="flex bg-gray-100 p-1 rounded-lg w-full xl:w-auto justify-center">
                                 <button
@@ -592,14 +589,14 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                 {/* Header: Time Slots / Days */}
                                 <div className="flex bg-white border-b border-gray-200 sticky top-0 z-20 h-12 shadow-sm">
                                     {/* Employee Header with Filter */}
-                                    <div 
-                                        className="w-48 shrink-0 p-3 border-r border-gray-200 font-semibold text-gray-800 bg-white sticky left-0 z-30 flex items-center justify-between group cursor-pointer hover:bg-gray-50 transition-colors" 
+                                    <div
+                                        className="w-48 shrink-0 p-3 border-r border-gray-200 font-semibold text-gray-800 bg-white sticky left-0 z-30 flex items-center justify-between group cursor-pointer hover:bg-gray-50 transition-colors"
                                         onClick={() => setIsFilterModalOpen(true)}
                                     >
                                         <span>Mitarbeiter</span>
                                         <AdjustmentsHorizontalIcon className={`h-5 w-5 ${plannerVisibleEmployeeIds.length !== employees.length ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600'}`} />
                                     </div>
-                                    
+
                                     {/* Columns Header (Timeline or Days) */}
                                     <div className="flex-1 flex relative">
                                         {viewMode === 'timeline' ? (
@@ -607,7 +604,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                 const hour = date.getHours();
                                                 const isNewDay = hour === 0;
                                                 const displayHour = hour.toString().padStart(2, '0');
-                                                
+
                                                 return (
                                                     <div key={i} className={`flex-1 border-r border-gray-200 last:border-r-0 flex flex-col justify-center items-center relative ${isNewDay ? 'bg-blue-50/50' : 'bg-gray-50/30'}`}>
                                                         <span className={`text-xs font-medium ${isNewDay ? 'text-blue-700 font-bold' : 'text-gray-500'}`}>
@@ -647,12 +644,12 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                         // Common: Filter Absences for this row
                                         // For simplicity in rendering, we fetch overlapping absences.
                                         // Ideally, fetch range based on viewMode start/end.
-                                        
+
                                         const rowStart = viewMode === 'timeline' ? viewStartDateTime : gridDays[0];
                                         const rowEnd = viewMode === 'timeline' ? timelineEndDateTime : gridDays[gridDays.length - 1];
-                                        
+
                                         // Safety check if rowEnd is invalid (empty gridDays)
-                                        if(!rowEnd) return null;
+                                        if (!rowEnd) return null;
 
                                         return (
                                             <div key={employee.id} className="flex h-16 group hover:bg-gray-50/50 transition-colors">
@@ -665,7 +662,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
                                                 {/* Track / Grid */}
                                                 <div className="flex-1 relative bg-white group-hover:bg-gray-50">
-                                                    
+
                                                     {viewMode === 'timeline' ? (
                                                         // --- TIMELINE RENDERING ---
                                                         <>
@@ -678,11 +675,11 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                             {/* Click Areas */}
                                                             <div className="absolute inset-0 flex z-0">
                                                                 {timelineSlots.map((d, i) => (
-                                                                    <div 
-                                                                        key={i} 
+                                                                    <div
+                                                                        key={i}
                                                                         className={`flex-1 transition-colors border-r border-transparent ${activeTemplate ? 'hover:bg-green-100/50' : 'hover:bg-blue-50/30 cursor-pointer'}`}
                                                                         onClick={() => handleTrackClick(employee.id, d)}
-                                                                        title={activeTemplate ? `Vorlage anwenden` : `${d.toLocaleTimeString([],{hour:'2-digit'})} - Klicken`}
+                                                                        title={activeTemplate ? `Vorlage anwenden` : `${d.toLocaleTimeString([], { hour: '2-digit' })} - Klicken`}
                                                                     ></div>
                                                                 ))}
                                                             </div>
@@ -701,16 +698,16 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                                         onClick={(e) => handleShiftClick(e, shift)}
                                                                         title={getShiftLabel(shift)}
                                                                     >
-                                                                        <div className="font-semibold truncate mr-1">{start.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}-{end.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}</div>
+                                                                        <div className="font-semibold truncate mr-1">{start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-{end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                                                                     </div>
                                                                 );
                                                             })}
-                                                            
+
                                                             {/* Absences (Timeline) */}
                                                             {absenceRequests.filter(req => req.employeeId === employee.id && req.status !== 'rejected' && ((req.startDate <= rowEnd.toLocaleDateString('sv-SE') && req.endDate >= rowStart.toLocaleDateString('sv-SE')))).map(req => {
                                                                 const style = getAbsenceStyle(req.type);
-                                                                const absStart = new Date(req.startDate); absStart.setHours(0,0,0,0);
-                                                                const absEnd = new Date(req.endDate); absEnd.setHours(23,59,59,999);
+                                                                const absStart = new Date(req.startDate); absStart.setHours(0, 0, 0, 0);
+                                                                const absEnd = new Date(req.endDate); absEnd.setHours(23, 59, 59, 999);
                                                                 const pos = getPositionStyle(absStart, absEnd);
                                                                 return (
                                                                     <div key={req.id} className="absolute top-0 bottom-0 flex items-center justify-center text-xs font-bold absence-pattern border-l border-r pointer-events-none opacity-60" style={{ ...pos, backgroundColor: style.bg, borderColor: style.border, color: style.text }}>
@@ -724,7 +721,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                         <div className="flex h-full">
                                                             {gridDays.map((day, i) => {
                                                                 const dayStr = day.toLocaleDateString('sv-SE');
-                                                                
+
                                                                 // Find Shift for this day
                                                                 // Note: Simple logic assuming shifts don't span multiple days visually in grid mode or show them on start day
                                                                 const dayShifts = shifts.filter(s => {
@@ -734,9 +731,9 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                                 });
 
                                                                 // Find Absence
-                                                                const absence = absenceRequests.find(req => 
-                                                                    req.employeeId === employee.id && 
-                                                                    req.status !== 'rejected' && 
+                                                                const absence = absenceRequests.find(req =>
+                                                                    req.employeeId === employee.id &&
+                                                                    req.status !== 'rejected' &&
                                                                     dayStr >= req.startDate && dayStr <= req.endDate
                                                                 );
 
@@ -744,8 +741,8 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                                 const isWeekend = day.getDay() === 0 || day.getDay() === 6;
 
                                                                 return (
-                                                                    <div 
-                                                                        key={i} 
+                                                                    <div
+                                                                        key={i}
                                                                         className={`flex-1 border-r border-gray-100 last:border-r-0 relative p-1 flex flex-col gap-1 overflow-hidden
                                                                             ${activeTemplate ? 'hover:bg-green-50 cursor-copy' : 'hover:bg-blue-50/50 cursor-pointer'}
                                                                             ${isToday ? 'bg-blue-50/30' : isWeekend ? 'bg-gray-50/30' : ''}
@@ -761,16 +758,16 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
                                                                         {/* Shifts */}
                                                                         {dayShifts.map(shift => (
-                                                                            <div 
+                                                                            <div
                                                                                 key={shift.id}
                                                                                 className={`relative z-10 text-xs text-white rounded px-1.5 py-0.5 shadow-sm truncate cursor-pointer hover:scale-105 transition-transform ${viewMode === 'month' ? 'h-full flex items-center justify-center' : ''}`}
                                                                                 style={{ backgroundColor: shift.color || '#3b82f6' }}
                                                                                 onClick={(e) => handleShiftClick(e, shift)}
-                                                                                title={`${getShiftLabel(shift)} (${new Date(shift.start).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}-${new Date(shift.end).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})})`}
+                                                                                title={`${getShiftLabel(shift)} (${new Date(shift.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-${new Date(shift.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`}
                                                                             >
                                                                                 {viewMode === 'week' ? (
                                                                                     <>
-                                                                                        <div className="font-bold">{new Date(shift.start).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'})}</div>
+                                                                                        <div className="font-bold">{new Date(shift.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                                                                                         <div className="truncate opacity-90 text-[10px]">{getShiftLabel(shift)}</div>
                                                                                     </>
                                                                                 ) : (
@@ -788,7 +785,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                             </div>
                                         );
                                     })}
-                                    
+
                                     {displayedEmployees.length === 0 && (
                                         <div className="p-8 text-center text-gray-500 italic">Keine Mitarbeiter für die aktuelle Auswahl gefunden.</div>
                                     )}
@@ -833,7 +830,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                         {reportData.map(({ employee, weeks }) => {
                             // Flatten weeks to get all shifts for list view
                             const allShiftsInPeriod = weeks.flatMap(w => w.flatMap(d => d.shifts));
-                            
+
                             if (allShiftsInPeriod.length === 0) return null;
 
                             return (
@@ -857,12 +854,12 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                     const sEnd = new Date(shift.end);
                                                     const customer = customers.find(c => c.id === shift.customerId);
                                                     const activity = activities.find(a => a.id === shift.activityId);
-                                                    
+
                                                     return (
                                                         <tr key={shift.id} className="hover:bg-gray-50">
                                                             <td className="px-4 py-2 font-medium">{sStart.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
                                                             <td className="px-4 py-2">
-                                                                {sStart.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})} - {sEnd.toLocaleTimeString([], {hour:'2-digit', minute:'2-digit'})}
+                                                                {sStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {sEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                                                             </td>
                                                             <td className="px-4 py-2">
                                                                 {customer?.name} {customer && activity && '/'} {activity?.name}
@@ -934,9 +931,9 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                     title="Mitarbeiter filtern"
                 />
             )}
-            
+
             {isTemplateModalOpen && (
-                <ShiftTemplateManagementModal 
+                <ShiftTemplateManagementModal
                     isOpen={isTemplateModalOpen}
                     onClose={() => setIsTemplateModalOpen(false)}
                     templates={shiftTemplates}
@@ -945,7 +942,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                     onDelete={deleteShiftTemplate}
                 />
             )}
-            
+
             {isGeneratorModalOpen && (
                 <ShiftPatternGeneratorModal
                     isOpen={isGeneratorModalOpen}

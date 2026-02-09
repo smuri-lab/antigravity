@@ -12,25 +12,25 @@ import { AbsenceType, TargetHoursModel } from '../types';
 import { ChevronDownIcon } from './icons/ChevronDownIcon';
 
 interface OverviewViewProps {
-  currentUser: Employee;
-  timeEntries: TimeEntry[];
-  customers: Customer[];
-  activities: Activity[];
-  userAccount: UserAccount;
-  absenceRequests: AbsenceRequest[];
-  holidaysByYear: HolidaysByYear;
-  selectedState: string;
-  companySettings: CompanySettings;
-  timeBalanceAdjustments: TimeBalanceAdjustment[];
-  onRetractAbsenceRequest: (id: number) => void;
-  onEnsureHolidaysForYear: (year: number) => void;
+    currentUser: Employee;
+    timeEntries: TimeEntry[];
+    customers: Customer[];
+    activities: Activity[];
+    userAccount: UserAccount;
+    absenceRequests: AbsenceRequest[];
+    holidaysByYear: HolidaysByYear;
+    selectedState: string;
+    companySettings: CompanySettings;
+    timeBalanceAdjustments: TimeBalanceAdjustment[];
+    onRetractAbsenceRequest: (id: number) => void;
+    onEnsureHolidaysForYear: (year: number) => void;
 }
 
 const getStatusChip = (status: AbsenceRequest['status']) => {
     switch (status) {
-      case 'pending': return <span className="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-200 rounded-full">Ausstehend</span>;
-      case 'approved': return <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Genehmigt</span>;
-      case 'rejected': return <span className="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">Abgelehnt</span>;
+        case 'pending': return <span className="px-2 py-1 text-xs font-semibold text-yellow-800 bg-yellow-200 rounded-full">Ausstehend</span>;
+        case 'approved': return <span className="px-2 py-1 text-xs font-semibold text-green-800 bg-green-200 rounded-full">Genehmigt</span>;
+        case 'rejected': return <span className="px-2 py-1 text-xs font-semibold text-red-800 bg-red-200 rounded-full">Abgelehnt</span>;
     }
 };
 const getAbsenceStyle = (type: AbsenceType) => {
@@ -44,25 +44,25 @@ const getAbsenceStyle = (type: AbsenceType) => {
 
 export const OverviewView: React.FC<OverviewViewProps> = (props) => {
     const { currentUser, userAccount, absenceRequests, timeEntries, timeBalanceAdjustments, holidaysByYear, companySettings, onRetractAbsenceRequest, onEnsureHolidaysForYear, customers, activities, selectedState } = props;
-    
+
     const [isExportModalOpen, setIsExportModalOpen] = useState(false);
     const [balanceDate, setBalanceDate] = useState(new Date(2026, 0, 1)); // Start in mock year for consistency
     const [requestToRetract, setRequestToRetract] = useState<AbsenceRequest | null>(null);
     const [isVacationOpen, setIsVacationOpen] = useState(true);
     const [isTimeBalanceOpen, setIsTimeBalanceOpen] = useState(true);
     const [isRequestsOpen, setIsRequestsOpen] = useState(() => absenceRequests.some(req => req.status === 'pending'));
-    
+
     const swipeContainerRef = useRef<HTMLDivElement>(null);
     const touchStartX = useRef<number | null>(null);
     const touchStartY = useRef<number | null>(null);
 
     const timeFormat = companySettings.employeeTimeFormat || 'hoursMinutes';
-    
+
     const changeBalanceMonth = useCallback((offset: number) => {
         setBalanceDate(prev => new Date(prev.getFullYear(), prev.getMonth() + offset, 1));
     }, []);
-    
-     useEffect(() => {
+
+    useEffect(() => {
         const node = swipeContainerRef.current;
         if (!node) return;
 
@@ -83,7 +83,7 @@ export const OverviewView: React.FC<OverviewViewProps> = (props) => {
 
         const handleTouchEnd = (e: TouchEvent) => {
             if (touchStartX.current === null || touchStartY.current === null) return;
-            
+
             const deltaX = e.changedTouches[0].clientX - touchStartX.current;
             const deltaY = e.changedTouches[0].clientY - touchStartY.current;
             const SWIPE_THRESHOLD = 50;
@@ -110,21 +110,21 @@ export const OverviewView: React.FC<OverviewViewProps> = (props) => {
         };
     }, [changeBalanceMonth]);
 
-    
+
     const monthlyVacationDetails = useMemo(() => {
         const year = balanceDate.getFullYear();
         const month = balanceDate.getMonth();
         onEnsureHolidaysForYear(year);
 
         const holidaysForYear = holidaysByYear[year] || [];
-        
+
         // Dynamically calculate entitlement and carryover based on the view's current date state
         const contractForYear = getContractDetailsForDate(currentUser, new Date(year, 6, 1)); // Mid-year for safety
         const annualEntitlement = contractForYear.vacationDays;
 
         const previousYear = year - 1;
         const carryover = currentUser.vacationCarryover?.[previousYear] || 0;
-        
+
         const totalAvailable = annualEntitlement + carryover;
 
         let vacationTakenBeforeThisMonth = 0;
@@ -158,7 +158,7 @@ export const OverviewView: React.FC<OverviewViewProps> = (props) => {
         const month = balanceDate.getMonth();
         onEnsureHolidaysForYear(year);
         if (month === 0) onEnsureHolidaysForYear(year - 1);
-        
+
         return calculateMonthlyBreakdown(
             currentUser,
             year,
@@ -171,26 +171,26 @@ export const OverviewView: React.FC<OverviewViewProps> = (props) => {
     }, [balanceDate, currentUser, timeEntries, absenceRequests, timeBalanceAdjustments, holidaysByYear, onEnsureHolidaysForYear]);
 
     const handleConfirmExport = (selectedEmployees: Employee[], year: number, selectedMonths: number[], format: 'excel' | 'pdf') => {
-      selectedMonths.forEach(month => {
-          const exportParams = {
-              employee: currentUser, year, month,
-              allTimeEntries: timeEntries,
-              allAbsenceRequests: absenceRequests,
-              customers, activities,
-              selectedState,
-              companySettings,
-              holidays: holidaysByYear[year] || [],
-              timeFormat,
-          };
-          if (format === 'pdf') {
-            exportTimesheetAsPdf(exportParams);
-          } else {
-            exportTimesheet(exportParams);
-          }
-      });
-      setIsExportModalOpen(false);
+        selectedMonths.forEach(month => {
+            const exportParams = {
+                employee: currentUser, year, month,
+                allTimeEntries: timeEntries,
+                allAbsenceRequests: absenceRequests,
+                customers, activities,
+                selectedState,
+                companySettings,
+                holidays: holidaysByYear[year] || [],
+                timeFormat,
+            };
+            if (format === 'pdf') {
+                exportTimesheetAsPdf(exportParams);
+            } else {
+                exportTimesheet(exportParams);
+            }
+        });
+        setIsExportModalOpen(false);
     };
-    
+
     const groupedRequests = useMemo(() => {
         const groups: { [year: string]: AbsenceRequest[] } = {};
         const sorted = [...absenceRequests].sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime());
@@ -205,10 +205,10 @@ export const OverviewView: React.FC<OverviewViewProps> = (props) => {
 
     return (
         <div ref={swipeContainerRef} className="space-y-6 max-w-2xl mx-auto">
-             <div className="flex justify-between items-center bg-white p-2 sm:p-4 rounded-lg shadow-lg">
-                <button onClick={() => changeBalanceMonth(-1)} className="p-2 rounded-full hover:bg-gray-100"><ChevronLeftIcon className="h-5 w-5"/></button>
+            <div className="flex justify-between items-center bg-white p-2 sm:p-4 rounded-lg shadow-lg">
+                <button onClick={() => changeBalanceMonth(-1)} className="p-2 rounded-full hover:bg-gray-100"><ChevronLeftIcon className="h-5 w-5" /></button>
                 <h2 className="text-xl font-bold text-center">Übersicht {balanceDate.toLocaleString('de-DE', { month: 'long', year: 'numeric' })}</h2>
-                <button onClick={() => changeBalanceMonth(1)} className="p-2 rounded-full hover:bg-gray-100"><ChevronRightIcon className="h-5 w-5"/></button>
+                <button onClick={() => changeBalanceMonth(1)} className="p-2 rounded-full hover:bg-gray-100"><ChevronRightIcon className="h-5 w-5" /></button>
             </div>
 
             <Card>
@@ -229,7 +229,7 @@ export const OverviewView: React.FC<OverviewViewProps> = (props) => {
                         )}
                         <div className="flex justify-between border-t pt-2 mt-2"><span className="font-semibold">Gesamtstunden (Plus)</span><span className="font-semibold">{formatHoursAndMinutes(monthlyBalanceDetails.totalCredited, timeFormat)}</span></div>
                         <div className="flex justify-between"><span className="text-gray-600">Soll-Stunden</span><span>{formatHoursAndMinutes(monthlyBalanceDetails.targetHours, timeFormat)}</span></div>
-                        
+
                         {/* --- Balance Summary --- */}
                         <div className="flex justify-between border-t pt-2 mt-2">
                             <span className="font-bold">Monatssaldo</span>
@@ -274,36 +274,36 @@ export const OverviewView: React.FC<OverviewViewProps> = (props) => {
                 </div>
                 <div id="requests-details" className={`transition-all duration-300 ease-in-out overflow-hidden ${isRequestsOpen ? 'max-h-[1000px] mt-4' : 'max-h-0 mt-0'}`}>
                     <div className="space-y-6">
-                      {sortedYears.length > 0 ? sortedYears.map(year => (
-                        <div key={year} className="space-y-4 pt-4 border-t first:border-t-0 first:pt-0">
-                          <h3 className="text-lg font-bold text-gray-800">{year}</h3>
-                          <div className="space-y-3">
-                            {groupedRequests[year].map(req => {
-                              const dayPortionText = req.dayPortion === 'am' ? ' (Vormittags)' : req.dayPortion === 'pm' ? ' (Nachmittags)' : '';
-                              const dateText = req.startDate === req.endDate
-                                  ? `${new Date(req.startDate).toLocaleDateString('de-DE')}${dayPortionText}`
-                                  : `${new Date(req.startDate).toLocaleDateString('de-DE')} - ${new Date(req.endDate).toLocaleDateString('de-DE')}`;
-                              return (
-                                <div key={req.id} className="p-3 bg-gray-50 rounded-lg border">
-                                  <div className="flex justify-between items-start gap-2">
-                                    <div>
-                                      <p className="font-semibold">{getAbsenceStyle(req.type).label}</p>
-                                      <p className="text-sm text-gray-600">{dateText}</p>
-                                    </div>
-                                    <div className="flex items-center gap-3 flex-shrink-0">
-                                      {getStatusChip(req.status)}
-                                      {req.status==='pending' && (<Button onClick={()=>setRequestToRetract(req)} className="text-xs bg-gray-500 hover:bg-gray-600 px-2 py-1">Zurückziehen</Button>)}
-                                    </div>
-                                  </div>
-                                  {req.adminComment && req.status!=='pending' && (<p className="mt-2 pt-2 border-t text-sm italic"><span className="font-medium not-italic text-gray-700">Kommentar:</span> "{req.adminComment}"</p>)}
+                        {sortedYears.length > 0 ? sortedYears.map(year => (
+                            <div key={year} className="space-y-4 pt-4 border-t first:border-t-0 first:pt-0">
+                                <h3 className="text-lg font-bold text-gray-800">{year}</h3>
+                                <div className="space-y-3">
+                                    {groupedRequests[year].map(req => {
+                                        const dayPortionText = req.dayPortion === 'am' ? ' (Vormittags)' : req.dayPortion === 'pm' ? ' (Nachmittags)' : '';
+                                        const dateText = req.startDate === req.endDate
+                                            ? `${new Date(req.startDate).toLocaleDateString('de-DE')}${dayPortionText}`
+                                            : `${new Date(req.startDate).toLocaleDateString('de-DE')} - ${new Date(req.endDate).toLocaleDateString('de-DE')}`;
+                                        return (
+                                            <div key={req.id} className="p-3 bg-gray-50 rounded-lg border">
+                                                <div className="flex justify-between items-start gap-2">
+                                                    <div>
+                                                        <p className="font-semibold">{getAbsenceStyle(req.type).label}</p>
+                                                        <p className="text-sm text-gray-600">{dateText}</p>
+                                                    </div>
+                                                    <div className="flex items-center gap-3 flex-shrink-0">
+                                                        {getStatusChip(req.status)}
+                                                        {req.status === 'pending' && (<Button onClick={() => setRequestToRetract(req)} className="text-xs bg-gray-500 hover:bg-gray-600 px-2 py-1">Zurückziehen</Button>)}
+                                                    </div>
+                                                </div>
+                                                {req.adminComment && req.status !== 'pending' && (<p className="mt-2 pt-2 border-t text-sm italic"><span className="font-medium not-italic text-gray-700">Kommentar:</span> "{req.adminComment}"</p>)}
+                                            </div>
+                                        );
+                                    })}
                                 </div>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      )) : (
-                        <p className="text-center text-gray-500 py-4">Keine Anträge vorhanden.</p>
-                      )}
+                            </div>
+                        )) : (
+                            <p className="text-center text-gray-500 py-4">Keine Anträge vorhanden.</p>
+                        )}
                     </div>
                 </div>
             </Card>
@@ -319,7 +319,7 @@ export const OverviewView: React.FC<OverviewViewProps> = (props) => {
             </Card>
 
             <TimesheetExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} onConfirm={handleConfirmExport} employees={[currentUser]} fixedEmployee={currentUser} />
-            <ConfirmModal isOpen={!!requestToRetract} onClose={() => setRequestToRetract(null)} onConfirm={() => { if(requestToRetract) { onRetractAbsenceRequest(requestToRetract.id); setRequestToRetract(null); }}} title="Antrag zurückziehen" message="Möchten Sie diesen Antrag wirklich zurückziehen?" confirmText="Ja, zurückziehen" />
+            <ConfirmModal isOpen={!!requestToRetract} onClose={() => setRequestToRetract(null)} onConfirm={() => { if (requestToRetract) { onRetractAbsenceRequest(requestToRetract.id); setRequestToRetract(null); } }} title="Antrag zurückziehen" message="Möchten Sie diesen Antrag wirklich zurückziehen?" confirmText="Ja, zurückziehen" />
         </div>
     );
 };

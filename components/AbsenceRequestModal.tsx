@@ -14,7 +14,7 @@ import { VacationSunIcon } from './icons/VacationSunIcon';
 import { SickFaceIcon } from './icons/SickFaceIcon';
 import { ClockIcon } from './icons/ClockIcon';
 import { InformationCircleIcon } from './icons/InformationCircleIcon';
-import { getContractDetailsForDate, formatHoursAndMinutes } from './utils';
+import { getContractDetailsForDate, formatHoursAndMinutes } from './utils/index';
 
 
 interface AbsenceRequestModalProps {
@@ -220,8 +220,8 @@ export const AbsenceRequestModal: React.FC<AbsenceRequestModalProps> = ({ curren
                 type="button"
                 onClick={() => setType(AbsenceType.Vacation)}
                 className={`flex flex-col items-center justify-center p-3 border rounded-xl transition-all duration-200 ${type === AbsenceType.Vacation
-                    ? 'bg-yellow-50 border-yellow-500 ring-1 ring-yellow-500 shadow-sm'
-                    : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                  ? 'bg-yellow-50 border-yellow-500 ring-1 ring-yellow-500 shadow-sm'
+                  : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
                   }`}
               >
                 <VacationSunIcon className="h-6 w-6 mb-2" />
@@ -232,8 +232,8 @@ export const AbsenceRequestModal: React.FC<AbsenceRequestModalProps> = ({ curren
                 type="button"
                 onClick={() => setType(AbsenceType.SickLeave)}
                 className={`flex flex-col items-center justify-center p-3 border rounded-xl transition-all duration-200 ${type === AbsenceType.SickLeave
-                    ? 'bg-orange-50 border-orange-500 ring-1 ring-orange-500 shadow-sm'
-                    : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                  ? 'bg-orange-50 border-orange-500 ring-1 ring-orange-500 shadow-sm'
+                  : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
                   }`}
               >
                 <SickFaceIcon className={`h-6 w-6 mb-2 ${type === AbsenceType.SickLeave ? 'text-orange-600' : 'text-orange-500'}`} />
@@ -244,8 +244,8 @@ export const AbsenceRequestModal: React.FC<AbsenceRequestModalProps> = ({ curren
                 type="button"
                 onClick={() => setType(AbsenceType.TimeOff)}
                 className={`flex flex-col items-center justify-center p-3 border rounded-xl transition-all duration-200 ${type === AbsenceType.TimeOff
-                    ? 'bg-green-50 border-green-500 ring-1 ring-green-500 shadow-sm'
-                    : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
+                  ? 'bg-green-50 border-green-500 ring-1 ring-green-500 shadow-sm'
+                  : 'bg-white border-gray-200 hover:bg-gray-50 hover:border-gray-300'
                   }`}
               >
                 <ClockIcon className={`h-6 w-6 mb-2 ${type === AbsenceType.TimeOff ? 'text-green-600' : 'text-green-500'}`} />
@@ -275,8 +275,8 @@ export const AbsenceRequestModal: React.FC<AbsenceRequestModalProps> = ({ curren
                     { value: 'pm', label: 'Nachmittag' },
                   ].map(option => (
                     <label key={option.value} className={`flex items-center justify-center p-3 border rounded-md cursor-pointer transition-colors text-center text-sm ${dayPortion === option.value
-                        ? 'bg-blue-50 border-blue-400 ring-1 ring-blue-400 font-semibold'
-                        : 'hover:bg-gray-50'
+                      ? 'bg-blue-50 border-blue-400 ring-1 ring-blue-400 font-semibold'
+                      : 'hover:bg-gray-50'
                       }`}>
                       <input
                         type="radio"

@@ -13,12 +13,12 @@ import { ChevronRightIcon } from '../icons/ChevronRightIcon';
 import { FlexibleTimeInput } from '../ui/FlexibleTimeInput';
 
 interface UtilizationViewProps {
-  employees: Employee[];
-  timeEntries: TimeEntry[];
-  absenceRequests: AbsenceRequest[];
-  holidaysByYear: HolidaysByYear;
-  onEnsureHolidaysForYear: (year: number) => void;
-  companySettings: CompanySettings;
+    employees: Employee[];
+    timeEntries: TimeEntry[];
+    absenceRequests: AbsenceRequest[];
+    holidaysByYear: HolidaysByYear;
+    onEnsureHolidaysForYear: (year: number) => void;
+    companySettings: CompanySettings;
 }
 
 const months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
@@ -51,12 +51,12 @@ const calculateMonthlyActualHours = (
     let absenceAndHolidayHours = 0;
     const holidayDates = new Set(holidaysForYear.map(h => h.date));
     const approvedAbsences = absenceRequests.filter(r => r.employeeId === employee.id && r.status === 'approved');
-    
+
     for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
         const contract = getContractDetailsForDate(employee, d);
         const dayOfWeek = d.getDay();
         const dateString = d.toLocaleDateString('sv-SE');
-        
+
         let dailyScheduledHours = 0;
         if (contract.targetHoursModel === TargetHoursModel.Weekly && contract.weeklySchedule) {
             const dayKeys: (keyof WeeklySchedule)[] = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
@@ -69,9 +69,9 @@ const calculateMonthlyActualHours = (
             const isHoliday = holidayDates.has(dateString);
             const absenceOnThisDay = approvedAbsences.find(r => dateString >= r.startDate && dateString <= r.endDate);
             const isCreditedAbsence = absenceOnThisDay && (absenceOnThisDay.type === AbsenceType.Vacation || absenceOnThisDay.type === AbsenceType.SickLeave);
-            
+
             if (isHoliday || isCreditedAbsence) {
-                 if (isCreditedAbsence && absenceOnThisDay.dayPortion && absenceOnThisDay.dayPortion !== 'full') {
+                if (isCreditedAbsence && absenceOnThisDay.dayPortion && absenceOnThisDay.dayPortion !== 'full') {
                     absenceAndHolidayHours += dailyScheduledHours / 2;
                 } else {
                     absenceAndHolidayHours += dailyScheduledHours;
@@ -79,7 +79,7 @@ const calculateMonthlyActualHours = (
             }
         }
     }
-    
+
     return workedHours + absenceAndHolidayHours;
 };
 
@@ -105,12 +105,12 @@ export const UtilizationView: React.FC<UtilizationViewProps> = ({ employees, tim
     useEffect(() => {
         onEnsureHolidaysForYear(selectedYear);
     }, [selectedYear, onEnsureHolidaysForYear]);
-    
+
     useEffect(() => {
         const handleClickOutside = (event: MouseEvent) => {
-          if (monthPickerRef.current && !monthPickerRef.current.contains(event.target as Node)) {
-            setIsMonthPickerOpen(false);
-          }
+            if (monthPickerRef.current && !monthPickerRef.current.contains(event.target as Node)) {
+                setIsMonthPickerOpen(false);
+            }
         };
         document.addEventListener('mousedown', handleClickOutside);
         return () => document.removeEventListener('mousedown', handleClickOutside);
@@ -145,7 +145,7 @@ export const UtilizationView: React.FC<UtilizationViewProps> = ({ employees, tim
             })
             .sort((a, b) => a.employeeName.localeCompare(b.employeeName));
     }, [visibleEmployeeIds, selectedYear, selectedMonth, employees, timeEntries, absenceRequests, holidaysByYear]);
-    
+
     const changeMonth = (offset: number) => {
         const newDate = new Date(selectedYear, selectedMonth, 1);
         newDate.setMonth(newDate.getMonth() + offset);
@@ -219,7 +219,7 @@ export const UtilizationView: React.FC<UtilizationViewProps> = ({ employees, tim
                 <div className="flex flex-col md:flex-row gap-4 items-end justify-center pt-4 border-t">
                     <div className="w-full md:w-auto">
                         <Button onClick={() => setIsEmployeeModalOpen(true)} className="w-full bg-gray-600 hover:bg-gray-700 h-10 flex items-center justify-center gap-2">
-                            <UsersIcon className="h-5 w-5"/> Mitarbeiter filtern
+                            <UsersIcon className="h-5 w-5" /> Mitarbeiter filtern
                         </Button>
                     </div>
                     <div className="w-full md:w-56">
@@ -261,7 +261,7 @@ export const UtilizationView: React.FC<UtilizationViewProps> = ({ employees, tim
                             </div>
                         ))}
                     </div>
-                    
+
                     <div className="relative flex-1">
                         {/* Grid Lines */}
                         <div className="absolute top-0 bottom-0 left-0 w-full">
@@ -275,22 +275,22 @@ export const UtilizationView: React.FC<UtilizationViewProps> = ({ employees, tim
                                 <span className="absolute -top-7 -translate-x-1/2 bg-red-100 text-red-700 text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">{formatHoursAndMinutes(targetHours, timeFormat)} Soll</span>
                             </div>
                         )}
-                        
+
                         {/* Data Bars */}
                         <div className="space-y-4 pt-8">
-                             {reportData.length > 0 ? reportData.map(data => (
+                            {reportData.length > 0 ? reportData.map(data => (
                                 <div key={data.employeeId} className="h-8 bg-gray-200 rounded relative group">
-                                    <div 
-                                        className="bg-blue-600 h-full rounded absolute left-0 top-0 transition-all duration-300 flex items-center pl-3 overflow-hidden" 
+                                    <div
+                                        className="bg-blue-600 h-full rounded absolute left-0 top-0 transition-all duration-300 flex items-center pl-3 overflow-hidden"
                                         style={{ width: `min(${(data.totalHours / chartMaxHours) * 100}%, 100%)` }}
                                     >
                                         <span className="text-white font-bold text-sm tracking-tighter whitespace-nowrap">
                                             {formatHoursAndMinutes(data.totalHours, timeFormat)}
                                         </span>
                                     </div>
-                                    
+
                                     {data.monthlyTargetHours > 0 && data.monthlyTargetHours <= chartMaxHours && (
-                                        <div 
+                                        <div
                                             className="absolute top-[-4px] bottom-[-4px] border-l-2 border-gray-500 z-10 group/marker"
                                             style={{ left: `${(data.monthlyTargetHours / chartMaxHours) * 100}%` }}
                                         >

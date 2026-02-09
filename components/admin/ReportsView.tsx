@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import type { TimeEntry, Customer, Activity, CompanySettings, Employee } from '../../types';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { formatHoursAndMinutes } from '../utils';
+import { getContractDetailsForDate } from '../utils';
 import { SelectorButton } from '../ui/SelectorButton';
 import { CalendarModal } from '../ui/CalendarModal';
 import { DateSelectorButton } from '../ui/DateSelectorButton';
@@ -14,28 +14,28 @@ import { Select } from '../ui/Select';
 import { Input } from '../ui/Input';
 
 interface ReportsViewProps {
-  timeEntries: TimeEntry[];
-  customers: Customer[];
-  activities: Activity[];
-  companySettings: CompanySettings;
-  employees: Employee[];
+    timeEntries: TimeEntry[];
+    customers: Customer[];
+    activities: Activity[];
+    companySettings: CompanySettings;
+    employees: Employee[];
 }
 
 interface ReportEntry {
-  employeeName: string;
-  dayOfWeek: string;
-  date: string;
-  customerName: string;
-  activityName: string;
-  startTime: string;
-  endTime: string;
-  breakMinutes: number;
-  totalSeconds: number;
-  comment?: string;
-  sortDate: Date;
-  employeeId: number;
-  customerId: string;
-  activityId: string;
+    employeeName: string;
+    dayOfWeek: string;
+    date: string;
+    customerName: string;
+    activityName: string;
+    startTime: string;
+    endTime: string;
+    breakMinutes: number;
+    totalSeconds: number;
+    comment?: string;
+    sortDate: Date;
+    employeeId: number;
+    customerId: string;
+    activityId: string;
 }
 
 const getStartOfMonth = () => new Date(new Date().getFullYear(), new Date().getMonth(), 1).toLocaleDateString('sv-SE');
@@ -48,7 +48,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
     const [endDate, setEndDate] = useState(getEndOfMonth());
     const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<number[]>(() => employees.filter(e => e.isActive).map(e => e.id));
     const [primaryCategory, setPrimaryCategory] = useState<'customer' | 'activity'>('customer');
-    
+
     // Modal States
     const [isDatePickerOpen, setIsDatePickerOpen] = useState(false);
     const [isEmployeeModalOpen, setIsEmployeeModalOpen] = useState(false);
@@ -64,11 +64,11 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
     const customerLabel = companySettings.customerLabel || 'Zeitkategorie 1';
     const activityLabel = companySettings.activityLabel || 'Zeitkategorie 2';
     const timeFormat = companySettings.adminTimeFormat || 'hoursMinutes';
-    
+
     const mode = companySettings.timeCategoryMode || 'both';
     const showCustomer = mode !== 'activity';
     const showActivity = mode !== 'customer';
-    
+
     const activeEmployees = useMemo(() => employees.filter(e => e.isActive), [employees]);
     const getEmployeeName = (id: number) => { const e = employees.find(emp => emp.id === id); return e ? `${e.firstName} ${e.lastName}` : 'Unbekannt'; };
 
@@ -82,7 +82,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
         if (reportEntries) {
             const uniqueEmployeeIdsInReport = [...new Set(reportEntries.map(e => e.employeeId))];
             setViewEmployeeIds(uniqueEmployeeIdsInReport);
-            
+
             if (primaryCategory === 'customer') {
                 const uniqueActivityIds = [...new Set(reportEntries.map(e => e.activityId))];
                 setSelectedSecondaryCategoryIds(uniqueActivityIds);
@@ -137,7 +137,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
         setReportEntries(mappedEntries);
         setCommentSearchTerm('');
     };
-    
+
     const handleExport = () => {
         if (!reportEntries) return;
 
@@ -150,7 +150,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
         );
 
         const dataToExport = filteredForExport.map(entry => {
-            const row: {[key: string]: any} = {};
+            const row: { [key: string]: any } = {};
             row['Mitarbeiter'] = entry.employeeName;
             row['Tag'] = entry.dayOfWeek;
             row['Datum'] = entry.date;
@@ -178,18 +178,18 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
                 'Mitarbeiter': '', 'Tag': '', 'Datum': '', 'Startzeit': '', 'Endzeit': '',
                 'Pause (min)': 'Gesamt:', 'Gesamtzeit': formattedTotal, 'Kommentar': ''
             };
-            if (showActivity) { summaryRow[activityLabel] = ''; } 
+            if (showActivity) { summaryRow[activityLabel] = ''; }
             if (showCustomer) { summaryRow[customerLabel] = ''; }
             dataToExport.push(summaryRow);
         }
-        
+
         const ws = XLSX.utils.json_to_sheet(dataToExport);
-        ws['!cols'] = [ { wch: 25 }, { wch: 10 }, { wch: 12 }, { wch: 30 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 40 } ];
+        ws['!cols'] = [{ wch: 25 }, { wch: 10 }, { wch: 12 }, { wch: 30 }, { wch: 10 }, { wch: 10 }, { wch: 10 }, { wch: 15 }, { wch: 40 }];
         ws['!freeze'] = { ySplit: 1 };
 
         const wb = XLSX.utils.book_new();
         XLSX.utils.book_append_sheet(wb, ws, 'Zeitauswertung');
-    
+
         XLSX.writeFile(wb, `Zeitauswertung_${startDate}_bis_${endDate}.xlsx`);
     };
 
@@ -220,11 +220,11 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
                 return customers.filter(cust => uniqueIds.includes(cust.id));
             }
         }, [reportEntries, primaryCategory, activities, customers]);
-    
+
         const getViewEmployeesText = () => {
             const totalInReport = employeesInReport.length;
             const selectedCount = viewEmployeeIds.length;
-        
+
             if (totalInReport > 0 && selectedCount === totalInReport) return 'Alle angezeigten Mitarbeiter';
             if (selectedCount === 0) return 'Kein Mitarbeiter';
             if (selectedCount === 1) {
@@ -233,12 +233,12 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
             }
             return `${selectedCount} von ${totalInReport} Mitarbeitern`;
         };
-        
+
         const getSecondaryCategoryFilterText = () => {
             const totalInReport = secondaryCategoriesInReport.length;
             const selectedCount = selectedSecondaryCategoryIds.length;
             const label = primaryCategory === 'customer' ? activityLabel : customerLabel;
-        
+
             if (totalInReport > 0 && selectedCount === totalInReport) return `Alle ${label}`;
             if (selectedCount === 0) return `Keine ${label}`;
             if (selectedCount === 1) {
@@ -249,10 +249,10 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
         };
 
         if (!reportEntries) return null;
-        
+
         const viewEmployeeIdsSet = new Set(viewEmployeeIds);
         const secondaryCategoryIdsSet = new Set(selectedSecondaryCategoryIds);
-        const filteredEntries = reportEntries.filter(entry => 
+        const filteredEntries = reportEntries.filter(entry =>
             viewEmployeeIdsSet.has(entry.employeeId) &&
             (entry.comment || '').toLowerCase().includes(commentSearchTerm.toLowerCase()) &&
             secondaryCategoryIdsSet.has(primaryCategory === 'customer' ? entry.activityId : entry.customerId)
@@ -306,14 +306,14 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
                             />
                         </div>
                     </div>
-                     {filteredEntries.length > 0 ? (
+                    {filteredEntries.length > 0 ? (
                         <div className="overflow-x-auto">
                             <table className="min-w-full text-sm">
                                 <thead className="text-left bg-gray-50 border-b">
                                     <tr>
                                         <th className="py-2 px-3 font-semibold text-gray-600">Mitarbeiter</th>
                                         <th className="py-2 px-3 font-semibold text-gray-600">Tag, Datum</th>
-                                        
+
                                         {/* Dynamic Headers based on Mode & Grouping */}
                                         {mode === 'both' ? (
                                             primaryCategory === 'customer' ? (
@@ -344,7 +344,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
                                         <tr key={index} className="hover:bg-gray-50">
                                             <td className="py-2 px-3 whitespace-nowrap align-top font-medium">{entry.employeeName}</td>
                                             <td className="py-2 px-3 whitespace-nowrap align-top"><div>{entry.dayOfWeek},</div><div>{entry.date}</div></td>
-                                            
+
                                             {/* Dynamic Cells */}
                                             {mode === 'both' ? (
                                                 primaryCategory === 'customer' ? (
@@ -386,7 +386,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
                         selectedEmployeeIds={viewEmployeeIds}
                     />
                 )}
-                 {isSecondaryCategoryModalOpen && mode === 'both' && (
+                {isSecondaryCategoryModalOpen && mode === 'both' && (
                     <EmployeeMultiSelectModal
                         isOpen={isSecondaryCategoryModalOpen}
                         onClose={() => setIsSecondaryCategoryModalOpen(false)}
@@ -405,8 +405,8 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
             <Card>
                 <h2 className="text-xl font-bold mb-4">Zeitauswertung</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 items-end">
-                    <div className="lg:col-span-1"><DateSelectorButton label="Zeitraum" value={`${formatDate(startDate)} - ${formatDate(endDate)}`} onClick={() => setIsDatePickerOpen(true)} placeholder="Zeitraum..."/></div>
-                    <div className="lg:col-span-1"><SelectorButton label="Mitarbeiter laden" value={getSelectedEmployeesText()} onClick={() => setIsEmployeeModalOpen(true)} placeholder="Auswählen..."/></div>
+                    <div className="lg:col-span-1"><DateSelectorButton label="Zeitraum" value={`${formatDate(startDate)} - ${formatDate(endDate)}`} onClick={() => setIsDatePickerOpen(true)} placeholder="Zeitraum..." /></div>
+                    <div className="lg:col-span-1"><SelectorButton label="Mitarbeiter laden" value={getSelectedEmployeesText()} onClick={() => setIsEmployeeModalOpen(true)} placeholder="Auswählen..." /></div>
                     <div className="lg:col-span-1">
                         {mode === 'both' && (
                             <Select
