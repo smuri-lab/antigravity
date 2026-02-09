@@ -29,18 +29,18 @@ interface AbsenceFormModalProps {
 }
 
 const formatDate = (dateString: string | undefined) => {
-    if (!dateString) return '';
-    return new Date(dateString).toLocaleDateString('de-DE', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
+  if (!dateString) return '';
+  return new Date(dateString).toLocaleDateString('de-DE', {
+    day: '2-digit',
+    month: '2-digit',
+    year: 'numeric'
+  });
 };
 
 const absenceTypeOptions = [
-    { id: AbsenceType.Vacation, name: 'Urlaub' },
-    { id: AbsenceType.SickLeave, name: 'Krankmeldung' },
-    { id: AbsenceType.TimeOff, name: 'Freizeitausgleich' },
+  { id: AbsenceType.Vacation, name: 'Urlaub' },
+  { id: AbsenceType.SickLeave, name: 'Krankmeldung' },
+  { id: AbsenceType.TimeOff, name: 'Freizeitausgleich' },
 ];
 
 export const AbsenceFormModal: React.FC<AbsenceFormModalProps> = ({ isOpen, onClose, onSave, onDelete, employees, initialData, allAbsenceRequests, allTimeEntries, companySettings, isRotated = false }) => {
@@ -51,14 +51,18 @@ export const AbsenceFormModal: React.FC<AbsenceFormModalProps> = ({ isOpen, onCl
   const [isTypeSelectOpen, setIsTypeSelectOpen] = useState(false);
   const [infoModal, setInfoModal] = useState({ isOpen: false, title: '', message: '' });
   const [isClosing, setIsClosing] = useState(false);
-  
+  const [isVisible, setIsVisible] = useState(false);
+
   const isEditing = !!(initialData && initialData.id);
 
   useEffect(() => {
     if (isOpen) {
       setFormData({ type: AbsenceType.Vacation, dayPortion: 'full', ...initialData });
+      setIsClosing(false);
+      const timer = setTimeout(() => setIsVisible(true), 10);
+      return () => clearTimeout(timer);
     } else {
-      // Reset closing state when modal is hidden/closed
+      setIsVisible(false);
       setIsClosing(false);
     }
   }, [initialData, isOpen]);
@@ -96,72 +100,72 @@ export const AbsenceFormModal: React.FC<AbsenceFormModalProps> = ({ isOpen, onCl
     const newEnd = new Date(formData.endDate);
 
     if (newStart > newEnd) {
-        setInfoModal({ isOpen: true, title: 'Ungültiger Zeitraum', message: 'Das Startdatum muss vor oder am Enddatum liegen.' });
-        return;
+      setInfoModal({ isOpen: true, title: 'Ungültiger Zeitraum', message: 'Das Startdatum muss vor oder am Enddatum liegen.' });
+      return;
     }
 
-    const existingAbsencesForEmployee = allAbsenceRequests.filter(req => 
-        req.employeeId === formData.employeeId && 
-        req.id !== formData.id 
+    const existingAbsencesForEmployee = allAbsenceRequests.filter(req =>
+      req.employeeId === formData.employeeId &&
+      req.id !== formData.id
     );
 
     const overlap = existingAbsencesForEmployee.find(req => {
-        const existingStart = new Date(req.startDate);
-        const existingEnd = new Date(req.endDate);
-        return newStart <= existingEnd && newEnd >= existingStart;
+      const existingStart = new Date(req.startDate);
+      const existingEnd = new Date(req.endDate);
+      return newStart <= existingEnd && newEnd >= existingStart;
     });
 
     if (overlap) {
-        setInfoModal({ isOpen: true, title: 'Überlappender Antrag', message: 'Der ausgewählte Zeitraum überschneidet sich mit einer bestehenden Abwesenheit für diesen Mitarbeiter.' });
-        return;
+      setInfoModal({ isOpen: true, title: 'Überlappender Antrag', message: 'Der ausgewählte Zeitraum überschneidet sich mit einer bestehenden Abwesenheit für diesen Mitarbeiter.' });
+      return;
     }
-    
+
     const timeEntryConflict = allTimeEntries.find(entry => {
-        if (entry.employeeId !== formData.employeeId) return false;
-        const entryDate = new Date(entry.start).toLocaleDateString('sv-SE');
-        return entryDate >= formData.startDate! && entryDate <= formData.endDate!;
+      if (entry.employeeId !== formData.employeeId) return false;
+      const entryDate = new Date(entry.start).toLocaleDateString('sv-SE');
+      return entryDate >= formData.startDate! && entryDate <= formData.endDate!;
     });
 
     if (timeEntryConflict) {
-        setInfoModal({ isOpen: true, title: 'Konflikt bei Abwesenheit', message: 'Für den ausgewählten Zeitraum existieren bereits Zeiteinträge. Bitte löschen Sie diese zuerst.' });
-        return;
+      setInfoModal({ isOpen: true, title: 'Konflikt bei Abwesenheit', message: 'Für den ausgewählten Zeitraum existieren bereits Zeiteinträge. Bitte löschen Sie diese zuerst.' });
+      return;
     }
-    
+
     setIsClosing(true);
     setTimeout(() => {
-        onSave(formData);
+      onSave(formData);
     }, 300);
   };
-  
+
   const handleDelete = () => {
-      if (isEditing && onDelete) {
-          setShowDeleteConfirm(true);
-      }
+    if (isEditing && onDelete) {
+      setShowDeleteConfirm(true);
+    }
   };
 
   const handleConfirmDelete = () => {
-      if (isEditing && onDelete) {
-          setIsClosing(true);
-          setTimeout(() => {
-             onDelete(initialData!.id!);
-          }, 300);
-          setShowDeleteConfirm(false);
-      }
+    if (isEditing && onDelete) {
+      setIsClosing(true);
+      setTimeout(() => {
+        onDelete(initialData!.id!);
+      }, 300);
+      setShowDeleteConfirm(false);
+    }
   };
 
   const getEmployeeName = (id: number) => {
-      const emp = employees.find(e => e.id === id);
-      return emp ? `${emp.firstName} ${emp.lastName}` : '';
+    const emp = employees.find(e => e.id === id);
+    return emp ? `${emp.firstName} ${emp.lastName}` : '';
   };
 
   if (!isOpen) return null;
 
   const containerClass = isRotated
-    ? `fixed top-0 left-0 w-[100vh] h-[100vw] origin-top-left rotate-90 translate-x-[100vw] flex items-center justify-center z-[250] p-1 sm:p-4 ${isClosing ? 'animate-modal-fade-out' : 'animate-modal-fade-in'}`
-    : `fixed inset-0 bg-black flex items-center justify-center z-[250] p-4 ${isClosing ? 'animate-modal-fade-out' : 'animate-modal-fade-in'}`;
+    ? `fixed top-0 left-0 w-[100vh] h-[100vw] origin-top-left rotate-90 translate-x-[100vw] flex items-center justify-center z-[250] p-1 sm:p-4 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`
+    : `fixed inset-0 flex items-center justify-center z-[250] p-4 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`;
 
   // More compact card in rotated mode
-  const cardClasses = `w-full max-w-lg relative flex flex-col ${isRotated ? 'max-h-[98vh] !p-3' : 'max-h-[90vh]'} ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`;
+  const cardClasses = `w-full max-w-lg relative flex flex-col ${isRotated ? 'max-h-[98vh] !p-3' : 'max-h-[90vh]'} ${isClosing ? 'animate-modal-slide-down' : (isVisible ? 'animate-modal-slide-up' : 'opacity-0 translate-y-4')}`;
 
   return ReactDOM.createPortal(
     <>
@@ -173,9 +177,9 @@ export const AbsenceFormModal: React.FC<AbsenceFormModalProps> = ({ isOpen, onCl
 
           <form onSubmit={handleSubmit} className="flex flex-col flex-grow min-h-0">
             <h2 className={`text-xl font-bold ${isRotated ? 'mb-2' : 'mb-4'} flex-shrink-0`}>
-                {isEditing ? 'Abwesenheit bearbeiten' : 'Abwesenheit eintragen'}
+              {isEditing ? 'Abwesenheit bearbeiten' : 'Abwesenheit eintragen'}
             </h2>
-            
+
             <div className={`space-y-4 ${isRotated ? 'pt-2' : 'pt-4'} border-t flex-grow overflow-y-auto px-1`}>
               <SelectorButton
                 label="Mitarbeiter"
@@ -201,17 +205,16 @@ export const AbsenceFormModal: React.FC<AbsenceFormModalProps> = ({ isOpen, onCl
                       { value: 'am', label: 'Vormittag' },
                       { value: 'pm', label: 'Nachmittag' },
                     ].map(option => (
-                      <label key={option.value} className={`flex items-center justify-center p-3 border rounded-md cursor-pointer transition-colors text-center text-sm ${
-                        (formData.dayPortion || 'full') === option.value
-                          ? 'bg-blue-50 border-blue-400 ring-1 ring-blue-400 font-semibold'
-                          : 'hover:bg-gray-50'
-                      }`}>
+                      <label key={option.value} className={`flex items-center justify-center p-3 border rounded-md cursor-pointer transition-colors text-center text-sm ${(formData.dayPortion || 'full') === option.value
+                        ? 'bg-blue-50 border-blue-400 ring-1 ring-blue-400 font-semibold'
+                        : 'hover:bg-gray-50'
+                        }`}>
                         <input
                           type="radio"
                           name="dayPortion"
                           value={option.value}
                           checked={(formData.dayPortion || 'full') === option.value}
-                          onChange={(e) => setFormData(prev => ({...prev, dayPortion: e.target.value as 'full' | 'am' | 'pm'}))}
+                          onChange={(e) => setFormData(prev => ({ ...prev, dayPortion: e.target.value as 'full' | 'am' | 'pm' }))}
                           className="sr-only"
                         />
                         {option.label}
@@ -230,17 +233,17 @@ export const AbsenceFormModal: React.FC<AbsenceFormModalProps> = ({ isOpen, onCl
             </div>
 
             <div className={`flex justify-between items-center ${isRotated ? 'pt-3 mt-2' : 'pt-6 mt-4'} border-t flex-shrink-0`}>
-                <div>
-                    {isEditing && onDelete && (
-                        <Button type="button" onClick={handleDelete} className="bg-red-600 hover:bg-red-700 flex items-center gap-2" title="Löschen">
-                            <TrashIcon className="h-5 w-5" /> <span className="hidden sm:inline">Löschen</span>
-                        </Button>
-                    )}
-                </div>
-                <div className="flex gap-4">
-                    <Button type="button" onClick={handleClose} className="bg-gray-500 hover:bg-gray-600">Abbrechen</Button>
-                    <Button type="submit" className="bg-blue-600 hover:bg-blue-700">Speichern</Button>
-                </div>
+              <div>
+                {isEditing && onDelete && (
+                  <Button type="button" onClick={handleDelete} className="bg-red-600 hover:bg-red-700 flex items-center gap-2" title="Löschen">
+                    <TrashIcon className="h-5 w-5" /> <span className="hidden sm:inline">Löschen</span>
+                  </Button>
+                )}
+              </div>
+              <div className="flex gap-4">
+                <Button type="button" onClick={handleClose} className="bg-gray-500 hover:bg-gray-600">Abbrechen</Button>
+                <Button type="submit" className="bg-blue-600 hover:bg-blue-700">Speichern</Button>
+              </div>
             </div>
           </form>
         </Card>
@@ -253,13 +256,13 @@ export const AbsenceFormModal: React.FC<AbsenceFormModalProps> = ({ isOpen, onCl
         isRotated={isRotated}
       />
       <ConfirmModal
-          isOpen={showDeleteConfirm}
-          onClose={() => setShowDeleteConfirm(false)}
-          onConfirm={handleConfirmDelete}
-          title="Abwesenheit löschen"
-          message="Möchten Sie diesen Abwesenheitseintrag wirklich endgültig löschen?"
-          confirmText="Ja, löschen"
-          isRotated={isRotated}
+        isOpen={showDeleteConfirm}
+        onClose={() => setShowDeleteConfirm(false)}
+        onConfirm={handleConfirmDelete}
+        title="Abwesenheit löschen"
+        message="Möchten Sie diesen Abwesenheitseintrag wirklich endgültig löschen?"
+        confirmText="Ja, löschen"
+        isRotated={isRotated}
       />
       <CalendarModal
         isOpen={isRangePickerOpen}

@@ -27,16 +27,16 @@ import { ArrowsPointingInIcon } from '../icons/ArrowsPointingInIcon';
 import { DevicePhoneMobileIcon } from '../icons/DevicePhoneMobileIcon';
 
 interface PlannerViewProps {
-  employees: Employee[];
-  absenceRequests: AbsenceRequest[];
-  holidaysByYear: HolidaysByYear;
-  timeEntries: TimeEntry[];
-  addAbsenceRequest: (request: Omit<AbsenceRequest, 'id' | 'status'>, status: AbsenceRequest['status']) => void;
-  onUpdateAbsenceRequest: (request: AbsenceRequest) => void;
-  onDeleteAbsenceRequest: (id: number) => void;
-  onEnsureHolidaysForYear: (year: number) => void;
-  onUpdateRequestStatus: (id: number, status: 'approved' | 'rejected', comment?: string) => void;
-  companySettings: CompanySettings;
+    employees: Employee[];
+    absenceRequests: AbsenceRequest[];
+    holidaysByYear: HolidaysByYear;
+    timeEntries: TimeEntry[];
+    addAbsenceRequest: (request: Omit<AbsenceRequest, 'id' | 'status'>, status: AbsenceRequest['status']) => void;
+    onUpdateAbsenceRequest: (request: AbsenceRequest) => void;
+    onDeleteAbsenceRequest: (id: number) => void;
+    onEnsureHolidaysForYear: (year: number) => void;
+    onUpdateRequestStatus: (id: number, status: 'approved' | 'rejected', comment?: string) => void;
+    companySettings: CompanySettings;
 }
 
 const getAbsenceTypeUI = (type: AbsenceType) => {
@@ -63,7 +63,7 @@ const AbsencePillWithTooltip: React.FC<{ absence: AbsenceRequest; day: Date; day
         const dateText = absence.startDate === absence.endDate
             ? `${new Date(absence.startDate).toLocaleDateString('de-DE')}${dayPortionText}`
             : `${new Date(absence.startDate).toLocaleDateString('de-DE')} - ${new Date(absence.endDate).toLocaleDateString('de-DE')}`;
-        
+
         const content = (
             <div className="text-xs">
                 <p className="font-bold">{ui.title} ({statusText})</p>
@@ -76,12 +76,12 @@ const AbsencePillWithTooltip: React.FC<{ absence: AbsenceRequest; day: Date; day
     const handlePointerLeave = () => {
         setTooltip(null);
     };
-    
+
     const dayStr = formatDateForComparison(day);
     const ui = getAbsenceTypeUI(absence.type);
 
     const isTrueStart = absence.startDate === dayStr;
-    
+
     const lastVisibleDayOfSpan = new Date(day);
     lastVisibleDayOfSpan.setDate(lastVisibleDayOfSpan.getDate() + daySpan - 1);
     const isTrueEnd = absence.endDate === formatDateForComparison(lastVisibleDayOfSpan);
@@ -94,9 +94,9 @@ const AbsencePillWithTooltip: React.FC<{ absence: AbsenceRequest; day: Date; day
         width: `calc(${daySpan * 100}%)`,
         zIndex: 10,
     };
-    
+
     let pillClasses = `absolute top-1/2 -translate-y-1/2 h-10 flex items-center justify-start text-sm font-bold px-2.5 transition-all duration-150 hover:shadow-lg hover:brightness-110 ${isPending ? `${ui.pendingClass} border border-dashed ${ui.pendingBorderClass}` : ui.solidClass}`;
-    
+
     if (isSingle) {
         pillClasses += ' rounded-md';
         pillStyle.width = `calc(100% - 4px)`;
@@ -139,10 +139,10 @@ const AbsencePillWithTooltip: React.FC<{ absence: AbsenceRequest; day: Date; day
 
 const getWeekAndYear = (d: Date): { week: number, year: number } => {
     d = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
-    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay()||7));
+    d.setUTCDate(d.getUTCDate() + 4 - (d.getUTCDay() || 7));
     const year = d.getUTCFullYear();
-    const yearStart = new Date(Date.UTC(year,0,1));
-    const weekNo = Math.ceil(( ( (d.getTime() - yearStart.getTime()) / 86400000) + 1)/7);
+    const yearStart = new Date(Date.UTC(year, 0, 1));
+    const weekNo = Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
     return { week: weekNo, year };
 }
 
@@ -164,11 +164,11 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
     }>({
         visibleEmployeeIds: props.employees.map(e => e.id)
     });
-    
+
     // Fullscreen & Landscape Logic
     const [isFullscreen, setIsFullscreen] = useState(false);
     const [isLandscape, setIsLandscape] = useState(false);
-    
+
     // For List View
     const [requestToDelete, setRequestToDelete] = useState<AbsenceRequest | null>(null);
     const [selectedEmployeeId, setSelectedEmployeeId] = useState<string>('all');
@@ -224,7 +224,7 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
             setViewEndDate(newEndDate);
         }
     };
-    
+
     const visibleDays = useMemo(() => {
         const days = [];
         let currentDate = new Date(viewStartDate);
@@ -257,11 +257,30 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
     const handleDeleteAbsence = (id: number) => { props.onDeleteAbsenceRequest(id); setIsFormModalOpen(false); };
     const handleConfirmAction = (status: 'approved' | 'rejected') => {
         if (approvalTarget) {
-            props.onUpdateRequestStatus(approvalTarget.id, status, adminComment.trim() || undefined);
-            setApprovalTarget(null); setAdminComment('');
+            setIsClosing(true);
+            setTimeout(() => {
+                props.onUpdateRequestStatus(approvalTarget.id, status, adminComment.trim() || undefined);
+                setApprovalTarget(null);
+                setAdminComment('');
+                setIsClosing(false);
+            }, 300);
         }
     };
-    
+
+    // ...
+    const [isClosing, setIsClosing] = useState(false);
+    const [isVisible, setIsVisible] = useState(false);
+
+    useEffect(() => {
+        if (approvalTarget || actionTarget) {
+            const timer = setTimeout(() => setIsVisible(true), 10);
+            return () => clearTimeout(timer);
+        } else {
+            setIsVisible(false);
+            setIsClosing(false);
+        }
+    }, [approvalTarget, actionTarget]);
+
     // List logic
     const filteredRequests = useMemo(() => {
         return props.absenceRequests.filter(req => {
@@ -269,9 +288,9 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
             return employeeMatch;
         });
     }, [props.absenceRequests, selectedEmployeeId]);
-    
-    const pendingRequests = useMemo(() => filteredRequests.filter(r => r.status === 'pending').sort((a,b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()), [filteredRequests]);
-    
+
+    const pendingRequests = useMemo(() => filteredRequests.filter(r => r.status === 'pending').sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime()), [filteredRequests]);
+
     const groupRequestsByYear = (requests: AbsenceRequest[]) => {
         const groups: { [year: string]: AbsenceRequest[] } = {};
         for (const req of requests) {
@@ -282,33 +301,43 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
         return groups;
     };
 
-    const groupedApprovedRequests = useMemo(() => groupRequestsByYear(filteredRequests.filter(r => r.status === 'approved').sort((a,b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())), [filteredRequests]);
-    const groupedRejectedRequests = useMemo(() => groupRequestsByYear(filteredRequests.filter(r => r.status === 'rejected').sort((a,b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())), [filteredRequests]);
-    
+    const groupedApprovedRequests = useMemo(() => groupRequestsByYear(filteredRequests.filter(r => r.status === 'approved').sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())), [filteredRequests]);
+    const groupedRejectedRequests = useMemo(() => groupRequestsByYear(filteredRequests.filter(r => r.status === 'rejected').sort((a, b) => new Date(b.startDate).getTime() - new Date(a.startDate).getTime())), [filteredRequests]);
+
     const sortedApprovedYears = useMemo(() => Object.keys(groupedApprovedRequests).sort((a, b) => Number(b) - Number(a)), [groupedApprovedRequests]);
     const sortedRejectedYears = useMemo(() => Object.keys(groupedRejectedRequests).sort((a, b) => Number(b) - Number(a)), [groupedRejectedRequests]);
-    
+
     const employeeOptions = useMemo(() => [{ id: 'all', name: 'Alle Mitarbeiter' }, ...props.employees.map(e => ({ id: String(e.id), name: `${e.firstName} ${e.lastName}` }))], [props.employees]);
     const getEmployeeName = (employeeId: number) => { const e = props.employees.find(e => e.id === employeeId); return e ? `${e.firstName} ${e.lastName}` : 'Unbekannt'; };
     const getAbsenceLabel = (type: AbsenceType) => ({ [AbsenceType.Vacation]: 'Urlaubsantrag', [AbsenceType.SickLeave]: 'Krankmeldung', [AbsenceType.TimeOff]: 'Freizeitausgleich' })[type];
     const getStatusChip = (status: AbsenceRequest['status']) => { const classes = { pending: 'text-yellow-800 bg-yellow-200', approved: 'text-green-800 bg-green-200', rejected: 'text-red-800 bg-red-200' }; const text = { pending: 'Ausstehend', approved: 'Genehmigt', rejected: 'Abgelehnt' }; return <span className={`px-2 py-1 text-xs font-semibold rounded-full ${classes[status]}`}>{text[status]}</span>; };
     const handleConfirmDelete = () => { if (requestToDelete) { props.onDeleteAbsenceRequest(requestToDelete.id); setRequestToDelete(null); } };
-    const handleListConfirmAction = () => { if (actionTarget) { props.onUpdateRequestStatus(actionTarget.id, actionTarget.status, adminComment.trim() || undefined); setActionTarget(null); setAdminComment(''); } };
+    const handleListConfirmAction = () => {
+        if (actionTarget) {
+            setIsClosing(true);
+            setTimeout(() => {
+                props.onUpdateRequestStatus(actionTarget.id, actionTarget.status, adminComment.trim() || undefined);
+                setActionTarget(null);
+                setAdminComment('');
+                setIsClosing(false);
+            }, 300);
+        }
+    };
 
     const formatHeaderDate = () => {
         if (viewMode === 'month') {
             return viewStartDate.toLocaleString('de-DE', { month: 'long', year: 'numeric' });
         }
-        
+
         const start = viewStartDate;
         const end = viewEndDate;
         const startYear = start.getFullYear();
         const endYear = end.getFullYear();
         const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short' };
-        
+
         const startStr = start.toLocaleDateString('de-DE', { ...options, year: startYear !== endYear ? 'numeric' : undefined });
         const endStr = end.toLocaleDateString('de-DE', { ...options, year: 'numeric' });
-        
+
         return `${startStr} - ${endStr}`;
     };
 
@@ -326,7 +355,7 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
         });
         return weekGroups;
     }, [visibleDays]);
-    
+
     const tabs = [
         { id: 'planner', label: 'Planer' },
         { id: 'list', label: 'Antragsliste', badge: pendingRequests.length },
@@ -348,7 +377,7 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
                                 <p className="text-sm text-gray-600">{dateText}</p>
                             </div>
                             <div className="flex items-center gap-2">
-                                <button onClick={() => setRequestToDelete(req)} className="p-2 text-gray-400 hover:text-red-600 opacity-50 hover:opacity-100 transition-opacity"><TrashIcon className="h-5 w-5"/></button>
+                                <button onClick={() => setRequestToDelete(req)} className="p-2 text-gray-400 hover:text-red-600 opacity-50 hover:opacity-100 transition-opacity"><TrashIcon className="h-5 w-5" /></button>
                             </div>
                         </div>
                         {req.adminComment && <p className="mt-2 pt-2 border-t text-sm italic">"{req.adminComment}"</p>}
@@ -380,7 +409,7 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
             <div className="overflow-x-auto min-h-[300px]">
                 <table className="min-w-full border-collapse table-fixed">
                     <thead className="sticky top-0 bg-white z-10 shadow-sm">
-                            <tr>
+                        <tr>
                             <th rowSpan={2} className="sticky left-0 bg-white border-b border-r border-gray-200 w-48 z-20 align-middle">
                                 <button onClick={() => setIsDisplayOptionsModalOpen(true)} className="w-full flex items-center justify-between text-left text-base font-semibold group py-3 px-2 hover:bg-gray-50 transition-colors">
                                     <span>Mitarbeiter</span>
@@ -426,7 +455,7 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
                                     for (let i = index + 1; i < visibleDays.length; i++) {
                                         const nextDay = visibleDays[i];
                                         if (formatDateForComparison(nextDay) > absence.endDate) break;
-                                        
+
                                         const nextDayAbsence = getAbsenceForDay(employee.id, nextDay);
                                         if (nextDayAbsence && nextDayAbsence.id === absence.id) {
                                             span++;
@@ -445,15 +474,15 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
                                     {visibleDays.map(day => {
                                         const absenceSpan = absenceSpans.find(s => formatDateForComparison(s.day) === formatDateForComparison(day));
                                         const absence = getAbsenceForDay(employee.id, day);
-                                        
+
                                         const dayOfWeek = day.getDay();
                                         const isSaturday = dayOfWeek === 6;
                                         const isSundayOrHoliday = props.holidaysByYear[day.getFullYear()]?.find(h => h.date === formatDateForComparison(day)) || dayOfWeek === 0;
                                         const isToday = day.toDateString() === today.toDateString();
                                         return (
-                                            <td 
-                                                key={day.toISOString()} 
-                                                className={`border-l border-gray-200 h-16 relative p-0 cursor-pointer ${!absence ? 'hover:bg-blue-50/30 group' : ''} ${isToday ? 'bg-blue-50' : isSundayOrHoliday ? 'bg-red-50' : isSaturday ? 'bg-gray-100' : 'bg-white'}`} 
+                                            <td
+                                                key={day.toISOString()}
+                                                className={`border-l border-gray-200 h-16 relative p-0 cursor-pointer ${!absence ? 'hover:bg-blue-50/30 group' : ''} ${isToday ? 'bg-blue-50' : isSundayOrHoliday ? 'bg-red-50' : isSaturday ? 'bg-gray-100' : 'bg-white'}`}
                                                 onClick={() => handleCellClick(employee.id, day)}
                                             >
                                                 {absenceSpan && <AbsencePillWithTooltip absence={absenceSpan.absence} day={absenceSpan.day} daySpan={absenceSpan.span} />}
@@ -490,7 +519,7 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
                     </Button>
                 </div>
             </div>
-            
+
             <div className="relative flex-grow w-full h-full bg-gray-100 overflow-hidden">
                 <div className={`
                     bg-white shadow-lg p-2 transition-all duration-300
@@ -514,11 +543,10 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
-                            className={`${
-                                activeTab === tab.id
-                                    ? 'border-blue-500 text-blue-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center`}
+                            className={`${activeTab === tab.id
+                                ? 'border-blue-500 text-blue-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center`}
                             aria-current={activeTab === tab.id ? 'page' : undefined}
                         >
                             {tab.label}
@@ -596,13 +624,13 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
 
                         {/* Column 2: Approved */}
                         <div className="bg-gray-50 rounded-lg p-4 h-full">
-                             <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">Genehmigt</h4>
-                             <div className="space-y-3">
+                            <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">Genehmigt</h4>
+                            <div className="space-y-3">
                                 {sortedApprovedYears.length > 0 ? (
                                     sortedApprovedYears.map(year => (
                                         <div key={year}>
-                                            <button 
-                                                onClick={() => toggleYear(year)} 
+                                            <button
+                                                onClick={() => toggleYear(year)}
                                                 className="w-full flex justify-between items-center p-2 rounded-md hover:bg-gray-200/50"
                                                 aria-expanded={openYears.has(year)}
                                                 aria-controls={`approved-${year}`}
@@ -622,18 +650,18 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
                                         <p className="text-center text-gray-500 py-8">Keine genehmigten Anträge.</p>
                                     </div>
                                 )}
-                             </div>
+                            </div>
                         </div>
 
                         {/* Column 3: Rejected */}
                         <div className="bg-gray-50 rounded-lg p-4 h-full">
-                             <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">Abgelehnt</h4>
-                             <div className="space-y-3">
+                            <h4 className="text-lg font-semibold text-gray-800 flex items-center gap-2 mb-4">Abgelehnt</h4>
+                            <div className="space-y-3">
                                 {sortedRejectedYears.length > 0 ? (
                                     sortedRejectedYears.map(year => (
                                         <div key={year}>
-                                            <button 
-                                                onClick={() => toggleYear(year)} 
+                                            <button
+                                                onClick={() => toggleYear(year)}
                                                 className="w-full flex justify-between items-center p-2 rounded-md hover:bg-gray-200/50"
                                                 aria-expanded={openYears.has(year)}
                                                 aria-controls={`rejected-${year}`}
@@ -658,32 +686,31 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
                     </div>
                 </div>
             )}
-            
-            <AbsenceFormModal 
-                isOpen={isFormModalOpen} 
-                onClose={() => setIsFormModalOpen(false)} 
-                onSave={handleSaveAbsence} 
-                onDelete={handleDeleteAbsence} 
-                employees={props.employees} 
-                initialData={initialModalData} 
+
+            <AbsenceFormModal
+                isOpen={isFormModalOpen}
+                onClose={() => setIsFormModalOpen(false)}
+                onSave={handleSaveAbsence}
+                onDelete={handleDeleteAbsence}
+                employees={props.employees}
+                initialData={initialModalData}
                 allAbsenceRequests={props.absenceRequests}
                 allTimeEntries={props.timeEntries}
                 companySettings={props.companySettings}
                 isRotated={isLandscape}
             />
-            
+
             {approvalTarget && (
-                <div className={`fixed z-[250] bg-black bg-opacity-60 flex items-center justify-center p-4 ${
-                    isLandscape 
-                    ? 'top-0 left-0 w-[100vh] h-[100vw] origin-top-left rotate-90 translate-x-[100vw]' 
+                <div className={`fixed z-[250] flex items-center justify-center p-4 transition-colors duration-300 ${isLandscape
+                    ? 'top-0 left-0 w-[100vh] h-[100vw] origin-top-left rotate-90 translate-x-[100vw]'
                     : 'inset-0'
-                }`} onClick={() => setApprovalTarget(null)}>
-                    <Card className="w-full max-w-md" onClick={(e) => e.stopPropagation()}>
-                        <div className="flex justify-between items-center mb-4"><h2 className="text-xl font-bold">Antrag prüfen</h2><button onClick={() => setApprovalTarget(null)}><XIcon className="h-6 w-6" /></button></div>
+                    } ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`} onClick={() => setIsClosing(true)}>
+                    <Card className={`w-full max-w-md ${isClosing ? 'animate-modal-slide-down' : (isVisible ? 'animate-modal-slide-up' : 'opacity-0 translate-y-4')}`} onClick={(e) => e.stopPropagation()}>
+                        <div className="flex justify-between items-center mb-4"><h2 className="text-xl font-bold">Antrag prüfen</h2><button onClick={() => setIsClosing(true)}><XIcon className="h-6 w-6" /></button></div>
                         <div className="space-y-2 text-sm border-t pt-4">
-                           <p><strong>Mitarbeiter:</strong> {getEmployeeName(approvalTarget.employeeId)}</p>
-                           <p><strong>Typ:</strong> {getAbsenceTypeUI(approvalTarget.type).title}</p>
-                           <p><strong>Zeitraum:</strong> {approvalTarget.startDate === approvalTarget.endDate ? `${new Date(approvalTarget.startDate).toLocaleDateString('de-DE')}${approvalTarget.dayPortion === 'am' ? ' (Vormittags)' : approvalTarget.dayPortion === 'pm' ? ' (Nachmittags)' : ''}` : `${new Date(approvalTarget.startDate).toLocaleDateString('de-DE')} - ${new Date(approvalTarget.endDate).toLocaleDateString('de-DE')}`}</p>
+                            <p><strong>Mitarbeiter:</strong> {getEmployeeName(approvalTarget.employeeId)}</p>
+                            <p><strong>Typ:</strong> {getAbsenceTypeUI(approvalTarget.type).title}</p>
+                            <p><strong>Zeitraum:</strong> {approvalTarget.startDate === approvalTarget.endDate ? `${new Date(approvalTarget.startDate).toLocaleDateString('de-DE')}${approvalTarget.dayPortion === 'am' ? ' (Vormittags)' : approvalTarget.dayPortion === 'pm' ? ' (Nachmittags)' : ''}` : `${new Date(approvalTarget.startDate).toLocaleDateString('de-DE')} - ${new Date(approvalTarget.endDate).toLocaleDateString('de-DE')}`}</p>
                         </div>
                         <div className="mt-4 space-y-2"><label className="block text-sm font-medium">Kommentar (optional)</label><textarea rows={3} className="w-full p-2 border rounded-md" value={adminComment} onChange={(e) => setAdminComment(e.target.value)} placeholder="Grund für die Entscheidung..." /></div>
                         <div className="flex gap-4 pt-4 border-t mt-4 justify-end">
@@ -693,12 +720,21 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
                     </Card>
                 </div>
             )}
-            
-            {actionTarget && (<div className={`fixed z-[250] bg-black bg-opacity-60 flex items-center justify-center p-4 ${
-                    isLandscape 
-                    ? 'top-0 left-0 w-[100vh] h-[100vw] origin-top-left rotate-90 translate-x-[100vw]' 
+
+            {actionTarget && (
+                <div className={`fixed z-[250] flex items-center justify-center p-4 transition-colors duration-300 ${isLandscape
+                    ? 'top-0 left-0 w-[100vh] h-[100vw] origin-top-left rotate-90 translate-x-[100vw]'
                     : 'inset-0'
-                }`} onClick={() => { setActionTarget(null); setAdminComment(''); }}><Card className="w-full max-w-md" onClick={e => e.stopPropagation()}><div className="flex justify-between items-center mb-4"><h2 className="text-xl font-bold">Antrag {actionTarget.status === 'approved' ? 'genehmigen' : 'ablehnen'}</h2><button onClick={() => { setActionTarget(null); setAdminComment(''); }}><XIcon className="h-6 w-6" /></button></div><div><textarea rows={3} className="w-full p-2 border rounded-md" value={adminComment} onChange={e => setAdminComment(e.target.value)} placeholder="Kommentar (optional)..." /></div><div className="flex gap-4 pt-4 justify-end"><Button onClick={handleListConfirmAction} className={`${actionTarget.status === 'approved' ? 'bg-green-600' : 'bg-red-600'}`}>{actionTarget.status === 'approved' ? 'Genehmigen' : 'Ablehnen'}</Button></div></Card></div>)}
+                    } ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`} onClick={() => setIsClosing(true)}>
+                    <Card className={`w-full max-w-md ${isClosing ? 'animate-modal-slide-down' : (isVisible ? 'animate-modal-slide-up' : 'opacity-0 translate-y-4')}`} onClick={e => e.stopPropagation()}>
+                        <div className="flex justify-between items-center mb-4"><h2 className="text-xl font-bold">Antrag {actionTarget.status === 'approved' ? 'genehmigen' : 'ablehnen'}</h2><button onClick={() => setIsClosing(true)}><XIcon className="h-6 w-6" /></button></div>
+                        <div><textarea rows={3} className="w-full p-2 border rounded-md" value={adminComment} onChange={e => setAdminComment(e.target.value)} placeholder="Kommentar (optional)..." /></div>
+                        <div className="flex gap-4 pt-4 justify-end">
+                            <Button onClick={handleListConfirmAction} className={`${actionTarget.status === 'approved' ? 'bg-green-600' : 'bg-red-600'}`}>{actionTarget.status === 'approved' ? 'Genehmigen' : 'Ablehnen'}</Button>
+                        </div>
+                    </Card>
+                </div>
+            )}
             <ConfirmModal isOpen={!!requestToDelete} onClose={() => setRequestToDelete(null)} onConfirm={handleConfirmDelete} title="Antrag löschen" message={`Möchten Sie den Antrag von ${getEmployeeName(requestToDelete?.employeeId || 0)} wirklich löschen?`} confirmText="Ja, löschen" isRotated={isLandscape} />
             <SelectionModal isOpen={isEmployeeModalOpen} onClose={() => setIsEmployeeModalOpen(false)} onSelect={item => setSelectedEmployeeId(item.id)} items={employeeOptions} title="Mitarbeiter auswählen" selectedValue={selectedEmployeeId} isRotated={isLandscape} />
             <PlannerDisplayOptionsModal
@@ -713,8 +749,8 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
                 isOpen={isDateRangeModalOpen}
                 onClose={() => setIsDateRangeModalOpen(false)}
                 onApply={(start, end, preset) => {
-                    setViewStartDate(start); 
-                    setViewEndDate(end); 
+                    setViewStartDate(start);
+                    setViewEndDate(end);
                     setViewMode(preset === 'month' ? 'month' : 'period');
                 }}
                 currentStartDate={viewStartDate}

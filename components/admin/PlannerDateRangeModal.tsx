@@ -18,31 +18,31 @@ interface PlannerDateRangeModalProps {
 }
 
 const getStartOfWeek = (date: Date): Date => {
-    const d = new Date(date);
-    d.setHours(0, 0, 0, 0);
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    return new Date(d.setDate(diff));
+  const d = new Date(date);
+  d.setHours(0, 0, 0, 0);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  return new Date(d.setDate(diff));
 };
 
 const checkDatesForPreset = (start: Date, end: Date): Preset | null => {
-    const today = new Date();
-    today.setHours(0, 0, 0, 0);
-    const startStr = start.toLocaleDateString('sv-SE');
-    const endStr = end.toLocaleDateString('sv-SE');
-    const startOfWeek = getStartOfWeek(today);
-    const startOfWeekStr = startOfWeek.toLocaleDateString('sv-SE');
-    
-    if (startStr === startOfWeekStr) {
-        const d = new Date(startOfWeek);
-        if (endStr === new Date(d.setDate(startOfWeek.getDate() + 13)).toLocaleDateString('sv-SE')) return '2w';
-        if (endStr === new Date(d.setDate(startOfWeek.getDate() + 20)).toLocaleDateString('sv-SE')) return '3w';
-        if (endStr === new Date(d.setDate(startOfWeek.getDate() + 27)).toLocaleDateString('sv-SE')) return '4w';
-    }
-    const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
-    const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
-    if (startStr === startOfMonth.toLocaleDateString('sv-SE') && endStr === endOfMonth.toLocaleDateString('sv-SE')) return 'month';
-    return null;
+  const today = new Date();
+  today.setHours(0, 0, 0, 0);
+  const startStr = start.toLocaleDateString('sv-SE');
+  const endStr = end.toLocaleDateString('sv-SE');
+  const startOfWeek = getStartOfWeek(today);
+  const startOfWeekStr = startOfWeek.toLocaleDateString('sv-SE');
+
+  if (startStr === startOfWeekStr) {
+    const d = new Date(startOfWeek);
+    if (endStr === new Date(d.setDate(startOfWeek.getDate() + 13)).toLocaleDateString('sv-SE')) return '2w';
+    if (endStr === new Date(d.setDate(startOfWeek.getDate() + 20)).toLocaleDateString('sv-SE')) return '3w';
+    if (endStr === new Date(d.setDate(startOfWeek.getDate() + 27)).toLocaleDateString('sv-SE')) return '4w';
+  }
+  const startOfMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+  const endOfMonth = new Date(today.getFullYear(), today.getMonth() + 1, 0);
+  if (startStr === startOfMonth.toLocaleDateString('sv-SE') && endStr === endOfMonth.toLocaleDateString('sv-SE')) return 'month';
+  return null;
 };
 
 export const PlannerDateRangeModal: React.FC<PlannerDateRangeModalProps> = ({ isOpen, onClose, onApply, currentStartDate, currentEndDate, isRotated = false }) => {
@@ -50,6 +50,7 @@ export const PlannerDateRangeModal: React.FC<PlannerDateRangeModalProps> = ({ is
   const [endDate, setEndDate] = useState('');
   const [activePreset, setActivePreset] = useState<Preset | null>(null);
   const [isClosing, setIsClosing] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
@@ -58,6 +59,11 @@ export const PlannerDateRangeModal: React.FC<PlannerDateRangeModalProps> = ({ is
       setStartDate(startStr);
       setEndDate(endStr);
       setActivePreset(checkDatesForPreset(currentStartDate, currentEndDate));
+      setIsClosing(false);
+      const timer = setTimeout(() => setIsVisible(true), 10);
+      return () => clearTimeout(timer);
+    } else {
+      setIsVisible(false);
       setIsClosing(false);
     }
   }, [isOpen, currentStartDate, currentEndDate]);
@@ -78,8 +84,8 @@ export const PlannerDateRangeModal: React.FC<PlannerDateRangeModalProps> = ({ is
     }
     setIsClosing(true);
     setTimeout(() => {
-        onApply(start, end, activePreset);
-        onClose();
+      onApply(start, end, activePreset);
+      onClose();
     }, 300);
   };
 
@@ -101,10 +107,10 @@ export const PlannerDateRangeModal: React.FC<PlannerDateRangeModalProps> = ({ is
     let end: Date;
 
     switch (preset) {
-        case '2w': start = getStartOfWeek(today); end = new Date(start); end.setDate(start.getDate() + 13); break;
-        case '3w': start = getStartOfWeek(today); end = new Date(start); end.setDate(start.getDate() + 20); break;
-        case '4w': start = getStartOfWeek(today); end = new Date(start); end.setDate(start.getDate() + 27); break;
-        case 'month': start = new Date(today.getFullYear(), today.getMonth(), 1); end = new Date(today.getFullYear(), today.getMonth() + 1, 0); break;
+      case '2w': start = getStartOfWeek(today); end = new Date(start); end.setDate(start.getDate() + 13); break;
+      case '3w': start = getStartOfWeek(today); end = new Date(start); end.setDate(start.getDate() + 20); break;
+      case '4w': start = getStartOfWeek(today); end = new Date(start); end.setDate(start.getDate() + 27); break;
+      case 'month': start = new Date(today.getFullYear(), today.getMonth(), 1); end = new Date(today.getFullYear(), today.getMonth() + 1, 0); break;
     }
     setStartDate(start.toLocaleDateString('sv-SE'));
     setEndDate(end.toLocaleDateString('sv-SE'));
@@ -114,10 +120,10 @@ export const PlannerDateRangeModal: React.FC<PlannerDateRangeModalProps> = ({ is
   const getButtonClass = (preset: Preset) => `px-3 py-2 text-sm font-semibold rounded-md transition-colors ${activePreset === preset ? 'bg-blue-600 text-white hover:bg-blue-700' : 'bg-gray-100 text-gray-800 hover:bg-gray-200'}`;
 
   const containerClass = isRotated
-    ? `fixed top-0 left-0 w-[100vh] h-[100vw] origin-top-left rotate-90 translate-x-[100vw] flex items-center justify-center z-[250] p-1 sm:p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : 'animate-modal-fade-in'}`
-    : `fixed inset-0 bg-black flex items-center justify-center z-[250] p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : 'animate-modal-fade-in'}`;
+    ? `fixed top-0 left-0 w-[100vh] h-[100vw] origin-top-left rotate-90 translate-x-[100vw] flex items-center justify-center z-[250] p-1 sm:p-4 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`
+    : `fixed inset-0 flex items-center justify-center z-[250] p-4 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`;
 
-  const cardClasses = `w-full max-w-md ${isRotated ? '!p-3' : ''} ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`;
+  const cardClasses = `w-full max-w-md ${isRotated ? '!p-3' : ''} ${isClosing ? 'animate-modal-slide-down' : (isVisible ? 'animate-modal-slide-up' : 'opacity-0 translate-y-4')}`;
 
   return ReactDOM.createPortal(
     <div className={containerClass} onClick={handleClose}>
@@ -135,10 +141,10 @@ export const PlannerDateRangeModal: React.FC<PlannerDateRangeModalProps> = ({ is
           <div>
             <label className="block text-sm font-medium text-gray-700 mb-2">Schnellauswahl</label>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
-                <button onClick={() => handleSetPreset('2w')} className={getButtonClass('2w')}>2 Wochen</button>
-                <button onClick={() => handleSetPreset('3w')} className={getButtonClass('3w')}>3 Wochen</button>
-                <button onClick={() => handleSetPreset('4w')} className={getButtonClass('4w')}>4 Wochen</button>
-                <button onClick={() => handleSetPreset('month')} className={getButtonClass('month')}>Akt. Monat</button>
+              <button onClick={() => handleSetPreset('2w')} className={getButtonClass('2w')}>2 Wochen</button>
+              <button onClick={() => handleSetPreset('3w')} className={getButtonClass('3w')}>3 Wochen</button>
+              <button onClick={() => handleSetPreset('4w')} className={getButtonClass('4w')}>4 Wochen</button>
+              <button onClick={() => handleSetPreset('month')} className={getButtonClass('month')}>Akt. Monat</button>
             </div>
           </div>
         </div>

@@ -21,11 +21,17 @@ export const PlannerDisplayOptionsModal: React.FC<PlannerDisplayOptionsModalProp
   const [selectedIds, setSelectedIds] = useState(new Set<number>());
   const [searchTerm, setSearchTerm] = useState('');
   const [isClosing, setIsClosing] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
 
   useEffect(() => {
     if (isOpen) {
       setSelectedIds(new Set(currentOptions.visibleEmployeeIds));
       setSearchTerm('');
+      setIsClosing(false);
+      const timer = setTimeout(() => setIsVisible(true), 10);
+      return () => clearTimeout(timer);
+    } else {
+      setIsVisible(false);
       setIsClosing(false);
     }
   }, [isOpen, currentOptions.visibleEmployeeIds]);
@@ -50,7 +56,7 @@ export const PlannerDisplayOptionsModal: React.FC<PlannerDisplayOptionsModalProp
 
   const handleSelectAll = () => setSelectedIds(new Set(employees.map(e => e.id)));
   const handleDeselectAll = () => setSelectedIds(new Set());
-  
+
   const handleSelectByEmploymentType = (type: EmploymentType) => {
     const today = new Date();
     const newIds = employees.filter(emp => getContractDetailsForDate(emp, today).employmentType === type).map(emp => emp.id);
@@ -60,17 +66,17 @@ export const PlannerDisplayOptionsModal: React.FC<PlannerDisplayOptionsModalProp
   const handleApply = () => {
     setIsClosing(true);
     setTimeout(() => {
-        onApply({ visibleEmployeeIds: Array.from(selectedIds) });
+      onApply({ visibleEmployeeIds: Array.from(selectedIds) });
     }, 300);
   };
 
   const containerClass = isRotated
-    ? `fixed top-0 left-0 w-[100vh] h-[100vw] origin-top-left rotate-90 translate-x-[100vw] flex items-center justify-center z-[250] p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : 'animate-modal-fade-in'}`
-    : `fixed inset-0 bg-black flex items-center justify-center z-[250] p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : 'animate-modal-fade-in'}`;
+    ? `fixed top-0 left-0 w-[100vh] h-[100vw] origin-top-left rotate-90 translate-x-[100vw] flex items-center justify-center z-[250] p-4 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`
+    : `fixed inset-0 flex items-center justify-center z-[250] p-4 ${isClosing ? 'animate-modal-fade-out' : (isVisible ? 'animate-modal-fade-in' : 'bg-transparent')}`;
 
   return ReactDOM.createPortal(
     <div className={containerClass} onClick={handleClose}>
-      <Card className={`w-full max-w-lg ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`} onClick={e => e.stopPropagation()}>
+      <Card className={`w-full max-w-lg ${isClosing ? 'animate-modal-slide-down' : (isVisible ? 'animate-modal-slide-up' : 'opacity-0 translate-y-4')}`} onClick={e => e.stopPropagation()}>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-xl font-bold">Anzeigeoptionen für Planer</h2>
           <button onClick={handleClose} className="p-1 rounded-full hover:bg-gray-100"><XIcon className="h-6 w-6" /></button>
@@ -91,15 +97,15 @@ export const PlannerDisplayOptionsModal: React.FC<PlannerDisplayOptionsModalProp
 
           <fieldset>
             <div className="flex justify-between items-center mb-2">
-                <legend className="text-base font-semibold text-gray-800">Mitarbeiter anzeigen</legend>
-                <button type="button" onClick={handleDeselectAll} className="text-sm font-semibold text-blue-600 hover:underline">Alle abwählen</button>
+              <legend className="text-base font-semibold text-gray-800">Mitarbeiter anzeigen</legend>
+              <button type="button" onClick={handleDeselectAll} className="text-sm font-semibold text-blue-600 hover:underline">Alle abwählen</button>
             </div>
             <div className="max-h-60 overflow-y-auto border rounded-md p-2 space-y-1">
               {filteredEmployees.length > 0 ? filteredEmployees.map((emp) => (
-                  <label key={emp.id} className="flex items-center space-x-3 p-2 rounded hover:bg-gray-50 cursor-pointer">
-                    <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked={selectedIds.has(emp.id)} onChange={() => handleSelectionChange(emp.id)} />
-                    <span>{emp.firstName} {emp.lastName}</span>
-                  </label>
+                <label key={emp.id} className="flex items-center space-x-3 p-2 rounded hover:bg-gray-50 cursor-pointer">
+                  <input type="checkbox" className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500" checked={selectedIds.has(emp.id)} onChange={() => handleSelectionChange(emp.id)} />
+                  <span>{emp.firstName} {emp.lastName}</span>
+                </label>
               )) : <p className="text-center text-gray-500 py-4">Keine Mitarbeiter gefunden.</p>}
             </div>
           </fieldset>
