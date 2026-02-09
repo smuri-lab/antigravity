@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="de">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <title>Zeiterfassungssystem</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+      /* Custom scrollbar for a more modern look */
+      ::-webkit-scrollbar {
+        width: 8px;
+      }
+      ::-webkit-scrollbar-track {
+        background: #f1f1f1;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: #888;
+        border-radius: 4px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: #555;
+      }
+      
+      html, body {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        /* CRITICAL: Disable window scrolling entirely */
+        overflow: hidden;
+        overscroll-behavior: none;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      #root {
+        height: 100%;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+      }
+      
+      /* Utility to ensure main content scrolls smoothly */
+      .scroll-container {
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+        overscroll-behavior-y: contain;
+      }
+      
+      /* PREVENT INPUT LAYOUT SHIFTS */
+      /* Hide IE/Edge clear and reveal buttons */
+      input::-ms-clear,
+      input::-ms-reveal {
+        display: none;
+      }
+      /* Hide Chrome/Safari search cancel button */
+      input::-webkit-search-decoration,
+      input::-webkit-search-cancel-button,
+      input::-webkit-search-results-button,
+      input::-webkit-search-results-decoration {
+        display: none;
+      }
+
+      /* Hide time picker indicator (clock icon) on desktop to prevent dropdown */
+      input[type="time"]::-webkit-calendar-picker-indicator {
+        display: none;
+      }
+      
+      /* Animation for general content fade-in */
+      @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+      }
+      .animate-fade-in {
+        animation: fadeIn 0.4s ease-in-out;
+      }
+      /* Animation for toast notification */
+      @keyframes toast-in {
+        from {
+          transform: translateY(20px);
+          opacity: 0;
+        }
+        to {
+          transform: translateY(0);
+          opacity: 1;
+        }
+      }
+      .animate-toast-in {
+        animation: toast-in 0.3s ease-out;
+      }
+      /* Animation for pending request indicator */
+      @keyframes pulse-dot {
+        0%, 100% {
+          transform: scale(1);
+          opacity: 1;
+        }
+        50% {
+          transform: scale(1.5);
+          opacity: 0.7;
+        }
+      }
+      .animate-pulse-dot {
+        animation: pulse-dot 1.5s ease-in-out infinite;
+      }
+      /* Animation for action sheet */
+      @keyframes slide-up {
+        from {
+          transform: translateY(100%);
+        }
+        to {
+          transform: translateY(0);
+        }
+      }
+      @keyframes slide-down-sheet {
+        from { transform: translateY(0); }
+        to { transform: translateY(100%); }
+      }
+      .animate-slide-up {
+        animation: slide-up 0.3s ease-out forwards;
+      }
+      .animate-slide-down-sheet {
+        animation: slide-down-sheet 0.3s ease-in forwards;
+      }
+       /* Modal Animations */
+      @keyframes modal-fade-in {
+        from { background-color: rgba(0,0,0,0); }
+        to { background-color: rgba(0,0,0,0.6); }
+      }
+      @keyframes modal-fade-out {
+          from { background-color: rgba(0,0,0,0.6); }
+          to { background-color: rgba(0,0,0,0); }
+      }
+      @keyframes modal-slide-up {
+          from { transform: translateY(20px); opacity: 0; }
+          to { transform: translateY(0); opacity: 1; }
+      }
+      @keyframes modal-slide-down {
+          from { transform: translateY(0); opacity: 1; }
+          to { transform: translateY(20px); opacity: 0; }
+      }
+      .animate-modal-fade-in { animation: modal-fade-in 0.3s ease-out forwards; }
+      .animate-modal-fade-out { animation: modal-fade-out 0.3s ease-in forwards; }
+      .animate-modal-slide-up { animation: modal-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+      .animate-modal-slide-down { animation: modal-slide-down 0.3s cubic-bezier(0.7, 0, 0.84, 0) forwards; }
+    </style>
+  <script type="importmap">
+{
+  "imports": {
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react-dom": "https://esm.sh/react-dom@^19.2.3",
+    "jspdf-autotable": "https://esm.sh/jspdf-autotable@^5.0.7",
+    "jspdf": "https://esm.sh/jspdf@^4.0.0"
+  }
+}
+</script>
+<script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+<script src="https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.js"></script>
+</head>
+  <body class="bg-gray-100 antialiased">
+    <div id="root"></div>
+    <script type="module" src="/index.tsx"></script>
+  </body>
+</html>
