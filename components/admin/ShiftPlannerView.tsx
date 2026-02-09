@@ -13,7 +13,7 @@ import { CalendarModal } from '../ui/CalendarModal';
 import { AdjustmentsHorizontalIcon } from '../icons/AdjustmentsHorizontalIcon';
 import { EmployeeMultiSelectModal } from './EmployeeMultiSelectModal';
 import { DocumentArrowDownIcon } from '../icons/DocumentArrowDownIcon';
-import { exportShiftPlanAsPdf } from '../utils';
+import { exportShiftPlanAsPdf } from '../utils/index';
 import { ArrowsPointingOutIcon } from '../icons/ArrowsPointingOutIcon';
 import { ArrowsPointingInIcon } from '../icons/ArrowsPointingInIcon';
 import { DevicePhoneMobileIcon } from '../icons/DevicePhoneMobileIcon';
@@ -464,8 +464,8 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                     <button
                         onClick={() => setActiveTab('planner')}
                         className={`${activeTab === 'planner'
-                                ? 'border-blue-500 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
                     >
                         <CalendarDaysIcon className="h-5 w-5" />
@@ -474,8 +474,8 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                     <button
                         onClick={() => setActiveTab('report')}
                         className={`${activeTab === 'report'
-                                ? 'border-blue-500 text-blue-600'
-                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
                     >
                         <DocumentTextIcon className="h-5 w-5" />
@@ -500,8 +500,8 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                             key={t.id}
                                             onClick={() => setActiveTemplate(isActive ? null : t)}
                                             className={`px-3 py-1.5 text-xs font-semibold rounded-full border shadow-sm transition-all flex items-center gap-2 whitespace-nowrap ${isActive
-                                                    ? 'ring-2 ring-offset-1 scale-105'
-                                                    : 'hover:bg-white hover:shadow-md opacity-80 hover:opacity-100'
+                                                ? 'ring-2 ring-offset-1 scale-105'
+                                                : 'hover:bg-white hover:shadow-md opacity-80 hover:opacity-100'
                                                 }`}
                                             style={{
                                                 backgroundColor: t.color + (isActive ? '' : '20'),

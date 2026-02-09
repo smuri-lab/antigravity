@@ -18,7 +18,7 @@ import { ClockIcon } from '../icons/ClockIcon';
 import { SickFaceIcon } from '../icons/SickFaceIcon';
 import { PlannerDisplayOptionsModal } from './PlannerDisplayOptionsModal';
 import { AdjustmentsHorizontalIcon } from '../icons/AdjustmentsHorizontalIcon';
-import { getContractDetailsForDate } from '../utils';
+import { getContractDetailsForDate } from '../utils/index';
 import { ChevronDownIcon } from '../icons/ChevronDownIcon';
 import { CalendarDaysIcon } from '../icons/CalendarDaysIcon';
 import { PlannerDateRangeModal, type Preset } from './PlannerDateRangeModal';

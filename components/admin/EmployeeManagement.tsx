@@ -7,7 +7,7 @@ import { Button } from '../ui/Button';
 import { EmployeeFormModal } from './EmployeeFormModal';
 import { PlusIcon } from '../icons/PlusIcon';
 import { ToggleSwitch } from '../ui/ToggleSwitch';
-import { getContractDetailsForDate, formatHoursAndMinutes } from '../utils';
+import { getContractDetailsForDate, formatHoursAndMinutes } from '../utils/index';
 import { CheckCircleIcon } from '../icons/CheckCircleIcon';
 import { MinusCircleIcon } from '../icons/MinusCircleIcon';
 import { InformationCircleIcon } from '../icons/InformationCircleIcon';
@@ -68,7 +68,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ loggedIn
             Anlegen
           </Button>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white">
             <thead className="bg-gray-50">
@@ -79,12 +79,12 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ loggedIn
                 <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Urlaubstage</th>
                 <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Stundenkonto</th>
                 <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">
-                    <div className="flex items-center justify-center gap-1">
-                        <span>Urlaubswarnung</span>
-                        <span title="Warnung für Resturlaub aus dem Vorjahr anzeigen">
-                            <InformationCircleIcon className="h-4 w-4 text-gray-400" />
-                        </span>
-                    </div>
+                  <div className="flex items-center justify-center gap-1">
+                    <span>Urlaubswarnung</span>
+                    <span title="Warnung für Resturlaub aus dem Vorjahr anzeigen">
+                      <InformationCircleIcon className="h-4 w-4 text-gray-400" />
+                    </span>
+                  </div>
                 </th>
                 <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Autom. Pause</th>
                 <th className="py-3 px-4 text-center text-xs font-medium text-gray-500 uppercase tracking-wider">Status</th>
@@ -96,7 +96,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ loggedIn
                   const currentContract = getContractDetailsForDate(emp, new Date());
                   const isSuperAdmin = emp.id === 0;
                   return (
-                    <tr 
+                    <tr
                       key={emp.id}
                       onClick={() => emp.isActive && handleOpenModal(emp)}
                       className={`transition-colors ${!emp.isActive ? 'bg-gray-50 text-gray-500' : 'cursor-pointer hover:bg-gray-50'}`}
@@ -107,40 +107,40 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ loggedIn
                       <td className="py-4 px-4 whitespace-nowrap text-center">{currentContract.vacationDays}</td>
                       <td className="py-4 px-4 whitespace-nowrap text-center">
                         <button
-                            type="button"
-                            onClick={(e) => {
-                                e.stopPropagation();
-                                handleDashboardTypeChange(emp, emp.dashboardType !== 'simplified' ? 'simplified' : 'standard');
-                            }}
-                            className="p-1 rounded-full transition-colors"
-                            title={emp.dashboardType !== 'simplified' ? 'Stundenkonto aktiv (klicken zum Deaktivieren)' : 'Stundenkonto inaktiv (klicken zum Aktivieren)'}
-                            aria-label={emp.dashboardType !== 'simplified' ? 'Stundenkonto deaktivieren' : 'Stundenkonto aktivieren'}
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleDashboardTypeChange(emp, emp.dashboardType !== 'simplified' ? 'simplified' : 'standard');
+                          }}
+                          className="p-1 rounded-full transition-colors"
+                          title={emp.dashboardType !== 'simplified' ? 'Stundenkonto aktiv (klicken zum Deaktivieren)' : 'Stundenkonto inaktiv (klicken zum Aktivieren)'}
+                          aria-label={emp.dashboardType !== 'simplified' ? 'Stundenkonto deaktivieren' : 'Stundenkonto aktivieren'}
                         >
-                            {emp.dashboardType !== 'simplified' ? (
-                                <CheckCircleIcon className="h-6 w-6 text-green-500" />
-                            ) : (
-                                <MinusCircleIcon className="h-6 w-6 text-gray-400" />
-                            )}
+                          {emp.dashboardType !== 'simplified' ? (
+                            <CheckCircleIcon className="h-6 w-6 text-green-500" />
+                          ) : (
+                            <MinusCircleIcon className="h-6 w-6 text-gray-400" />
+                          )}
                         </button>
                       </td>
                       <td className="py-4 px-4 whitespace-nowrap text-center">
-                          <ToggleSwitch
-                              checked={emp.showVacationWarning ?? true}
-                              onChange={(checked) => onUpdate({ ...emp, showVacationWarning: checked, lastModified: new Date().toISOString() })}
-                          />
-                      </td>
-                       <td className="py-4 px-4 whitespace-nowrap text-center">
-                          <ToggleSwitch
-                              checked={emp.automaticBreakDeduction ?? false}
-                              onChange={(checked) => onUpdate({ ...emp, automaticBreakDeduction: checked, lastModified: new Date().toISOString() })}
-                          />
+                        <ToggleSwitch
+                          checked={emp.showVacationWarning ?? true}
+                          onChange={(checked) => onUpdate({ ...emp, showVacationWarning: checked, lastModified: new Date().toISOString() })}
+                        />
                       </td>
                       <td className="py-4 px-4 whitespace-nowrap text-center">
-                          <ToggleSwitch
-                              checked={emp.isActive}
-                              onChange={(checked) => onUpdate({ ...emp, isActive: checked, lastModified: new Date().toISOString() })}
-                              disabled={isSuperAdmin}
-                          />
+                        <ToggleSwitch
+                          checked={emp.automaticBreakDeduction ?? false}
+                          onChange={(checked) => onUpdate({ ...emp, automaticBreakDeduction: checked, lastModified: new Date().toISOString() })}
+                        />
+                      </td>
+                      <td className="py-4 px-4 whitespace-nowrap text-center">
+                        <ToggleSwitch
+                          checked={emp.isActive}
+                          onChange={(checked) => onUpdate({ ...emp, isActive: checked, lastModified: new Date().toISOString() })}
+                          disabled={isSuperAdmin}
+                        />
                       </td>
                     </tr>
                   );
@@ -156,7 +156,7 @@ export const EmployeeManagement: React.FC<EmployeeManagementProps> = ({ loggedIn
           </table>
         </div>
       </Card>
-      
+
       {isModalOpen && (
         <EmployeeFormModal
           isOpen={isModalOpen}

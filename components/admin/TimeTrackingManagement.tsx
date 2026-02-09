@@ -10,7 +10,7 @@ import { ChevronLeftIcon } from '../icons/ChevronLeftIcon';
 import { ChevronRightIcon } from '../icons/ChevronRightIcon';
 import { ArrowUturnLeftIcon } from '../icons/ArrowUturnLeftIcon';
 import { PlusIcon } from '../icons/PlusIcon';
-import { calculateBalance, formatHoursAndMinutes, calculateAbsenceDaysInMonth, calculateAnnualVacationTaken, getContractDetailsForDate, calculateAnnualSickDays, exportTimesheet, getAbsenceTypeDetails, exportTimesheetAsPdf, exportDatev } from '../utils';
+import { calculateBalance, formatHoursAndMinutes, calculateAbsenceDaysInMonth, calculateAnnualVacationTaken, getContractDetailsForDate, calculateAnnualSickDays, exportTimesheet, getAbsenceTypeDetails, exportTimesheetAsPdf, exportDatev } from '../utils/index';
 import { TimesheetExportModal } from './TimesheetExportModal';
 import { Select } from '../ui/Select';
 import { ManualEntryFormModal } from './ManualEntryFormModal';

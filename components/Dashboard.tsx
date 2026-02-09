@@ -4,7 +4,7 @@ import type { TimeEntry, Customer, Activity, UserAccount, Employee, AbsenceReque
 import { Stopwatch } from './Stopwatch';
 import { ManualEntryForm } from './ManualEntryForm';
 import { Card } from './ui/Card';
-import { formatHoursAndMinutes } from './utils';
+import { formatHoursAndMinutes } from './utils/index';
 import { ExclamationTriangleIcon } from './icons/ExclamationTriangleIcon';
 import { CheckCircleIcon } from './icons/CheckCircleIcon';
 import { ClockIcon } from './icons/ClockIcon';

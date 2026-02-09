@@ -1,4 +1,4 @@
-import { Employee, TimeEntry, AbsenceRequest, Customer, Activity, CompanySettings, Holiday, HolidaysByYear } from '../../types';
+import { Employee, TimeEntry, AbsenceRequest, Customer, Activity, CompanySettings, Holiday, HolidaysByYear, Shift } from '../../types';
 import * as XLSX from 'xlsx';
 import { jsPDF } from 'jspdf';
 import autoTable from 'jspdf-autotable';
@@ -16,8 +16,17 @@ export interface ExportTimesheetParams {
     activities: Activity[];
     selectedState: string;
     companySettings: CompanySettings;
-    holidays: Holiday[];
     timeFormat?: 'decimal' | 'hoursMinutes';
+}
+
+export interface ExportShiftPlanParams {
+    employees: Employee[];
+    shifts: Shift[];
+    startDate: Date;
+    endDate: Date;
+    customers: Customer[];
+    activities: Activity[];
+    companySettings: CompanySettings;
 }
 
 const getTimesheetExportData = (params: ExportTimesheetParams) => {
@@ -269,4 +278,63 @@ export const exportDatev = (
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);
+};
+
+export const exportShiftPlanAsPdf = (params: ExportShiftPlanParams) => {
+    const { employees, shifts, startDate, endDate, customers, activities, companySettings } = params;
+    const doc = new jsPDF();
+
+    doc.setFontSize(18);
+    doc.text(`Schichtplan: ${startDate.toLocaleDateString('de-DE')} - ${endDate.toLocaleDateString('de-DE')}`, 14, 20);
+    doc.setFontSize(12);
+    doc.text(`Firma: ${companySettings.companyName}`, 14, 30);
+
+    let currentY = 40;
+
+    employees.forEach((emp, index) => {
+        if (index > 0) {
+            doc.addPage();
+            currentY = 20;
+        }
+
+        doc.setFontSize(14);
+        doc.setFont("helvetica", "bold");
+        doc.text(`Schichtplan für: ${emp.firstName} ${emp.lastName}`, 14, currentY);
+        currentY += 10;
+
+        // Ensure we compare basic dates or ISO strings correctly
+        const empShifts = shifts.filter(s => {
+            const sStart = new Date(s.start);
+            // Simple range check
+            return s.employeeId === emp.id && sStart >= startDate && sStart <= endDate;
+        }).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+
+        const tableBody = empShifts.map(shift => {
+            const sStart = new Date(shift.start);
+            const sEnd = new Date(shift.end);
+            const customer = customers.find(c => c.id === shift.customerId);
+            const activity = activities.find(a => a.id === shift.activityId);
+
+            return [
+                sStart.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' }),
+                `${sStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${sEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`,
+                customer?.name || '-',
+                activity?.name || '-',
+                shift.label || '-'
+            ];
+        });
+
+        autoTable(doc, {
+            startY: currentY,
+            head: [['Datum', 'Zeit', 'Ort / Kunde', 'Tätigkeit', 'Label']],
+            body: tableBody,
+            theme: 'grid',
+            headStyles: { fillColor: [59, 130, 246] },
+            margin: { left: 14, right: 14 }
+        });
+
+        currentY = (doc as any).lastAutoTable.finalY + 15;
+    });
+
+    doc.save(`Schichtplan_${startDate.toLocaleDateString('de-DE')}_${endDate.toLocaleDateString('de-DE')}.pdf`);
 };

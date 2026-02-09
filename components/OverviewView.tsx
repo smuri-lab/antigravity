@@ -3,7 +3,7 @@ import type { TimeEntry, Customer, Activity, UserAccount, Employee, AbsenceReque
 import { Card } from './ui/Card';
 import { DocumentArrowDownIcon } from './icons/DocumentArrowDownIcon';
 import { TimesheetExportModal } from './admin/TimesheetExportModal';
-import { formatHoursAndMinutes, exportTimesheet, calculateBalance, getContractDetailsForDate, calculateAbsenceDaysInMonth, exportTimesheetAsPdf, calculateMonthlyBreakdown } from './utils';
+import { formatHoursAndMinutes, exportTimesheet, calculateBalance, getContractDetailsForDate, calculateAbsenceDaysInMonth, exportTimesheetAsPdf, calculateMonthlyBreakdown } from './utils/index';
 import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
 import { ChevronRightIcon } from './icons/ChevronRightIcon';
 import { Button } from './ui/Button';

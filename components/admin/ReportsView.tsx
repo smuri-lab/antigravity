@@ -3,7 +3,7 @@ import React, { useState, useMemo, useEffect } from 'react';
 import type { TimeEntry, Customer, Activity, CompanySettings, Employee } from '../../types';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
-import { getContractDetailsForDate } from '../utils';
+import { getContractDetailsForDate, formatHoursAndMinutes } from '../utils/index';
 import { SelectorButton } from '../ui/SelectorButton';
 import { CalendarModal } from '../ui/CalendarModal';
 import { DateSelectorButton } from '../ui/DateSelectorButton';

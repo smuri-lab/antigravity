@@ -8,7 +8,7 @@ import { ConfirmModal } from './ui/ConfirmModal';
 import { ChevronLeftIcon } from './icons/ChevronLeftIcon';
 import { ChevronRightIcon } from './icons/ChevronRightIcon';
 import { ChevronDownIcon } from './icons/ChevronDownIcon';
-import { formatHoursAndMinutes } from './utils';
+import { formatHoursAndMinutes } from './utils/index';
 
 interface CalendarViewProps {
     currentUser: Employee;

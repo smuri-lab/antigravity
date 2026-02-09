@@ -6,7 +6,7 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { XIcon } from '../icons/XIcon';
 import { Input } from '../ui/Input';
-import { getContractDetailsForDate } from '../utils';
+import { getContractDetailsForDate } from '../utils/index';
 
 interface PlannerDisplayOptionsModalProps {
   isOpen: boolean;

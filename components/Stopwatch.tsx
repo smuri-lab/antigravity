@@ -9,7 +9,7 @@ import { PlayIcon } from './icons/PlayIcon';
 import { StopIcon } from './icons/StopIcon';
 import { Textarea } from './ui/Textarea';
 import { InfoModal } from './ui/InfoModal';
-import { getDistanceFromLatLonInMeters, checkCollision } from './utils';
+import { getDistanceFromLatLonInMeters, checkCollision } from './utils/index';
 import { MapPinIcon } from './icons/MapPinIcon';
 
 interface StopwatchProps {

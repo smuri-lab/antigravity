@@ -9,7 +9,7 @@ import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
 import { XIcon } from '../icons/XIcon';
 import { ToggleSwitch } from '../ui/ToggleSwitch';
-import { getContractDetailsForDate } from '../utils';
+import { getContractDetailsForDate } from '../utils/index';
 import { CalendarModal } from '../ui/CalendarModal';
 import { DateSelectorButton } from '../ui/DateSelectorButton';
 import { FlexibleTimeInput } from '../ui/FlexibleTimeInput';
@@ -513,8 +513,8 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
                                                         type="button"
                                                         onClick={() => setFormData(prev => ({ ...prev, employmentType: type.id }))}
                                                         className={`py-2 px-3 text-sm font-medium rounded-md border transition-all duration-200 ${formData.employmentType === type.id
-                                                                ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
-                                                                : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                                            ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                                            : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
                                                             }`}
                                                     >
                                                         {type.label}

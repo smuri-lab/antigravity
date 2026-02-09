@@ -5,7 +5,7 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Select } from '../ui/Select';
 import { Input } from '../ui/Input';
-import { getContractDetailsForDate, formatHoursAndMinutes } from '../utils';
+import { getContractDetailsForDate, formatHoursAndMinutes } from '../utils/index';
 import { XIcon } from '../icons/XIcon';
 import { UsersIcon } from '../icons/UsersIcon';
 import { ChevronLeftIcon } from '../icons/ChevronLeftIcon';
