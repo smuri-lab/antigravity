@@ -198,7 +198,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                     <XIcon className="h-6 w-6" />
                 </button>
 
-                <div className="mb-6 border-b pb-4">
+                <div className="mb-4 border-b pb-3">
                     <div className="flex justify-between items-center">
                         <h2 className="text-xl font-bold flex items-center gap-2">
                             <SparklesIcon className="h-6 w-6 text-indigo-500" />
@@ -226,7 +226,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                     </p>
                 </div>
 
-                <div className="flex-grow overflow-y-auto space-y-6 pr-2">
+                <div className="flex-grow overflow-y-auto space-y-4 pr-2">
 
                     {/* SECTION 1: SETTINGS */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -266,7 +266,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                                                 <span className="text-[10px] uppercase font-bold text-gray-400">Tag {index + 1}</span>
                                                 <button
                                                     onClick={() => setIsTemplateSelectOpen({ index, isOpen: true })}
-                                                    className={`w-24 h-16 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${template
+                                                    className={`w-24 h-14 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${template
                                                         ? 'bg-white border-transparent shadow-sm'
                                                         : 'bg-white border-dashed border-gray-300 text-gray-400 hover:border-gray-400'
                                                         }`}
@@ -323,7 +323,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
 
                                     <button
                                         onClick={addToPattern}
-                                        className="w-8 h-16 mt-5 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 hover:border-blue-300 hover:text-blue-500 transition-colors bg-white/50"
+                                        className="w-8 h-14 mt-4 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 hover:border-blue-300 hover:text-blue-500 transition-colors bg-white/50"
                                         title="Tag hinzufügen"
                                     >
                                         <PlusIcon className="h-5 w-5" />
@@ -345,7 +345,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                                                     </span>
                                                     <button
                                                         onClick={() => setIsTemplateSelectOpen({ index: dayIdx, isOpen: true })}
-                                                        className={`w-full h-16 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${template
+                                                        className={`w-full h-14 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${template
                                                             ? 'bg-white border-transparent shadow-sm'
                                                             : 'bg-white border-dashed border-gray-300 text-gray-400 hover:border-gray-400'
                                                             }`}
@@ -394,7 +394,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                         )}
                     </div>
 
-                    <div className="flex items-center gap-2 p-3 bg-yellow-50 rounded-md text-sm text-yellow-800">
+                    <div className="flex items-center gap-2 p-2 bg-yellow-50 rounded-md text-sm text-yellow-800">
                         <input
                             type="checkbox"
                             id="clearExisting"
@@ -407,7 +407,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
 
                 </div>
 
-                <div className="flex justify-end gap-4 pt-6 mt-4 border-t">
+                <div className="flex justify-end gap-4 pt-4 mt-2 border-t">
                     <Button onClick={handleClose} className="bg-gray-200 hover:bg-gray-300 text-gray-800">Abbrechen</Button>
                     <Button onClick={handleGenerate} className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2">
                         <SparklesIcon className="h-5 w-5" />
