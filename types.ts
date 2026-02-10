@@ -93,10 +93,10 @@ export interface TimeBalanceAdjustment {
 
 
 export interface UserAccount {
-    timeBalanceHours: number;
-    vacationDaysLeft: number;
-    vacationAnnualEntitlement?: number;
-    vacationCarryover?: number;
+  timeBalanceHours: number;
+  vacationDaysLeft: number;
+  vacationAnnualEntitlement?: number;
+  vacationCarryover?: number;
 }
 
 export enum EmploymentType {
@@ -106,18 +106,18 @@ export enum EmploymentType {
 }
 
 export enum TargetHoursModel {
-    Monthly = 'monthly',
-    Weekly = 'weekly',
+  Monthly = 'monthly',
+  Weekly = 'weekly',
 }
 
 export interface WeeklySchedule {
-    mon: number;
-    tue: number;
-    wed: number;
-    thu: number;
-    fri: number;
-    sat: number;
-    sun: number;
+  mon: number;
+  tue: number;
+  wed: number;
+  thu: number;
+  fri: number;
+  sat: number;
+  sun: number;
 }
 
 export interface ContractDetails {
@@ -156,26 +156,27 @@ export interface Employee {
 
 
 export enum View {
-    Dashboard = 'dashboard',
-    Calendar = 'calendar',
-    Overview = 'overview',
+  Dashboard = 'dashboard',
+  Calendar = 'calendar',
+  Overview = 'overview',
 }
 
 export enum AdminViewType {
-    Planner = 'planner',
-    ShiftPlanner = 'shift_planner', // New View
-    TimeTracking = 'time_tracking',
-    Reports = 'reports',
-    Employees = 'employees',
-    Customers = 'customers',
-    Activities = 'activities',
-    Settings = 'settings',
-    Profile = 'profile',
+  Dashboard = 'dashboard',
+  Planner = 'planner',
+  ShiftPlanner = 'shift_planner', // New View
+  TimeTracking = 'time_tracking',
+  Reports = 'reports',
+  Employees = 'employees',
+  Customers = 'customers',
+  Activities = 'activities',
+  Settings = 'settings',
+  Profile = 'profile',
 }
 
 export interface Holiday {
-    date: string;
-    name: string;
+  date: string;
+  name: string;
 }
 
 export type HolidaysByYear = { [year: number]: Holiday[] };

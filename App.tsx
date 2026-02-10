@@ -21,6 +21,7 @@ import { UserCircleIcon } from './components/icons/UserCircleIcon';
 import { CogIcon } from './components/icons/CogIcon';
 import { OverviewView } from './components/OverviewView';
 import { useStore } from './store/useStore';
+import { useTranslation } from 'react-i18next';
 
 // --- PERSISTENCE HOOK ---
 function useLocalStorage<T>(key: string, initialValue: T) {
@@ -205,6 +206,7 @@ const DEMO_DATA = generateDemoData();
 const MOCK_CURRENT_YEAR = 2026;
 
 const App: React.FC = () => {
+  const { t, i18n } = useTranslation();
   const {
     loggedInUser, setLoggedInUser,
     currentView, setCurrentView,
@@ -768,9 +770,23 @@ const App: React.FC = () => {
                       <span className="hidden sm:inline">{isDisplayingAdminView ? 'Mitarbeiter' : 'Admin'}</span>
                     </button>
                   )}
+                  <div className="flex items-center bg-gray-100 rounded-lg p-1">
+                    <button
+                      onClick={() => i18n.changeLanguage('de')}
+                      className={`px-2 py-1 text-xs font-bold rounded ${i18n.language === 'de' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                      DE
+                    </button>
+                    <button
+                      onClick={() => i18n.changeLanguage('en')}
+                      className={`px-2 py-1 text-xs font-bold rounded ${i18n.language === 'en' ? 'bg-white shadow-sm text-blue-600' : 'text-gray-500 hover:text-gray-700'}`}
+                    >
+                      EN
+                    </button>
+                  </div>
                   <button onClick={handleLogout} className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm font-semibold bg-red-100 text-red-700 hover:bg-red-200">
                     <LogoutIcon className="h-5 w-5" />
-                    <span className="hidden sm:inline">Abmelden</span>
+                    <span className="hidden sm:inline">{t('common.logout', 'Abmelden')}</span>
                   </button>
                 </div>
               </div>

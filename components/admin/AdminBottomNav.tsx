@@ -1,6 +1,8 @@
 
 import React from 'react';
 import { AdminViewType, type AbsenceRequest } from '../../types';
+import { useTranslation } from 'react-i18next';
+import { LayoutDashboardIcon } from '../icons/LayoutDashboardIcon';
 import { SunIcon } from '../icons/SunIcon';
 import { ClockIcon } from '../icons/ClockIcon';
 import { ChartBarIcon } from '../icons/ChartBarIcon';
@@ -32,9 +34,9 @@ const NavItem: React.FC<NavItemProps> = ({ label, isActive, onClick, Icon, badge
       <div className="relative">
         <Icon className="h-6 w-6 mb-1" />
         {badge !== undefined && badge > 0 && (
-            <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
-                {badge}
-            </span>
+          <span className="absolute -top-1 -right-2 bg-red-500 text-white text-[10px] font-bold rounded-full h-4 w-4 flex items-center justify-center">
+            {badge}
+          </span>
         )}
       </div>
       <span className="text-xs font-medium">{label}</span>
@@ -43,37 +45,38 @@ const NavItem: React.FC<NavItemProps> = ({ label, isActive, onClick, Icon, badge
 };
 
 export const AdminBottomNav: React.FC<AdminBottomNavProps> = ({ activeView, setActiveView, absenceRequests }) => {
+  const { t } = useTranslation();
   const pendingRequestsCount = absenceRequests.filter(r => r.status === 'pending').length;
-  
-  const isStammdatenActive = 
-    activeView === AdminViewType.Employees || 
-    activeView === AdminViewType.Customers || 
+
+  const isStammdatenActive =
+    activeView === AdminViewType.Employees ||
+    activeView === AdminViewType.Customers ||
     activeView === AdminViewType.Activities;
 
   return (
     <div className="md:hidden fixed bottom-0 left-0 right-0 h-16 bg-white border-t border-gray-200 shadow-[0_-2px_5px_rgba(0,0,0,0.05)] z-30">
       <div className="flex justify-around items-center h-full max-w-4xl mx-auto px-2">
-        <NavItem 
-          label="Planer" 
-          isActive={activeView === AdminViewType.Planner} 
+        <NavItem
+          label={t('nav.dashboard')}
+          isActive={activeView === AdminViewType.Dashboard}
+          onClick={() => setActiveView(AdminViewType.Dashboard)}
+          Icon={LayoutDashboardIcon}
+        />
+        <NavItem
+          label={t('nav.planner', 'Planer')}
+          isActive={activeView === AdminViewType.Planner}
           onClick={() => setActiveView(AdminViewType.Planner)}
           Icon={SunIcon}
           badge={pendingRequestsCount}
         />
-        <NavItem 
-          label="Zeiten" 
-          isActive={activeView === AdminViewType.TimeTracking} 
-          onClick={() => setActiveView(AdminViewType.TimeTracking)}
-          Icon={ClockIcon}
-        />
-        <NavItem 
-          label="Berichte" 
-          isActive={activeView === AdminViewType.Reports} 
+        <NavItem
+          label={t('nav.reports', 'Berichte')}
+          isActive={activeView === AdminViewType.Reports}
           onClick={() => setActiveView(AdminViewType.Reports)}
           Icon={ChartBarIcon}
         />
-        <NavItem 
-          label="Stammdaten" 
+        <NavItem
+          label={t('nav.admin', 'Stammdaten')}
           isActive={isStammdatenActive}
           onClick={() => setActiveView(AdminViewType.Employees)}
           Icon={BriefcaseIcon}

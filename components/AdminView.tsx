@@ -11,6 +11,7 @@ import { PlannerView } from './admin/PlannerView';
 import { VerwaltungView } from './admin/VerwaltungView';
 import { ShiftPlannerView } from './admin/ShiftPlannerView';
 import { AdminBottomNav } from './admin/AdminBottomNav';
+import { DashboardView } from './admin/DashboardView';
 
 interface AdminViewProps {
   loggedInUser: Employee;
@@ -73,58 +74,66 @@ export const AdminView: React.FC<AdminViewProps> = (props) => {
 
   const renderActiveView = () => {
     switch (activeView) {
+      case AdminViewType.Dashboard:
+        return <DashboardView
+          employees={props.employees}
+          timeEntries={props.timeEntries}
+          absenceRequests={props.absenceRequests}
+          holidaysByYear={props.holidaysByYear}
+          companySettings={props.companySettings}
+        />;
       case AdminViewType.Planner:
         return <PlannerView {...props} />;
       case AdminViewType.ShiftPlanner:
-        return <ShiftPlannerView 
-                  employees={props.employees} 
-                  shifts={props.shifts} 
-                  addShift={props.addShift} 
-                  updateShift={props.updateShift} 
-                  deleteShift={props.deleteShift}
-                  customers={props.customers}
-                  activities={props.activities}
-                  companySettings={props.companySettings}
-                  absenceRequests={props.absenceRequests}
-                  shiftTemplates={props.shiftTemplates || []}
-                  addShiftTemplate={props.addShiftTemplate}
-                  updateShiftTemplate={props.updateShiftTemplate}
-                  deleteShiftTemplate={props.deleteShiftTemplate}
-               />;
+        return <ShiftPlannerView
+          employees={props.employees}
+          shifts={props.shifts}
+          addShift={props.addShift}
+          updateShift={props.updateShift}
+          deleteShift={props.deleteShift}
+          customers={props.customers}
+          activities={props.activities}
+          companySettings={props.companySettings}
+          absenceRequests={props.absenceRequests}
+          shiftTemplates={props.shiftTemplates || []}
+          addShiftTemplate={props.addShiftTemplate}
+          updateShiftTemplate={props.updateShiftTemplate}
+          deleteShiftTemplate={props.deleteShiftTemplate}
+        />;
       case AdminViewType.TimeTracking:
         return <TimeTrackingManagement {...props} />;
       case AdminViewType.Reports:
         return <ReportsView
-                  timeEntries={props.timeEntries}
-                  customers={props.customers}
-                  activities={props.activities}
-                  companySettings={props.companySettings}
-                  employees={props.employees}
-               />;
+          timeEntries={props.timeEntries}
+          customers={props.customers}
+          activities={props.activities}
+          companySettings={props.companySettings}
+          employees={props.employees}
+        />;
       case AdminViewType.Employees:
       case AdminViewType.Customers:
       case AdminViewType.Activities:
-        return <VerwaltungView 
-                  {...props}
-                  initialView={activeView}
-                  setActiveView={setActiveView}
-               />;
+        return <VerwaltungView
+          {...props}
+          initialView={activeView}
+          setActiveView={setActiveView}
+        />;
       case AdminViewType.Profile:
         return <ProfileSettings
-                  currentUser={props.loggedInUser}
-                  onUpdate={props.onUpdateEmployee}
-                  companySettings={props.companySettings}
-                  onUpdateCompanySettings={props.onUpdateCompanySettings}
-                />;
+          currentUser={props.loggedInUser}
+          onUpdate={props.onUpdateEmployee}
+          companySettings={props.companySettings}
+          onUpdateCompanySettings={props.onUpdateCompanySettings}
+        />;
       case AdminViewType.Settings:
-        return <SettingsView 
-                  selectedState={props.selectedState}
-                  onStateChange={props.onStateChange}
-                  timeTrackingMethod={props.timeTrackingMethod}
-                  onTimeTrackingMethodChange={props.onTimeTrackingMethodChange}
-                  companySettings={props.companySettings}
-                  onUpdateCompanySettings={props.onUpdateCompanySettings}
-                />;
+        return <SettingsView
+          selectedState={props.selectedState}
+          onStateChange={props.onStateChange}
+          timeTrackingMethod={props.timeTrackingMethod}
+          onTimeTrackingMethodChange={props.onTimeTrackingMethodChange}
+          companySettings={props.companySettings}
+          onUpdateCompanySettings={props.onUpdateCompanySettings}
+        />;
       default:
         return null;
     }
@@ -132,24 +141,24 @@ export const AdminView: React.FC<AdminViewProps> = (props) => {
 
   return (
     <div className="max-w-8xl mx-auto w-full">
-        <div className="flex flex-col md:flex-row gap-6 items-start">
-            <div className="md:pt-6">
-              <AdminNav 
-                  activeView={activeView} 
-                  setActiveView={setActiveView} 
-                  companySettings={props.companySettings} 
-                  absenceRequests={props.absenceRequests}
-              />
-            </div>
-            <main className="flex-grow w-full overflow-x-auto pb-16 md:pb-0 md:pt-6">
-                {renderActiveView()}
-            </main>
-        </div>
-        <AdminBottomNav
+      <div className="flex flex-col md:flex-row gap-6 items-start">
+        <div className="md:pt-6">
+          <AdminNav
             activeView={activeView}
             setActiveView={setActiveView}
+            companySettings={props.companySettings}
             absenceRequests={props.absenceRequests}
-        />
+          />
+        </div>
+        <main className="flex-grow w-full overflow-x-auto pb-16 md:pb-0 md:pt-6">
+          {renderActiveView()}
+        </main>
+      </div>
+      <AdminBottomNav
+        activeView={activeView}
+        setActiveView={setActiveView}
+        absenceRequests={props.absenceRequests}
+      />
     </div>
   );
 };
