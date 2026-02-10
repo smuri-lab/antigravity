@@ -73,7 +73,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* Overtime Trend */}
                 <Card className="p-6">
-                    <h3 className="text-lg font-bold mb-6 text-gray-800 flex items-center gap-2">
+                    <h3 className="text-lg font-bold mb-6 text-gray-800 flex items-center gap-2 font-display">
                         <span className="w-2 h-6 bg-blue-600 rounded-full"></span>
                         {t('dashboard.overtime_trend')}
                     </h3>
@@ -102,7 +102,7 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
 
                 {/* Top Performers / Utilization */}
                 <Card className="p-6">
-                    <h3 className="text-lg font-bold mb-6 text-gray-800 flex items-center gap-2">
+                    <h3 className="text-lg font-bold mb-6 text-gray-800 flex items-center gap-2 font-display">
                         <span className="w-2 h-6 bg-green-500 rounded-full"></span>
                         {t('dashboard.team_utilization')} (Aktueller Monat)
                     </h3>
@@ -129,9 +129,9 @@ export const DashboardView: React.FC<DashboardViewProps> = ({
                 {utilizationData.slice(0, 3).map((item, idx) => (
                     <Card key={idx} className="bg-gradient-to-br from-white to-gray-50 border-white shadow-sm hover:shadow-md transition-shadow">
                         <div className="p-1">
-                            <p className="text-xs font-bold text-gray-500 uppercase tracking-wider">{item.name}</p>
+                            <p className="text-xs font-bold text-gray-500 uppercase tracking-widest font-sans">{item.name}</p>
                             <div className="flex justify-between items-end mt-2">
-                                <span className="text-2xl font-black text-gray-900">{item.hours}h</span>
+                                <span className="text-2xl font-black text-gray-900 font-display">{item.hours}h</span>
                                 <span className={`text-xs px-2 py-0.5 rounded-full font-bold ${item.hours >= item.target ? 'bg-green-100 text-green-700' : 'bg-blue-100 text-blue-700'}`}>
                                     {item.target > 0 ? Math.round((item.hours / item.target) * 100) : 0}% Soll
                                 </span>

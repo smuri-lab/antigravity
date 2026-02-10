@@ -744,7 +744,7 @@ const App: React.FC = () => {
             {/* Header */}
             <header className="flex-none bg-white shadow-md z-30 relative">
               <div className={`${isDisplayingAdminView ? 'max-w-8xl' : 'max-w-7xl'} mx-auto px-4 py-4 flex justify-between items-center`}>
-                <h1 className="text-2xl font-bold text-gray-900 truncate pr-2">
+                <h1 className="text-2xl font-bold text-gray-900 truncate pr-2 font-display tracking-tight">
                   {isDisplayingAdminView ? 'Admin-Dashboard' : `Hallo, ${loggedInUser.firstName}`}
                 </h1>
                 <div className="flex items-center gap-2 sm:gap-4 flex-shrink-0">

@@ -1,147 +1,237 @@
 <!DOCTYPE html>
 <html lang="de">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-    <title>Zeiterfassungssystem</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-      /* Custom scrollbar for a more modern look */
-      ::-webkit-scrollbar {
-        width: 8px;
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <title>Zeiterfassungssystem</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link
+    href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&family=Outfit:wght@100..900&display=swap"
+    rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['Inter', 'ui-sans-serif', 'system-ui', '-apple-system', 'BlinkMacSystemFont', 'Segoe UI', 'Roboto', 'Helvetica Neue', 'Arial', 'Noto Sans', 'sans-serif'],
+            display: ['Outfit', 'sans-serif'],
+          },
+        }
       }
-      ::-webkit-scrollbar-track {
-        background: #f1f1f1;
-      }
-      ::-webkit-scrollbar-thumb {
-        background: #888;
-        border-radius: 4px;
-      }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #555;
-      }
-      
-      html, body {
-        height: 100%;
-        width: 100%;
-        margin: 0;
-        padding: 0;
-        /* CRITICAL: Disable window scrolling entirely */
-        overflow: hidden;
-        overscroll-behavior: none;
-        -webkit-overflow-scrolling: touch;
+    }
+  </script>
+  <style>
+    /* Custom scrollbar for a more modern look */
+    ::-webkit-scrollbar {
+      width: 8px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: #f1f1f1;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: #888;
+      border-radius: 4px;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #555;
+    }
+
+    html,
+    body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
+      /* CRITICAL: Disable window scrolling entirely */
+      overflow: hidden;
+      overscroll-behavior: none;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    #root {
+      height: 100%;
+      width: 100%;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Utility to ensure main content scrolls smoothly */
+    .scroll-container {
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      overscroll-behavior-y: contain;
+    }
+
+    /* PREVENT INPUT LAYOUT SHIFTS */
+    /* Hide IE/Edge clear and reveal buttons */
+    input::-ms-clear,
+    input::-ms-reveal {
+      display: none;
+    }
+
+    /* Hide Chrome/Safari search cancel button */
+    input::-webkit-search-decoration,
+    input::-webkit-search-cancel-button,
+    input::-webkit-search-results-button,
+    input::-webkit-search-results-decoration {
+      display: none;
+    }
+
+    /* Hide time picker indicator (clock icon) on desktop to prevent dropdown */
+    input[type="time"]::-webkit-calendar-picker-indicator {
+      display: none;
+    }
+
+    /* Animation for general content fade-in */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(10px);
       }
 
-      #root {
-        height: 100%;
-        width: 100%;
-        display: flex;
-        flex-direction: column;
+      to {
+        opacity: 1;
+        transform: translateY(0);
       }
-      
-      /* Utility to ensure main content scrolls smoothly */
-      .scroll-container {
-        overflow-y: auto;
-        -webkit-overflow-scrolling: touch;
-        overscroll-behavior-y: contain;
-      }
-      
-      /* PREVENT INPUT LAYOUT SHIFTS */
-      /* Hide IE/Edge clear and reveal buttons */
-      input::-ms-clear,
-      input::-ms-reveal {
-        display: none;
-      }
-      /* Hide Chrome/Safari search cancel button */
-      input::-webkit-search-decoration,
-      input::-webkit-search-cancel-button,
-      input::-webkit-search-results-button,
-      input::-webkit-search-results-decoration {
-        display: none;
+    }
+
+    .animate-fade-in {
+      animation: fadeIn 0.4s ease-in-out;
+    }
+
+    /* Animation for toast notification */
+    @keyframes toast-in {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
       }
 
-      /* Hide time picker indicator (clock icon) on desktop to prevent dropdown */
-      input[type="time"]::-webkit-calendar-picker-indicator {
-        display: none;
+      to {
+        transform: translateY(0);
+        opacity: 1;
       }
-      
-      /* Animation for general content fade-in */
-      @keyframes fadeIn {
-        from { opacity: 0; transform: translateY(10px); }
-        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-toast-in {
+      animation: toast-in 0.3s ease-out;
+    }
+
+    /* Animation for pending request indicator */
+    @keyframes pulse-dot {
+
+      0%,
+      100% {
+        transform: scale(1);
+        opacity: 1;
       }
-      .animate-fade-in {
-        animation: fadeIn 0.4s ease-in-out;
+
+      50% {
+        transform: scale(1.5);
+        opacity: 0.7;
       }
-      /* Animation for toast notification */
-      @keyframes toast-in {
-        from {
-          transform: translateY(20px);
-          opacity: 0;
-        }
-        to {
-          transform: translateY(0);
-          opacity: 1;
-        }
+    }
+
+    .animate-pulse-dot {
+      animation: pulse-dot 1.5s ease-in-out infinite;
+    }
+
+    /* Animation for action sheet */
+    @keyframes slide-up {
+      from {
+        transform: translateY(100%);
       }
-      .animate-toast-in {
-        animation: toast-in 0.3s ease-out;
+
+      to {
+        transform: translateY(0);
       }
-      /* Animation for pending request indicator */
-      @keyframes pulse-dot {
-        0%, 100% {
-          transform: scale(1);
-          opacity: 1;
-        }
-        50% {
-          transform: scale(1.5);
-          opacity: 0.7;
-        }
+    }
+
+    @keyframes slide-down-sheet {
+      from {
+        transform: translateY(0);
       }
-      .animate-pulse-dot {
-        animation: pulse-dot 1.5s ease-in-out infinite;
+
+      to {
+        transform: translateY(100%);
       }
-      /* Animation for action sheet */
-      @keyframes slide-up {
-        from {
-          transform: translateY(100%);
-        }
-        to {
-          transform: translateY(0);
-        }
+    }
+
+    .animate-slide-up {
+      animation: slide-up 0.3s ease-out forwards;
+    }
+
+    .animate-slide-down-sheet {
+      animation: slide-down-sheet 0.3s ease-in forwards;
+    }
+
+    /* Modal Animations */
+    @keyframes modal-fade-in {
+      from {
+        background-color: rgba(0, 0, 0, 0);
       }
-      @keyframes slide-down-sheet {
-        from { transform: translateY(0); }
-        to { transform: translateY(100%); }
+
+      to {
+        background-color: rgba(0, 0, 0, 0.6);
       }
-      .animate-slide-up {
-        animation: slide-up 0.3s ease-out forwards;
+    }
+
+    @keyframes modal-fade-out {
+      from {
+        background-color: rgba(0, 0, 0, 0.6);
       }
-      .animate-slide-down-sheet {
-        animation: slide-down-sheet 0.3s ease-in forwards;
+
+      to {
+        background-color: rgba(0, 0, 0, 0);
       }
-       /* Modal Animations */
-      @keyframes modal-fade-in {
-        from { background-color: rgba(0,0,0,0); }
-        to { background-color: rgba(0,0,0,0.6); }
+    }
+
+    @keyframes modal-slide-up {
+      from {
+        transform: translateY(20px);
+        opacity: 0;
       }
-      @keyframes modal-fade-out {
-          from { background-color: rgba(0,0,0,0.6); }
-          to { background-color: rgba(0,0,0,0); }
+
+      to {
+        transform: translateY(0);
+        opacity: 1;
       }
-      @keyframes modal-slide-up {
-          from { transform: translateY(20px); opacity: 0; }
-          to { transform: translateY(0); opacity: 1; }
+    }
+
+    @keyframes modal-slide-down {
+      from {
+        transform: translateY(0);
+        opacity: 1;
       }
-      @keyframes modal-slide-down {
-          from { transform: translateY(0); opacity: 1; }
-          to { transform: translateY(20px); opacity: 0; }
+
+      to {
+        transform: translateY(20px);
+        opacity: 0;
       }
-      .animate-modal-fade-in { animation: modal-fade-in 0.3s ease-out forwards; }
-      .animate-modal-fade-out { animation: modal-fade-out 0.3s ease-in forwards; }
-      .animate-modal-slide-up { animation: modal-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-      .animate-modal-slide-down { animation: modal-slide-down 0.3s cubic-bezier(0.7, 0, 0.84, 0) forwards; }
-    </style>
+    }
+
+    .animate-modal-fade-in {
+      animation: modal-fade-in 0.3s ease-out forwards;
+    }
+
+    .animate-modal-fade-out {
+      animation: modal-fade-out 0.3s ease-in forwards;
+    }
+
+    .animate-modal-slide-up {
+      animation: modal-slide-up 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+    }
+
+    .animate-modal-slide-down {
+      animation: modal-slide-down 0.3s cubic-bezier(0.7, 0, 0.84, 0) forwards;
+    }
+  </style>
   <script type="importmap">
 {
   "imports": {
@@ -154,11 +244,13 @@
   }
 }
 </script>
-<script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
-<script src="https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.js"></script>
+  <script src="https://unpkg.com/jspdf@latest/dist/jspdf.umd.min.js"></script>
+  <script src="https://unpkg.com/jspdf-autotable@latest/dist/jspdf.plugin.autotable.js"></script>
 </head>
-  <body class="bg-gray-100 antialiased">
-    <div id="root"></div>
-    <script type="module" src="/index.tsx"></script>
-  </body>
+
+<body class="bg-gray-50 antialiased font-sans text-base text-gray-900 leading-relaxed translate-z-0">
+  <div id="root"></div>
+  <script type="module" src="/index.tsx"></script>
+</body>
+
 </html>

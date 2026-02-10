@@ -39,7 +39,7 @@ const NavItem: React.FC<NavItemProps> = ({ label, isActive, onClick, Icon, badge
           </span>
         )}
       </div>
-      <span className="text-xs font-medium">{label}</span>
+      <span className="text-[10px] font-bold uppercase tracking-wider text-gray-500 group-hover:text-blue-600 transition-colors">{label}</span>
     </button>
   );
 };

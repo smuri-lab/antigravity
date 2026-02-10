@@ -48,7 +48,7 @@ export const LoginScreen: React.FC<LoginScreenProps> = ({ onLogin, onSwitchToReg
     <>
       <div className="min-h-screen bg-gray-100 flex items-start sm:items-center justify-center p-4 pt-16 sm:pt-4 relative z-50 animate-fade-in">
         <Card className="w-full max-w-sm">
-          <h1 className="text-2xl font-bold text-center text-gray-800 mb-6">Willkommen bei TimePro</h1>
+          <h1 className="text-2xl font-bold text-center text-gray-900 mb-8 font-display tracking-tight">Willkommen bei TimePro</h1>
           <form onSubmit={handleSubmit} className="space-y-4" noValidate>
             <Input
               label="Benutzername"
