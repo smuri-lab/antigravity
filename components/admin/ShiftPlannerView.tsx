@@ -550,7 +550,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
                                 <button onClick={() => setIsDatePickModalOpen(true)} className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
                                     <CalendarDaysIcon className="h-6 w-6 text-gray-400 group-hover:text-blue-600" />
-                                    <h2 className="text-xl sm:text-2xl font-bold text-gray-800 whitespace-nowrap">
+                                    <h2 className="text-lg font-bold text-gray-800 whitespace-nowrap font-display tracking-tight">
                                         {dateRangeLabel}
                                     </h2>
                                 </button>

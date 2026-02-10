@@ -394,7 +394,7 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
                     <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
                 </button>
                 <button onClick={() => setIsDateRangeModalOpen(true)} className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors" title="Zeitraum anpassen">
-                    <h2 className="text-lg font-bold text-gray-800 text-center">{formatHeaderDate()}</h2>
+                    <h2 className="text-lg font-bold text-gray-800 text-center font-display tracking-tight">{formatHeaderDate()}</h2>
                     <CalendarDaysIcon className="h-5 w-5 text-gray-600 group-hover:text-blue-600 transition-colors" />
                 </button>
                 <button onClick={() => changePeriod(1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Nächster Zeitraum">
