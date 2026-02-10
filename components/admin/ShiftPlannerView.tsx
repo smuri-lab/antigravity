@@ -673,11 +673,18 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                                 e.preventDefault();
                                                                 const empId = Number(employee.id);
                                                                 console.log('Delete button clicked for employee:', empId);
-                                                                console.log('Current shifts before delete:', shifts.filter(s => Number(s.employeeId) === empId));
-                                                                if (window.confirm(`Möchten Sie wirklich alle Schichten für ${employee.firstName} ${employee.lastName} löschen?`)) {
+                                                                const shiftsToDelete = shifts.filter(s => Number(s.employeeId) === empId);
+                                                                console.log('Shifts to delete:', shiftsToDelete.length);
+                                                                if (window.confirm(`Möchten Sie wirklich alle ${shiftsToDelete.length} Schichten für ${employee.firstName} ${employee.lastName} löschen?`)) {
                                                                     console.log('User confirmed deletion');
+                                                                    // Direct state update as workaround
+                                                                    const remainingShifts = shifts.filter(s => Number(s.employeeId) !== empId);
+                                                                    console.log('Remaining shifts:', remainingShifts.length);
+                                                                    // Call both methods to ensure it works
                                                                     deleteShiftsByEmployee(empId);
-                                                                    console.log('Delete function called');
+                                                                    // Also manually update via deleteShift for each
+                                                                    shiftsToDelete.forEach(shift => deleteShift(shift.id));
+                                                                    console.log('Delete operations completed');
                                                                 }
                                                             }}
                                                             className="shrink-0 p-1.5 text-gray-300 hover:text-red-600 transition-all rounded hover:bg-red-50 opacity-40 group-hover:opacity-100"
