@@ -295,7 +295,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
 
                                             {/* Template Selection Popover */}
                                             {isTemplateSelectOpen.isOpen && isTemplateSelectOpen.index === index && (
-                                                <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-50 p-2 max-h-60 overflow-y-auto">
+                                                <div className="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-50 p-2 max-h-60 overflow-y-auto">
                                                     <div className="text-xs font-bold text-gray-400 mb-2 px-2 uppercase tracking-tight">Vorlage wählen</div>
                                                     <button
                                                         onClick={() => setPatternItem(index, null)}
@@ -363,7 +363,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                                                 </div>
 
                                                 {isTemplateSelectOpen.isOpen && isTemplateSelectOpen.index === dayIdx && (
-                                                    <div className="absolute top-full left-0 mt-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-50 p-2 max-h-60 overflow-y-auto">
+                                                    <div className="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-50 p-2 max-h-60 overflow-y-auto">
                                                         <div className="text-xs font-bold text-gray-400 mb-2 px-2 uppercase tracking-tight">Vorlage wählen</div>
                                                         <button
                                                             onClick={() => setPatternItem(dayIdx, null)}
