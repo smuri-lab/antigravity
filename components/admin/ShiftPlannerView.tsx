@@ -659,18 +659,18 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                             <div key={employee.id} className="flex h-16 group hover:bg-gray-50/50 transition-colors">
                                                 {/* Employee Column */}
                                                 <div className="w-48 shrink-0 p-3 border-r border-gray-200 sticky left-0 z-20 bg-white group-hover:bg-gray-50 flex flex-col justify-center shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
-                                                    <div className="flex items-center justify-between gap-2 overflow-hidden">
-                                                        <div className="text-sm font-medium text-gray-900 truncate">
+                                                    <div className="flex items-center w-full gap-2">
+                                                        <div className="text-sm font-medium text-gray-900 truncate flex-1 leading-tight">
                                                             {employee.firstName} {employee.lastName}
                                                         </div>
                                                         <button
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
                                                                 if (window.confirm(`Möchten Sie wirklich alle Schichten für ${employee.firstName} ${employee.lastName} löschen?`)) {
-                                                                    deleteShiftsByEmployee(employee.id);
+                                                                    deleteShiftsByEmployee(Number(employee.id));
                                                                 }
                                                             }}
-                                                            className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-600 transition-all rounded hover:bg-red-50"
+                                                            className="shrink-0 p-1.5 text-gray-300 hover:text-red-600 transition-all rounded hover:bg-red-50 opacity-40 group-hover:opacity-100"
                                                             title="Alle Schichten dieses Mitarbeiters löschen"
                                                         >
                                                             <TrashIcon className="h-4 w-4" />
