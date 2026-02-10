@@ -666,8 +666,14 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                         <button
                                                             onClick={(e) => {
                                                                 e.stopPropagation();
+                                                                e.preventDefault();
+                                                                const empId = Number(employee.id);
+                                                                console.log('Delete button clicked for employee:', empId);
+                                                                console.log('Current shifts before delete:', shifts.filter(s => Number(s.employeeId) === empId));
                                                                 if (window.confirm(`Möchten Sie wirklich alle Schichten für ${employee.firstName} ${employee.lastName} löschen?`)) {
-                                                                    deleteShiftsByEmployee(Number(employee.id));
+                                                                    console.log('User confirmed deletion');
+                                                                    deleteShiftsByEmployee(empId);
+                                                                    console.log('Delete function called');
                                                                 }
                                                             }}
                                                             className="shrink-0 p-1.5 text-gray-300 hover:text-red-600 transition-all rounded hover:bg-red-50 opacity-40 group-hover:opacity-100"
