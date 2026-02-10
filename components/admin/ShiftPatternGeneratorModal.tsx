@@ -193,7 +193,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
 
     return ReactDOM.createPortal(
         <div className={`fixed inset-0 bg-black flex items-center justify-center z-[250] p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : 'animate-modal-fade-in'}`} onClick={handleClose}>
-            <Card className={`w-full max-w-3xl relative max-h-[90vh] flex flex-col ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`} onClick={e => e.stopPropagation()}>
+            <Card className={`w-full max-w-3xl relative max-h-[95vh] overflow-y-auto flex flex-col ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`} onClick={e => e.stopPropagation()}>
                 <button onClick={handleClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
                     <XIcon className="h-6 w-6" />
                 </button>
@@ -226,7 +226,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                     </p>
                 </div>
 
-                <div className="flex-grow overflow-y-auto space-y-4 pr-2">
+                <div className="flex-grow space-y-4 pr-2">
 
                     {/* SECTION 1: SETTINGS */}
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -266,7 +266,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                                                 <span className="text-[10px] uppercase font-bold text-gray-400">Tag {index + 1}</span>
                                                 <button
                                                     onClick={() => setIsTemplateSelectOpen({ index, isOpen: true })}
-                                                    className={`w-24 h-14 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${template
+                                                    className={`w-24 h-12 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${template
                                                         ? 'bg-white border-transparent shadow-sm'
                                                         : 'bg-white border-dashed border-gray-300 text-gray-400 hover:border-gray-400'
                                                         }`}
@@ -323,7 +323,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
 
                                     <button
                                         onClick={addToPattern}
-                                        className="w-8 h-14 mt-4 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 hover:border-blue-300 hover:text-blue-500 transition-colors bg-white/50"
+                                        className="w-8 h-12 mt-4 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 hover:border-blue-300 hover:text-blue-500 transition-colors bg-white/50"
                                         title="Tag hinzufügen"
                                     >
                                         <PlusIcon className="h-5 w-5" />
@@ -345,7 +345,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                                                     </span>
                                                     <button
                                                         onClick={() => setIsTemplateSelectOpen({ index: dayIdx, isOpen: true })}
-                                                        className={`w-full h-14 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${template
+                                                        className={`w-full h-12 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${template
                                                             ? 'bg-white border-transparent shadow-sm'
                                                             : 'bg-white border-dashed border-gray-300 text-gray-400 hover:border-gray-400'
                                                             }`}
