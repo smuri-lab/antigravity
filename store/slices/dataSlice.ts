@@ -172,7 +172,12 @@ export const createDataSlice: StateCreator<DataSlice> = (set) => ({
         shiftTemplates: state.shiftTemplates.filter(t => t.id !== id),
         shifts: state.shifts.map(s => s.templateId === id ? { ...s, templateId: undefined } : s)
     })),
-    deleteShiftsByEmployee: (employeeId) => set((state) => ({
-        shifts: state.shifts.filter(s => Number(s.employeeId) != Number(employeeId))
-    })),
+    deleteShiftsByEmployee: (employeeId) => set((state) => {
+        console.log('Store: deleteShiftsByEmployee called with ID:', employeeId);
+        console.log('Store: Current shifts count:', state.shifts.length);
+        const newShifts = state.shifts.filter(s => Number(s.employeeId) != Number(employeeId));
+        console.log('Store: New shifts count after filter:', newShifts.length);
+        console.log('Store: Shifts removed:', state.shifts.length - newShifts.length);
+        return { shifts: newShifts };
+    }),
 });
