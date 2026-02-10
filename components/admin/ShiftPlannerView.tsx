@@ -545,18 +545,18 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
                             <div className="flex items-center justify-center gap-2 sm:gap-4 w-full xl:w-auto">
                                 <button onClick={() => shiftView(-1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Zurück">
-                                    <ChevronLeftIcon className="h-6 w-6 text-gray-600" />
+                                    <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
                                 </button>
 
                                 <button onClick={() => setIsDatePickModalOpen(true)} className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
-                                    <CalendarDaysIcon className="h-6 w-6 text-gray-400 group-hover:text-blue-600" />
+                                    <CalendarDaysIcon className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
                                     <h2 className="text-lg font-bold text-gray-800 whitespace-nowrap font-display tracking-tight">
                                         {dateRangeLabel}
                                     </h2>
                                 </button>
 
                                 <button onClick={() => shiftView(1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Vor">
-                                    <ChevronRightIcon className="h-6 w-6 text-gray-600" />
+                                    <ChevronRightIcon className="h-5 w-5 text-gray-600" />
                                 </button>
                             </div>
 
