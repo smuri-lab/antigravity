@@ -762,7 +762,7 @@ const App: React.FC = () => {
                   )}
                   {isUserAdmin && (
                     <button
-                      onClick={() => setAdminViewMode(prev => prev === 'admin' ? 'employee' : 'admin')}
+                      onClick={() => setAdminViewMode(adminViewMode === 'admin' ? 'employee' : 'admin')}
                       className="flex items-center gap-2 px-3 py-2 rounded-lg transition-colors text-sm font-semibold bg-gray-100 text-gray-700 hover:bg-gray-200"
                       title={isDisplayingAdminView ? 'Zur Mitarbeiter-Ansicht wechseln' : 'Zur Admin-Ansicht wechseln'}
                     >
