@@ -440,10 +440,6 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                 initialEndDate={endDate}
             />
 
-            {/* Click overlay to close template dropdown if open */}
-            {isTemplateSelectOpen.isOpen && (
-                <div className="fixed inset-0 z-[240]" onClick={() => setIsTemplateSelectOpen({ index: -1, isOpen: false })}></div>
-            )}
         </div>,
         document.body
     );

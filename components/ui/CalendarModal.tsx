@@ -133,7 +133,10 @@ export const CalendarModal: React.FC<CalendarModalProps> = ({
   const cardClasses = `w-full max-w-sm ${isRotated ? '!p-3' : ''} ${isClosing ? 'animate-modal-slide-down' : (isVisible ? 'animate-modal-slide-up' : 'opacity-0 translate-y-4')}`;
 
   return (
-    <div className={containerClass} onClick={handleClose}>
+    <div className={containerClass} onClick={(e) => {
+      e.stopPropagation();
+      handleClose();
+    }}>
       <Card className={cardClasses} onClick={(e) => e.stopPropagation()}>
         <div className={`flex justify-between items-center ${isRotated ? 'pb-2' : 'pb-4'} border-b`}>
           <h2 className="text-xl font-bold">{title}</h2>
