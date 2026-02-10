@@ -254,6 +254,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                 end: end.toISOString(),
                 label: activeTemplate.label || activeTemplate.name,
                 color: activeTemplate.color,
+                templateId: activeTemplate.id,
             });
             return;
         }

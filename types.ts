@@ -57,6 +57,7 @@ export interface Shift {
   color?: string; // Hex code for UI
   customerId?: string;
   activityId?: string;
+  templateId?: string;
 }
 
 export enum AbsenceType {

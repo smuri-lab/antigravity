@@ -165,7 +165,8 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                         start: sTime.toISOString(),
                         end: eTime.toISOString(),
                         label: template.label || template.name,
-                        color: template.color
+                        color: template.color,
+                        templateId: template.id
                     });
                 }
 
