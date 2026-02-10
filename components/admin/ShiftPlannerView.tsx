@@ -677,11 +677,11 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                                 {timelineSlots.map((d, i) => (
                                                                     <div
                                                                         key={i}
-                                                                        className={`flex-1 transition-colors border-r border-transparent relative group ${activeTemplate ? 'hover:bg-green-100/50' : 'hover:bg-blue-50/30 cursor-pointer'}`}
+                                                                        className={`flex-1 transition-colors border-r border-transparent relative group/cell ${activeTemplate ? 'hover:bg-green-100/50' : 'hover:bg-blue-50/30 cursor-pointer'}`}
                                                                         onClick={() => handleTrackClick(employee.id, d)}
                                                                         title={activeTemplate ? `Vorlage anwenden` : `${d.toLocaleTimeString([], { hour: '2-digit' })} - Klicken`}
                                                                     >
-                                                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none">
+                                                                        <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/cell:opacity-100 transition-opacity duration-150 pointer-events-none">
                                                                             <PlusIcon className="h-4 w-4 text-gray-400" />
                                                                         </div>
                                                                     </div>
@@ -747,7 +747,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                                 return (
                                                                     <div
                                                                         key={i}
-                                                                        className={`flex-1 border-r border-gray-100 last:border-r-0 relative p-1 flex flex-col gap-1 overflow-hidden group
+                                                                        className={`flex-1 border-r border-gray-100 last:border-r-0 relative p-1 flex flex-col gap-1 overflow-hidden group/cell
                                                                             ${activeTemplate ? 'hover:bg-green-50 cursor-copy' : 'hover:bg-blue-50/50 cursor-pointer'}
                                                                             ${isToday ? 'bg-blue-50/30' : isWeekend ? 'bg-gray-50/30' : ''}
                                                                         `}
@@ -755,7 +755,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                                     >
                                                                         {/* Hover Plus Icon */}
                                                                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                                                                            <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-150">
+                                                                            <div className="opacity-0 group-hover/cell:opacity-100 transition-opacity duration-150">
                                                                                 <PlusIcon className="h-4 w-4 text-gray-400" />
                                                                             </div>
                                                                         </div>
