@@ -70,7 +70,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     addShiftTemplate = () => { },
     updateShiftTemplate = () => { },
     deleteShiftTemplate = () => { },
-    deleteShiftsByEmployee = () => { }
+    deleteShiftsByEmployee = (_id: number) => { }
 }) => {
     // --- GENERAL STATE ---
     const [activeTab, setActiveTab] = useState<'planner' | 'report'>('planner');

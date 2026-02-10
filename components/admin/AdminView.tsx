@@ -59,6 +59,7 @@ interface AdminViewProps {
   addShiftTemplate: (template: Omit<ShiftTemplate, 'id'>) => void;
   updateShiftTemplate: (template: ShiftTemplate) => void;
   deleteShiftTemplate: (id: string) => void;
+  deleteShiftsByEmployee: (employeeId: number) => void;
 }
 
 export const AdminView: React.FC<AdminViewProps> = (props) => {

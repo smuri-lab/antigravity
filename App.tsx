@@ -847,6 +847,7 @@ const App: React.FC = () => {
                   addShiftTemplate={addShiftTemplate}
                   updateShiftTemplate={updateShiftTemplate}
                   deleteShiftTemplate={deleteShiftTemplate}
+                  deleteShiftsByEmployee={deleteShiftsByEmployee}
                 />
               ) : (
                 renderEmployeeView()
