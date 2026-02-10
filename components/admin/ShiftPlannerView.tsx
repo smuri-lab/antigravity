@@ -7,6 +7,7 @@ import { Button } from '../ui/Button';
 import { ChevronLeftIcon } from '../icons/ChevronLeftIcon';
 import { ChevronRightIcon } from '../icons/ChevronRightIcon';
 import { PlusIcon } from '../icons/PlusIcon';
+import { TrashIcon } from '../icons/TrashIcon';
 import { ShiftFormModal } from './ShiftFormModal';
 import { CalendarDaysIcon } from '../icons/CalendarDaysIcon';
 import { CalendarModal } from '../ui/CalendarModal';
@@ -43,6 +44,7 @@ interface ShiftPlannerViewProps {
     addShiftTemplate: (template: Omit<ShiftTemplate, 'id'>) => void;
     updateShiftTemplate: (template: ShiftTemplate) => void;
     deleteShiftTemplate: (id: string) => void;
+    deleteShiftsByEmployee: (employeeId: number) => void;
 }
 
 // Helper to check if a shift overlaps with the visible time window
@@ -67,7 +69,8 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     shiftTemplates = [],
     addShiftTemplate = () => { },
     updateShiftTemplate = () => { },
-    deleteShiftTemplate = () => { }
+    deleteShiftTemplate = () => { },
+    deleteShiftsByEmployee = () => { }
 }) => {
     // --- GENERAL STATE ---
     const [activeTab, setActiveTab] = useState<'planner' | 'report'>('planner');
@@ -656,8 +659,22 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                             <div key={employee.id} className="flex h-16 group hover:bg-gray-50/50 transition-colors">
                                                 {/* Employee Column */}
                                                 <div className="w-48 shrink-0 p-3 border-r border-gray-200 sticky left-0 z-20 bg-white group-hover:bg-gray-50 flex flex-col justify-center shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
-                                                    <div className="text-sm font-medium text-gray-900 truncate">
-                                                        {employee.firstName} {employee.lastName}
+                                                    <div className="flex items-center justify-between gap-2 overflow-hidden">
+                                                        <div className="text-sm font-medium text-gray-900 truncate">
+                                                            {employee.firstName} {employee.lastName}
+                                                        </div>
+                                                        <button
+                                                            onClick={(e) => {
+                                                                e.stopPropagation();
+                                                                if (window.confirm(`Möchten Sie wirklich alle Schichten für ${employee.firstName} ${employee.lastName} löschen?`)) {
+                                                                    deleteShiftsByEmployee(employee.id);
+                                                                }
+                                                            }}
+                                                            className="opacity-0 group-hover:opacity-100 p-1 text-gray-400 hover:text-red-600 transition-all rounded hover:bg-red-50"
+                                                            title="Alle Schichten dieses Mitarbeiters löschen"
+                                                        >
+                                                            <TrashIcon className="h-4 w-4" />
+                                                        </button>
                                                     </div>
                                                 </div>
 

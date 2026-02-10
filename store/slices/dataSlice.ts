@@ -46,6 +46,7 @@ export interface DataSlice {
     addShiftTemplate: (template: Omit<ShiftTemplate, 'id'>) => void;
     updateShiftTemplate: (updatedTemplate: ShiftTemplate) => void;
     deleteShiftTemplate: (id: string) => void;
+    deleteShiftsByEmployee: (employeeId: number) => void;
 }
 
 export const createDataSlice: StateCreator<DataSlice> = (set) => ({
@@ -170,5 +171,8 @@ export const createDataSlice: StateCreator<DataSlice> = (set) => ({
     deleteShiftTemplate: (id) => set((state) => ({
         shiftTemplates: state.shiftTemplates.filter(t => t.id !== id),
         shifts: state.shifts.map(s => s.templateId === id ? { ...s, templateId: undefined } : s)
+    })),
+    deleteShiftsByEmployee: (employeeId) => set((state) => ({
+        shifts: state.shifts.filter(s => s.employeeId !== employeeId)
     })),
 });
