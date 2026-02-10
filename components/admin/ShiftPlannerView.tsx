@@ -72,6 +72,10 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     deleteShiftTemplate = () => { },
     deleteShiftsByEmployee = (_id: number) => { }
 }) => {
+    // Verify prop is correctly passed
+    console.log('ShiftPlannerView: deleteShiftsByEmployee prop:', deleteShiftsByEmployee);
+    console.log('ShiftPlannerView: Is default function?', deleteShiftsByEmployee.toString().includes('{ }'));
+
     // --- GENERAL STATE ---
     const [activeTab, setActiveTab] = useState<'planner' | 'report'>('planner');
 
