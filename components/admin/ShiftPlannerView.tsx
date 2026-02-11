@@ -1037,7 +1037,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                                     <div
                                                                         key={i}
                                                                         className={`flex-1 border-r border-gray-100 last:border-r-0 relative p-1 flex flex-col gap-1 overflow-hidden group/cell
-                                                                            ${activeTemplate ? 'hover:bg-green-50 cursor-copy' : 'hover:bg-blue-50/50 cursor-pointer'}
+                                                                            ${draggedTemplate ? 'cursor-copy' : activeTemplate ? 'hover:bg-green-50 cursor-pointer' : 'hover:bg-blue-50/50 cursor-pointer'}
                                                                             ${isToday ? 'bg-blue-50/30' : isWeekend ? 'bg-gray-50/30' : ''}
                                                                             ${isDropTarget ? 'bg-green-100 ring-2 ring-green-500 ring-inset' : ''}
                                                                         `}
