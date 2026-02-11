@@ -1,7 +1,8 @@
 
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import type { Shift, Employee, Customer, Activity, CompanySettings, ShiftTemplate } from '../../types';
+import type { Shift, Employee, Customer, Activity, CompanySettings, ShiftTemplate, AbsenceRequest } from '../../types';
+import { AbsenceType } from '../../types';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
@@ -26,7 +27,8 @@ interface ShiftFormModalProps {
     initialData: Partial<Shift> | null;
     defaultDate?: string;
     defaultEmployeeId?: number;
-    shiftTemplates?: ShiftTemplate[]; // New prop
+    shiftTemplates?: ShiftTemplate[];
+    absenceRequests?: AbsenceRequest[];
 }
 
 const formatDate = (dateString: string) => {
@@ -38,8 +40,35 @@ const formatDate = (dateString: string) => {
     });
 };
 
+// Helper to check if a shift conflicts with an approved absence
+const checkAbsenceConflict = (employeeId: number, shiftDate: string, absenceRequests: AbsenceRequest[]): AbsenceRequest | null => {
+    const shiftDateObj = new Date(shiftDate);
+
+    const conflict = absenceRequests.find(absence => {
+        if (absence.employeeId !== employeeId) return false;
+        if (absence.status !== 'approved') return false;
+
+        const startDate = new Date(absence.startDate);
+        const endDate = new Date(absence.endDate);
+
+        return shiftDateObj >= startDate && shiftDateObj <= endDate;
+    });
+
+    return conflict || null;
+};
+
+// Helper to get absence type label in German
+const getAbsenceTypeLabel = (type: AbsenceType): string => {
+    switch (type) {
+        case AbsenceType.Vacation: return 'Urlaub';
+        case AbsenceType.SickLeave: return 'Krankheit';
+        case AbsenceType.TimeOff: return 'Freizeitausgleich';
+        default: return 'Abwesenheit';
+    }
+};
+
 export const ShiftFormModal: React.FC<ShiftFormModalProps> = ({
-    isOpen, onClose, onSave, onDelete, employees, customers, activities, companySettings, initialData, defaultDate, defaultEmployeeId, shiftTemplates = []
+    isOpen, onClose, onSave, onDelete, employees, customers, activities, companySettings, initialData, defaultDate, defaultEmployeeId, shiftTemplates = [], absenceRequests = []
 }) => {
     const [formData, setFormData] = useState<Partial<Shift>>({});
     const [date, setDate] = useState(defaultDate || new Date().toLocaleDateString('sv-SE'));
@@ -54,6 +83,10 @@ export const ShiftFormModal: React.FC<ShiftFormModalProps> = ({
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
     const [isClosing, setIsClosing] = useState(false);
+
+    // Conflict warning state
+    const [conflictWarning, setConflictWarning] = useState<{ show: boolean; absenceType: AbsenceType | null }>({ show: false, absenceType: null });
+    const [pendingShiftData, setPendingShiftData] = useState<any>(null);
 
     const customerLabel = companySettings.customerLabel || 'Zeitkategorie 1';
     const activityLabel = companySettings.activityLabel || 'Zeitkategorie 2';
@@ -146,10 +179,38 @@ export const ShiftFormModal: React.FC<ShiftFormModalProps> = ({
             color: formData.color || '#3b82f6',
         };
 
+        // Check for absence conflicts
+        const conflict = checkAbsenceConflict(formData.employeeId!, date, absenceRequests);
+        if (conflict) {
+            // Show warning modal
+            setConflictWarning({ show: true, absenceType: conflict.type });
+            setPendingShiftData(shiftData);
+            return;
+        }
+
+        // No conflict, save directly
         setIsClosing(true);
         setTimeout(() => {
             onSave(shiftData as Shift);
         }, 300);
+    };
+
+    // Handle confirmed save despite conflict
+    const handleConfirmConflict = () => {
+        setConflictWarning({ show: false, absenceType: null });
+        if (pendingShiftData) {
+            setIsClosing(true);
+            setTimeout(() => {
+                onSave(pendingShiftData as Shift);
+                setPendingShiftData(null);
+            }, 300);
+        }
+    };
+
+    // Handle cancel conflict warning
+    const handleCancelConflict = () => {
+        setConflictWarning({ show: false, absenceType: null });
+        setPendingShiftData(null);
     };
 
     const handleDelete = () => {
@@ -299,6 +360,19 @@ export const ShiftFormModal: React.FC<ShiftFormModalProps> = ({
                 title="Datum auswählen"
                 initialStartDate={date}
                 selectionMode="single"
+            />
+
+            <ConfirmModal
+                isOpen={conflictWarning.show}
+                onClose={handleCancelConflict}
+                onConfirm={handleConfirmConflict}
+                title="⚠️ Konflikt erkannt"
+                message={conflictWarning.absenceType
+                    ? `Der Mitarbeiter ist an diesem Tag im ${getAbsenceTypeLabel(conflictWarning.absenceType)}. Möchten Sie die Schicht trotzdem speichern?`
+                    : 'Der Mitarbeiter ist an diesem Tag abwesend. Möchten Sie die Schicht trotzdem speichern?'
+                }
+                confirmText="Trotzdem speichern"
+                cancelText="Abbrechen"
             />
 
             <ConfirmModal
