@@ -29,6 +29,7 @@ import { XIcon } from '../icons/XIcon';
 import { SparklesIcon } from '../icons/SparklesIcon';
 import { ClockIcon } from '../icons/ClockIcon';
 import { CalendarIcon } from '../icons/CalendarIcon';
+import { ConfirmModal } from '../ui/ConfirmModal';
 
 interface ShiftPlannerViewProps {
     employees: Employee[];
@@ -78,6 +79,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
     // --- GENERAL STATE ---
     const [activeTab, setActiveTab] = useState<'planner' | 'report'>('planner');
+    const [employeeToDelete, setEmployeeToDelete] = useState<{ id: number; name: string; shiftCount: number } | null>(null);
 
     // --- PLANNER TAB STATE ---
     const settingStartHour = companySettings.shiftPlannerStartHour ?? 6;
@@ -672,20 +674,12 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                                 e.stopPropagation();
                                                                 e.preventDefault();
                                                                 const empId = Number(employee.id);
-                                                                console.log('Delete button clicked for employee:', empId);
                                                                 const shiftsToDelete = shifts.filter(s => Number(s.employeeId) === empId);
-                                                                console.log('Shifts to delete:', shiftsToDelete.length);
-                                                                if (window.confirm(`Möchten Sie wirklich alle ${shiftsToDelete.length} Schichten für ${employee.firstName} ${employee.lastName} löschen?`)) {
-                                                                    console.log('User confirmed deletion');
-                                                                    // Direct state update as workaround
-                                                                    const remainingShifts = shifts.filter(s => Number(s.employeeId) !== empId);
-                                                                    console.log('Remaining shifts:', remainingShifts.length);
-                                                                    // Call both methods to ensure it works
-                                                                    deleteShiftsByEmployee(empId);
-                                                                    // Also manually update via deleteShift for each
-                                                                    shiftsToDelete.forEach(shift => deleteShift(shift.id));
-                                                                    console.log('Delete operations completed');
-                                                                }
+                                                                setEmployeeToDelete({
+                                                                    id: empId,
+                                                                    name: `${employee.firstName} ${employee.lastName}`,
+                                                                    shiftCount: shiftsToDelete.length
+                                                                });
                                                             }}
                                                             className="shrink-0 p-1.5 text-gray-300 hover:text-red-600 transition-all rounded hover:bg-red-50 opacity-40 group-hover:opacity-100"
                                                             title="Alle Schichten dieses Mitarbeiters löschen"
@@ -1025,6 +1019,27 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                 employees={employees}
                 selectedEmployeeIds={reportEmployeeIds}
                 title="Mitarbeiter auswählen"
+            />
+
+            {/* Delete Confirmation Modal */}
+            <ConfirmModal
+                isOpen={employeeToDelete !== null}
+                onClose={() => setEmployeeToDelete(null)}
+                onConfirm={() => {
+                    if (employeeToDelete) {
+                        const shiftsToDelete = shifts.filter(s => Number(s.employeeId) === employeeToDelete.id);
+                        deleteShiftsByEmployee(employeeToDelete.id);
+                        shiftsToDelete.forEach(shift => deleteShift(shift.id));
+                        setEmployeeToDelete(null);
+                    }
+                }}
+                title="Schichten löschen"
+                message={employeeToDelete
+                    ? `Möchten Sie wirklich alle ${employeeToDelete.shiftCount} Schichten für ${employeeToDelete.name} löschen?`
+                    : ''
+                }
+                confirmText="Löschen"
+                cancelText="Abbrechen"
             />
         </div>
     );
