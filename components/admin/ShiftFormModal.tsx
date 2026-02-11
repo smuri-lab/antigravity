@@ -12,6 +12,7 @@ import { TrashIcon } from '../icons/TrashIcon';
 import { ConfirmModal } from '../ui/ConfirmModal';
 import { DateSelectorButton } from '../ui/DateSelectorButton';
 import { CalendarModal } from '../ui/CalendarModal';
+import { TimePicker } from '../ui/TimePicker';
 
 interface ShiftFormModalProps {
     isOpen: boolean;
@@ -223,8 +224,8 @@ export const ShiftFormModal: React.FC<ShiftFormModalProps> = ({
                         />
 
                         <div className="grid grid-cols-2 gap-4">
-                            <Input label="Von" type="time" value={startTime} onChange={e => setStartTime(e.target.value)} required />
-                            <Input label="Bis" type="time" value={endTime} onChange={e => setEndTime(e.target.value)} required />
+                            <TimePicker label="Von" value={startTime} onChange={setStartTime} required />
+                            <TimePicker label="Bis" value={endTime} onChange={setEndTime} required />
                         </div>
 
                         {showCustomer && (
