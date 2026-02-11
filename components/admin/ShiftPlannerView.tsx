@@ -995,7 +995,8 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                     initialData={modalInitialData}
                     defaultDate={modalDefaultDate}
                     defaultEmployeeId={modalDefaultEmployeeId}
-                    shiftTemplates={shiftTemplates} // Pass templates
+                    shiftTemplates={shiftTemplates}
+                    absenceRequests={absenceRequests}
                 />
             )}
 
