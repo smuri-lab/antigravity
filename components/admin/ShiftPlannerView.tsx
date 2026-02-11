@@ -369,7 +369,10 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
     const handleShiftClick = (e: React.MouseEvent, shift: Shift) => {
         e.stopPropagation();
-        if (isInputDisabled) return;
+
+        // Don't open modal if we're dragging
+        if (isDragging || isInputDisabled) return;
+
         setIsInputDisabled(true);
         setModalInitialData(shift);
         setModalDefaultDate(undefined);
@@ -555,21 +558,6 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
         setDraggedShift(null);
         setDropTarget(null);
-    };
-
-    // Handle shift click - prevent modal opening during drag
-    const handleShiftClick = (e: React.MouseEvent, shift: Shift) => {
-        // Don't open modal if we're in the middle of a drag operation
-        if (isDragging) {
-            e.stopPropagation();
-            return;
-        }
-
-        e.stopPropagation();
-        setModalInitialData(shift);
-        setModalDefaultDate(undefined);
-        setModalDefaultEmployeeId(undefined);
-        setIsModalOpen(true);
     };
 
 
