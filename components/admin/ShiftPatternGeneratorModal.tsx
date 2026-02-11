@@ -120,10 +120,10 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
         setPatternBlocks(prev => {
             const newBlocks = [...prev];
             if (field === 'template') {
-                const template = templates.find(t => t.id === parseInt(value)) || null;
-                newBlocks[index].template = template;
+                const template = value ? templates.find(t => String(t.id) === String(value)) || null : null;
+                newBlocks[index] = { ...newBlocks[index], template };
             } else {
-                newBlocks[index].days = Math.max(1, parseInt(value) || 1);
+                newBlocks[index] = { ...newBlocks[index], days: Math.max(1, parseInt(value) || 1) };
             }
             return newBlocks;
         });
