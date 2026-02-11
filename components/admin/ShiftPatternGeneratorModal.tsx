@@ -499,90 +499,92 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                                         </div>
                                     </>
                                 )}
-                                ) : (
-                                <>
-                                    <label className="block text-sm font-medium text-gray-700 font-display">Wochen-Muster festlegen (Feste Tage)</label>
-                                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
-                                        {[1, 2, 3, 4, 5, 6, 0].map((dayIdx) => {
-                                            const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-                                            const template = weeklyPattern[dayIdx];
-                                            return (
-                                                <div key={dayIdx} className="relative group">
-                                                    <div className="flex flex-col items-center gap-1">
-                                                        <span className={`text-[10px] uppercase font-bold ${dayIdx === 0 || dayIdx === 6 ? 'text-red-400' : 'text-gray-400'}`}>
-                                                            {days[dayIdx]}
-                                                        </span>
-                                                        <button
-                                                            onClick={() => setIsTemplateSelectOpen({ index: dayIdx, isOpen: true })}
-                                                            className={`w-full h-12 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${template
-                                                                ? 'bg-white border-transparent shadow-sm'
-                                                                : 'bg-white border-dashed border-gray-300 text-gray-400 hover:border-gray-400'
-                                                                }`}
-                                                            style={template ? { borderColor: template.color, color: template.color } : {}}
-                                                        >
-                                                            {template ? (
-                                                                <>
-                                                                    <span className="font-bold text-xs truncate w-full text-center px-1 font-display">{template.name}</span>
-                                                                    <span className="text-[10px] opacity-75 font-sans">{template.startTime}-{template.endTime}</span>
-                                                                </>
-                                                            ) : (
-                                                                <span className="text-xs">Frei</span>
-                                                            )}
-                                                        </button>
-                                                    </div>
-
-                                                    {isTemplateSelectOpen.isOpen && isTemplateSelectOpen.index === dayIdx && (
-                                                        <div className="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-50 p-2 max-h-60 overflow-y-auto">
-                                                            <div className="text-xs font-bold text-gray-400 mb-2 px-2 uppercase tracking-tight">Vorlage wählen</div>
-                                                            <button
-                                                                onClick={() => setPatternItem(dayIdx, null)}
-                                                                className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded-lg text-sm text-gray-600 mb-1"
-                                                            >
-                                                                Frei / Keine Schicht
-                                                            </button>
-                                                            {templates.map(t => (
-                                                                <button
-                                                                    key={t.id}
-                                                                    onClick={() => setPatternItem(dayIdx, t)}
-                                                                    className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded-lg text-sm flex items-center gap-2"
-                                                                >
-                                                                    <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: t.color }}></div>
-                                                                    <span className="truncate">{t.name}</span>
-                                                                </button>
-                                                            ))}
-                                                            <div className="border-t mt-1 pt-1">
-                                                                <button onClick={() => setIsTemplateSelectOpen({ index: -1, isOpen: false })} className="w-full text-center text-xs text-gray-400 hover:text-gray-600 py-2">Abbrechen</button>
-                                                            </div>
-                                                        </div>
-                                                    )}
+                            </>
+                        ) : (
+                            <>
+                                <label className="block text-sm font-medium text-gray-700 font-display">Wochen-Muster festlegen (Feste Tage)</label>
+                                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                    {[1, 2, 3, 4, 5, 6, 0].map((dayIdx) => {
+                                        const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+                                        const template = weeklyPattern[dayIdx];
+                                        return (
+                                            <div key={dayIdx} className="relative group">
+                                                <div className="flex flex-col items-center gap-1">
+                                                    <span className={`text-[10px] uppercase font-bold ${dayIdx === 0 || dayIdx === 6 ? 'text-red-400' : 'text-gray-400'}`}>
+                                                        {days[dayIdx]}
+                                                    </span>
+                                                    <button
+                                                        onClick={() => setIsTemplateSelectOpen({ index: dayIdx, isOpen: true })}
+                                                        className={`w-full h-12 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${template
+                                                            ? 'bg-white border-transparent shadow-sm'
+                                                            : 'bg-white border-dashed border-gray-300 text-gray-400 hover:border-gray-400'
+                                                            }`}
+                                                        style={template ? { borderColor: template.color, color: template.color } : {}}
+                                                    >
+                                                        {template ? (
+                                                            <>
+                                                                <span className="font-bold text-xs truncate w-full text-center px-1 font-display">{template.name}</span>
+                                                                <span className="text-[10px] opacity-75 font-sans">{template.startTime}-{template.endTime}</span>
+                                                            </>
+                                                        ) : (
+                                                            <span className="text-xs">Frei</span>
+                                                        )}
+                                                    </button>
                                                 </div>
-                                            );
-                                        })}
-                                    </div>
-                                </>
+
+                                                {isTemplateSelectOpen.isOpen && isTemplateSelectOpen.index === dayIdx && (
+                                                    <div className="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-50 p-2 max-h-60 overflow-y-auto">
+                                                        <div className="text-xs font-bold text-gray-400 mb-2 px-2 uppercase tracking-tight">Vorlage wählen</div>
+                                                        <button
+                                                            onClick={() => setPatternItem(dayIdx, null)}
+                                                            className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded-lg text-sm text-gray-600 mb-1"
+                                                        >
+                                                            Frei / Keine Schicht
+                                                        </button>
+                                                        {templates.map(t => (
+                                                            <button
+                                                                key={t.id}
+                                                                onClick={() => setPatternItem(dayIdx, t)}
+                                                                className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded-lg text-sm flex items-center gap-2"
+                                                            >
+                                                                <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: t.color }}></div>
+                                                                <span className="truncate">{t.name}</span>
+                                                            </button>
+                                                        ))}
+                                                        <div className="border-t mt-1 pt-1">
+                                                            <button onClick={() => setIsTemplateSelectOpen({ index: -1, isOpen: false })} className="w-full text-center text-xs text-gray-400 hover:text-gray-600 py-2">Abbrechen</button>
+                                                        </div>
+                                                    </div>
+                                                )}
+                                            </div>
+                                        );
+                                    })}
+                                </div>
+                            </>
                         )}
-                            </div>
-
-                        <div className="flex items-center gap-2 p-2 bg-yellow-50 rounded-md text-sm text-yellow-800">
-                            <input
-                                type="checkbox"
-                                id="clearExisting"
-                                checked={clearExisting}
-                                onChange={e => setClearExisting(e.target.checked)}
-                                className="h-4 w-4 text-yellow-600 rounded border-yellow-300 focus:ring-yellow-500"
-                            />
-                            <label htmlFor="clearExisting">Bestehende Schichten im gewählten Zeitraum für diese Mitarbeiter löschen?</label>
-                        </div>
-
                     </div>
 
-                    <div className="flex justify-end gap-4 pt-4 mt-2 border-t">
-                        <Button onClick={handleClose} className="bg-gray-200 hover:bg-gray-300 text-gray-800">Abbrechen</Button>
-                        <Button onClick={handleGenerate} className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2">
-                            <SparklesIcon className="h-5 w-5" />
-                            Schichten generieren
-                        </Button>
+
+                    <div className="flex items-center gap-2 p-2 bg-yellow-50 rounded-md text-sm text-yellow-800">
+                        <input
+                            type="checkbox"
+                            id="clearExisting"
+                            checked={clearExisting}
+                            onChange={e => setClearExisting(e.target.checked)}
+                            className="h-4 w-4 text-yellow-600 rounded border-yellow-300 focus:ring-yellow-500"
+                        />
+                        <label htmlFor="clearExisting">Bestehende Schichten im gewählten Zeitraum für diese Mitarbeiter löschen?</label>
                     </div>
+
+                </div>
+
+                <div className="flex justify-end gap-4 pt-4 mt-2 border-t">
+                    <Button onClick={handleClose} className="bg-gray-200 hover:bg-gray-300 text-gray-800">Abbrechen</Button>
+                    <Button onClick={handleGenerate} className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2">
+                        <SparklesIcon className="h-5 w-5" />
+                        Schichten generieren
+                    </Button>
+                </div>
             </Card>
 
             {/* Sub-Modals */}
