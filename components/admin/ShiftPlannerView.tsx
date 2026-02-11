@@ -93,6 +93,44 @@ const getAbsenceTypeLabel = (type: AbsenceType): string => {
     }
 };
 
+// Helper to calculate daily statistics
+const calculateDailyStats = (date: Date, shifts: Shift[], employees: Employee[]) => {
+    const dateStr = date.toLocaleDateString('sv-SE');
+
+    // Get all shifts for this day
+    const dayShifts = shifts.filter(shift => {
+        const shiftDate = new Date(shift.start).toLocaleDateString('sv-SE');
+        return shiftDate === dateStr;
+    });
+
+    // Count unique employees
+    const uniqueEmployeeIds = new Set(dayShifts.map(s => s.employeeId));
+    const employeeCount = uniqueEmployeeIds.size;
+
+    // Calculate total hours
+    const totalHours = dayShifts.reduce((sum, shift) => {
+        const start = new Date(shift.start);
+        const end = new Date(shift.end);
+        const hours = (end.getTime() - start.getTime()) / (1000 * 60 * 60);
+        return sum + hours;
+    }, 0);
+
+    return { employeeCount, totalHours };
+};
+
+// Helper to get coverage level color
+const getCoverageColor = (employeeCount: number): { bg: string; text: string; label: string } => {
+    if (employeeCount >= 3) {
+        return { bg: 'bg-green-100', text: 'text-green-800', label: 'Gut' };
+    } else if (employeeCount === 2) {
+        return { bg: 'bg-yellow-100', text: 'text-yellow-800', label: 'Mittel' };
+    } else if (employeeCount === 1) {
+        return { bg: 'bg-orange-100', text: 'text-orange-800', label: 'Niedrig' };
+    } else {
+        return { bg: 'bg-red-100', text: 'text-red-800', label: 'Keine' };
+    }
+};
+
 type ViewMode = 'timeline' | 'week' | 'month';
 
 export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
@@ -880,6 +918,38 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
                                     {displayedEmployees.length === 0 && (
                                         <div className="p-8 text-center text-gray-500 italic">Keine Mitarbeiter für die aktuelle Auswahl gefunden.</div>
+                                    )}
+
+                                    {/* SUMMARY ROW */}
+                                    {displayedEmployees.length > 0 && viewMode !== 'timeline' && (
+                                        <div className="flex border-t-2 border-gray-300 bg-gray-50 sticky bottom-0 z-10 shadow-lg">
+                                            {/* Summary Label */}
+                                            <div className="w-48 shrink-0 p-3 border-r border-gray-200 font-bold text-gray-900 bg-gray-100 sticky left-0 z-20 flex items-center">
+                                                <span>GESAMT</span>
+                                            </div>
+
+                                            {/* Daily Summaries */}
+                                            <div className="flex-1 flex">
+                                                {gridDays.map((day, i) => {
+                                                    const stats = calculateDailyStats(day, shifts, employees);
+                                                    const coverage = getCoverageColor(stats.employeeCount);
+
+                                                    return (
+                                                        <div
+                                                            key={i}
+                                                            className={`flex-1 border-r border-gray-200 last:border-r-0 p-2 flex flex-col items-center justify-center ${coverage.bg}`}
+                                                        >
+                                                            <div className={`text-sm font-bold ${coverage.text}`}>
+                                                                {stats.employeeCount} MA
+                                                            </div>
+                                                            <div className="text-xs text-gray-600">
+                                                                {stats.totalHours.toFixed(1)}h
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
                                     )}
                                 </div>
                             </div>
