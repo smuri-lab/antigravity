@@ -220,6 +220,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
     // Drag and drop state
     const [draggedShift, setDraggedShift] = useState<Shift | null>(null);
+    const [draggedTemplate, setDraggedTemplate] = useState<ShiftTemplate | null>(null);
     const [dropTarget, setDropTarget] = useState<{ employeeId: number; date: string } | null>(null);
 
 
@@ -530,34 +531,81 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const handleDrop = (e: React.DragEvent, targetEmployeeId: number, targetDate: string) => {
         e.preventDefault();
 
-        if (!draggedShift) return;
+        if (!draggedShift && !draggedTemplate) return;
 
-        // Calculate the time difference to maintain the same time of day
-        const originalStart = new Date(draggedShift.start);
-        const originalEnd = new Date(draggedShift.end);
+        // Handle shift drag & drop
+        if (draggedShift) {
+            // Calculate the time difference to maintain the same time of day
+            const originalStart = new Date(draggedShift.start);
+            const originalEnd = new Date(draggedShift.end);
 
-        // Parse target date (YYYY-MM-DD format)
-        const [year, month, day] = targetDate.split('-').map(Number);
+            // Parse target date (YYYY-MM-DD format)
+            const [year, month, day] = targetDate.split('-').map(Number);
 
-        // Create new dates with same time but different day
-        const newStart = new Date(year, month - 1, day, originalStart.getHours(), originalStart.getMinutes());
-        const newEnd = new Date(year, month - 1, day, originalEnd.getHours(), originalEnd.getMinutes());
+            // Create new dates with same time but different day
+            const newStart = new Date(year, month - 1, day, originalStart.getHours(), originalStart.getMinutes());
+            const newEnd = new Date(year, month - 1, day, originalEnd.getHours(), originalEnd.getMinutes());
 
-        // Handle overnight shifts
-        if (originalEnd < originalStart) {
-            newEnd.setDate(newEnd.getDate() + 1);
+            // Handle overnight shifts
+            if (originalEnd < originalStart) {
+                newEnd.setDate(newEnd.getDate() + 1);
+            }
+
+            // Update the shift
+            updateShift({
+                ...draggedShift,
+                employeeId: targetEmployeeId,
+                start: newStart.toISOString(),
+                end: newEnd.toISOString()
+            });
+
+            setDraggedShift(null);
+            setDropTarget(null);
         }
+        // Handle template drag & drop
+        else if (draggedTemplate) {
+            const [startHour, startMin] = draggedTemplate.startTime.split(':').map(Number);
+            const [endHour, endMin] = draggedTemplate.endTime.split(':').map(Number);
 
-        // Update the shift
-        updateShift({
-            ...draggedShift,
-            employeeId: targetEmployeeId,
-            start: newStart.toISOString(),
-            end: newEnd.toISOString()
-        });
+            const [year, month, day] = targetDate.split('-').map(Number);
+            const start = new Date(year, month - 1, day, startHour, startMin);
+            const end = new Date(year, month - 1, day, endHour, endMin);
 
-        setDraggedShift(null);
-        setDropTarget(null);
+            // Handle overnight shifts
+            if (end < start) {
+                end.setDate(end.getDate() + 1);
+            }
+
+            // Create shift from template
+            addShift({
+                employeeId: targetEmployeeId,
+                start: start.toISOString(),
+                end: end.toISOString(),
+                label: draggedTemplate.name,
+                color: draggedTemplate.color,
+                customerId: draggedTemplate.customerId,
+                activityId: draggedTemplate.activityId,
+            } as Omit<Shift, 'id'>);
+
+            setDraggedTemplate(null);
+            setDropTarget(null);
+        }
+    };
+
+    // Template drag handlers
+    const handleTemplateDragStart = (e: React.DragEvent, template: ShiftTemplate) => {
+        setDraggedTemplate(template);
+        e.dataTransfer.effectAllowed = 'copy';
+        if (e.currentTarget instanceof HTMLElement) {
+            e.currentTarget.style.opacity = '0.5';
+        }
+    };
+
+    const handleTemplateDragEnd = (e: React.DragEvent) => {
+        setDraggedTemplate(null);
+        if (e.currentTarget instanceof HTMLElement) {
+            e.currentTarget.style.opacity = '1';
+        }
     };
 
 
@@ -685,8 +733,11 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                     return (
                                         <button
                                             key={t.id}
+                                            draggable={true}
+                                            onDragStart={(e) => handleTemplateDragStart(e, t)}
+                                            onDragEnd={handleTemplateDragEnd}
                                             onClick={() => setActiveTemplate(isActive ? null : t)}
-                                            className={`px-3 py-1.5 text-xs font-semibold rounded-full border shadow-sm transition-all flex items-center gap-2 whitespace-nowrap ${isActive
+                                            className={`px-3 py-1.5 text-xs font-semibold rounded-full border shadow-sm transition-all flex items-center gap-2 whitespace-nowrap cursor-grab active:cursor-grabbing ${isActive
                                                 ? 'ring-2 ring-offset-1 scale-105'
                                                 : 'hover:bg-white hover:shadow-md opacity-80 hover:opacity-100'
                                                 }`}
