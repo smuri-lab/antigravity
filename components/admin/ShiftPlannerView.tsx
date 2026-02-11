@@ -1219,6 +1219,20 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                 confirmText="Löschen"
                 cancelText="Abbrechen"
             />
+
+            <WeekCopyModal
+                isOpen={isWeekCopyModalOpen}
+                onClose={() => setIsWeekCopyModalOpen(false)}
+                onCopy={handleWeekCopy}
+                sourceWeekStart={getStartOfWeek(viewStartDateTime)}
+                shiftCount={shifts.filter(s => {
+                    const shiftDate = new Date(s.start);
+                    const weekStart = getStartOfWeek(viewStartDateTime);
+                    const weekEnd = new Date(weekStart);
+                    weekEnd.setDate(weekEnd.getDate() + 7);
+                    return shiftDate >= weekStart && shiftDate < weekEnd;
+                }).length}
+            />
         </div>
     );
 };
