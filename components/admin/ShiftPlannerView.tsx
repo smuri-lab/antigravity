@@ -31,6 +31,7 @@ import { ClockIcon } from '../icons/ClockIcon';
 import { CalendarIcon } from '../icons/CalendarIcon';
 import { ConfirmModal } from '../ui/ConfirmModal';
 import { ExclamationTriangleIcon } from '../icons/ExclamationTriangleIcon';
+import { WeekCopyModal } from '../ui/WeekCopyModal';
 
 interface ShiftPlannerViewProps {
     employees: Employee[];
@@ -213,6 +214,12 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const [reportEmployeeIds, setReportEmployeeIds] = useState<number[]>(() => employees.filter(e => e.isActive).map(e => e.id));
     const [isReportDateRangeOpen, setIsReportDateRangeOpen] = useState(false);
     const [isReportEmployeeSelectOpen, setIsReportEmployeeSelectOpen] = useState(false);
+
+    // Week copy modal state
+    const [isWeekCopyModalOpen, setIsWeekCopyModalOpen] = useState(false);
+
+    // Employee deletion confirmation
+    const [employeeToDelete, setEmployeeToDelete] = useState<{ id: number; name: string; shiftCount: number } | null>(null);
 
 
     // --- PLANNER HELPERS ---
@@ -451,6 +458,37 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
         return Math.ceil((((d.getTime() - yearStart.getTime()) / 86400000) + 1) / 7);
     }
 
+    // Handle week copy
+    const handleWeekCopy = (targetWeekStart: Date) => {
+        const sourceWeekStart = getStartOfWeek(viewStartDateTime);
+        const dayDiff = Math.round((targetWeekStart.getTime() - sourceWeekStart.getTime()) / (1000 * 60 * 60 * 24));
+
+        const sourceWeekEnd = new Date(sourceWeekStart);
+        sourceWeekEnd.setDate(sourceWeekEnd.getDate() + 7);
+
+        const weekShifts = shifts.filter(shift => {
+            const shiftDate = new Date(shift.start);
+            return shiftDate >= sourceWeekStart && shiftDate < sourceWeekEnd;
+        });
+
+        weekShifts.forEach(shift => {
+            const newStart = new Date(shift.start);
+            newStart.setDate(newStart.getDate() + dayDiff);
+
+            const newEnd = new Date(shift.end);
+            newEnd.setDate(newEnd.getDate() + dayDiff);
+
+            addShift({
+                ...shift,
+                id: undefined,
+                start: newStart.toISOString(),
+                end: newEnd.toISOString()
+            } as Omit<Shift, 'id'>);
+        });
+
+        setIsWeekCopyModalOpen(false);
+    };
+
 
     // --- REPORT HELPERS ---
     const getReportEmployeeSelectorLabel = () => {
@@ -619,6 +657,22 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                     <SparklesIcon className="h-4 w-4" />
                                     <span>Automatik</span>
                                 </Button>
+
+                                {viewMode === 'week' && (
+                                    <Button
+                                        onClick={() => setIsWeekCopyModalOpen(true)}
+                                        className="bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2 text-sm px-3 py-2 flex-1 xl:flex-initial justify-center"
+                                        disabled={shifts.filter(s => {
+                                            const shiftDate = new Date(s.start);
+                                            const weekStart = getStartOfWeek(viewStartDateTime);
+                                            const weekEnd = new Date(weekStart);
+                                            weekEnd.setDate(weekEnd.getDate() + 7);
+                                            return shiftDate >= weekStart && shiftDate < weekEnd;
+                                        }).length === 0}
+                                    >
+                                        📋 Woche kopieren
+                                    </Button>
+                                )}
                             </div>
 
                             <div className="flex items-center justify-center gap-2 sm:gap-4 w-full xl:w-auto">
