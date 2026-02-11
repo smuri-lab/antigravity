@@ -1,4 +1,4 @@
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 interface TimePickerProps {
     label: string;
@@ -14,6 +14,7 @@ export const TimePicker: React.FC<TimePickerProps> = ({ label, value, onChange, 
     const containerRef = useRef<HTMLDivElement>(null);
     const hoursScrollRef = useRef<HTMLDivElement>(null);
     const minutesScrollRef = useRef<HTMLDivElement>(null);
+    const scrollTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
     useEffect(() => {
         if (value) {
@@ -56,28 +57,34 @@ export const TimePicker: React.FC<TimePickerProps> = ({ label, value, onChange, 
                 }
             }, 50);
         }
-    }, [isOpen, hours, minutes]);
+    }, [isOpen]);
 
-    const handleScroll = (type: 'hours' | 'minutes', scrollTop: number) => {
-        // Each item is 40px high
-        const itemHeight = 40;
-        // Calculate index, accounting for the initial h-20 (which is 2 items high)
-        const index = Math.round((scrollTop - itemHeight * 0.5) / itemHeight); // Adjust for centering
-
-        if (type === 'hours') {
-            const newHour = Math.max(0, Math.min(23, index)).toString().padStart(2, '0');
-            if (newHour !== hours) {
-                setHours(newHour);
-                onChange(`${newHour}:${minutes}`);
-            }
-        } else {
-            const newMinute = Math.max(0, Math.min(59, index)).toString().padStart(2, '0');
-            if (newMinute !== minutes) {
-                setMinutes(newMinute);
-                onChange(`${hours}:${newMinute}`);
-            }
+    const handleScroll = useCallback((type: 'hours' | 'minutes', scrollTop: number) => {
+        // Clear any existing timeout
+        if (scrollTimeoutRef.current) {
+            clearTimeout(scrollTimeoutRef.current);
         }
-    };
+
+        // Debounce the scroll event - only update after scrolling stops
+        scrollTimeoutRef.current = setTimeout(() => {
+            const itemHeight = 40;
+            const index = Math.round(scrollTop / itemHeight);
+
+            if (type === 'hours') {
+                const newHour = Math.max(0, Math.min(23, index)).toString().padStart(2, '0');
+                if (newHour !== hours) {
+                    setHours(newHour);
+                    onChange(`${newHour}:${minutes}`);
+                }
+            } else {
+                const newMinute = Math.max(0, Math.min(59, index)).toString().padStart(2, '0');
+                if (newMinute !== minutes) {
+                    setMinutes(newMinute);
+                    onChange(`${hours}:${newMinute}`);
+                }
+            }
+        }, 150); // Wait 150ms after scrolling stops
+    }, [hours, minutes, onChange]);
 
     const hourOptions = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
     const minuteOptions = Array.from({ length: 60 }, (_, i) => i.toString().padStart(2, '0'));
