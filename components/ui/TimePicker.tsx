@@ -70,6 +70,17 @@ export const TimePicker: React.FC<TimePickerProps> = ({ label, value, onChange, 
             const itemHeight = 40;
             const index = Math.round(scrollTop / itemHeight);
 
+            // Snap to the center of the selected item
+            const targetScrollTop = index * itemHeight;
+            const scrollRef = type === 'hours' ? hoursScrollRef : minutesScrollRef;
+
+            if (scrollRef.current) {
+                scrollRef.current.scrollTo({
+                    top: targetScrollTop,
+                    behavior: 'smooth'
+                });
+            }
+
             if (type === 'hours') {
                 const newHour = Math.max(0, Math.min(23, index)).toString().padStart(2, '0');
                 if (newHour !== hours) {
