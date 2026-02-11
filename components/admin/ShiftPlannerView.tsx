@@ -520,7 +520,12 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
     const handleDragOver = (e: React.DragEvent, employeeId: number, date: string) => {
         e.preventDefault();
-        e.dataTransfer.dropEffect = 'move';
+        // Set appropriate cursor based on what's being dragged
+        if (draggedShift) {
+            e.dataTransfer.dropEffect = 'move';
+        } else if (draggedTemplate) {
+            e.dataTransfer.dropEffect = 'copy';
+        }
         setDropTarget({ employeeId, date });
     };
 
