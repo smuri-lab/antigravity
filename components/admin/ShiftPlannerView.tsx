@@ -218,6 +218,10 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     // Week copy modal state
     const [isWeekCopyModalOpen, setIsWeekCopyModalOpen] = useState(false);
 
+    // Drag and drop state
+    const [draggedShift, setDraggedShift] = useState<Shift | null>(null);
+    const [dropTarget, setDropTarget] = useState<{ employeeId: number; date: string } | null>(null);
+
     // Employee deletion confirmation
     const [employeeToDelete, setEmployeeToDelete] = useState<{ id: number; name: string; shiftCount: number } | null>(null);
 
@@ -487,6 +491,67 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
         });
 
         setIsWeekCopyModalOpen(false);
+    };
+
+    // Drag and drop handlers
+    const handleDragStart = (e: React.DragEvent, shift: Shift) => {
+        setDraggedShift(shift);
+        e.dataTransfer.effectAllowed = 'move';
+        // Add a semi-transparent effect
+        if (e.currentTarget instanceof HTMLElement) {
+            e.currentTarget.style.opacity = '0.5';
+        }
+    };
+
+    const handleDragEnd = (e: React.DragEvent) => {
+        setDraggedShift(null);
+        setDropTarget(null);
+        if (e.currentTarget instanceof HTMLElement) {
+            e.currentTarget.style.opacity = '1';
+        }
+    };
+
+    const handleDragOver = (e: React.DragEvent, employeeId: number, date: string) => {
+        e.preventDefault();
+        e.dataTransfer.dropEffect = 'move';
+        setDropTarget({ employeeId, date });
+    };
+
+    const handleDragLeave = () => {
+        setDropTarget(null);
+    };
+
+    const handleDrop = (e: React.DragEvent, targetEmployeeId: number, targetDate: string) => {
+        e.preventDefault();
+
+        if (!draggedShift) return;
+
+        // Calculate the time difference to maintain the same time of day
+        const originalStart = new Date(draggedShift.start);
+        const originalEnd = new Date(draggedShift.end);
+
+        // Parse target date (YYYY-MM-DD format)
+        const [year, month, day] = targetDate.split('-').map(Number);
+
+        // Create new dates with same time but different day
+        const newStart = new Date(year, month - 1, day, originalStart.getHours(), originalStart.getMinutes());
+        const newEnd = new Date(year, month - 1, day, originalEnd.getHours(), originalEnd.getMinutes());
+
+        // Handle overnight shifts
+        if (originalEnd < originalStart) {
+            newEnd.setDate(newEnd.getDate() + 1);
+        }
+
+        // Update the shift
+        updateShift({
+            ...draggedShift,
+            employeeId: targetEmployeeId,
+            start: newStart.toISOString(),
+            end: newEnd.toISOString()
+        });
+
+        setDraggedShift(null);
+        setDropTarget(null);
     };
 
 
@@ -904,6 +969,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
                                                                 const isToday = day.toDateString() === new Date().toDateString();
                                                                 const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+                                                                const isDropTarget = dropTarget?.employeeId === employee.id && dropTarget?.date === dayStr;
 
                                                                 return (
                                                                     <div
@@ -911,8 +977,12 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                                         className={`flex-1 border-r border-gray-100 last:border-r-0 relative p-1 flex flex-col gap-1 overflow-hidden group/cell
                                                                             ${activeTemplate ? 'hover:bg-green-50 cursor-copy' : 'hover:bg-blue-50/50 cursor-pointer'}
                                                                             ${isToday ? 'bg-blue-50/30' : isWeekend ? 'bg-gray-50/30' : ''}
+                                                                            ${isDropTarget ? 'bg-green-100 ring-2 ring-green-500 ring-inset' : ''}
                                                                         `}
                                                                         onClick={() => handleTrackClick(employee.id, day)}
+                                                                        onDragOver={(e) => handleDragOver(e, employee.id, dayStr)}
+                                                                        onDragLeave={handleDragLeave}
+                                                                        onDrop={(e) => handleDrop(e, employee.id, dayStr)}
                                                                     >
                                                                         {/* Hover Plus Icon */}
                                                                         <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
