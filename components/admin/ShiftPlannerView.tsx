@@ -1046,12 +1046,14 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                                         onDragLeave={handleDragLeave}
                                                                         onDrop={(e) => handleDrop(e, employee.id, dayStr)}
                                                                     >
-                                                                        {/* Hover Plus Icon */}
-                                                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                                                                            <div className="opacity-0 group-hover/cell:opacity-100 transition-opacity duration-150">
-                                                                                <PlusIcon className="h-4 w-4 text-gray-400" />
+                                                                        {/* Hover Plus Icon - only show in empty cells */}
+                                                                        {dayShifts.length === 0 && (
+                                                                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                                                                                <div className="opacity-0 group-hover/cell:opacity-100 transition-opacity duration-150">
+                                                                                    <PlusIcon className="h-4 w-4 text-gray-400" />
+                                                                                </div>
                                                                             </div>
-                                                                        </div>
+                                                                        )}
                                                                         {/* Absence Layer */}
                                                                         {absence && (
                                                                             <div className={`absolute inset-0 opacity-40 z-0 absence-pattern flex items-center justify-center`} style={{ backgroundColor: getAbsenceStyle(absence.type).bg }}>
