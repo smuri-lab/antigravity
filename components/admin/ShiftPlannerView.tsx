@@ -666,7 +666,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                 {/* Employee Column */}
                                                 <div className="w-48 shrink-0 p-3 border-r border-gray-200 sticky left-0 z-20 bg-white group-hover:bg-gray-50 flex flex-col justify-center shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
                                                     <div className="flex items-center w-full gap-2">
-                                                        <div className="text-sm font-medium text-gray-900 truncate flex-1 leading-tight">
+                                                        <div className="text-base font-normal text-gray-900 truncate flex-1 leading-tight">
                                                             {employee.firstName} {employee.lastName}
                                                         </div>
                                                         <button
