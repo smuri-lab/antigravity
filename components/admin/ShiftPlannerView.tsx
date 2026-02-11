@@ -490,8 +490,12 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
         setIsWeekCopyModalOpen(false);
     };
 
+
     // Drag and drop handlers
+    const [isDragging, setIsDragging] = React.useState(false);
+
     const handleDragStart = (e: React.DragEvent, shift: Shift) => {
+        setIsDragging(true);
         setDraggedShift(shift);
         e.dataTransfer.effectAllowed = 'move';
         // Add a semi-transparent effect
@@ -501,6 +505,8 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     };
 
     const handleDragEnd = (e: React.DragEvent) => {
+        // Delay resetting isDragging to prevent onClick from firing
+        setTimeout(() => setIsDragging(false), 100);
         setDraggedShift(null);
         setDropTarget(null);
         if (e.currentTarget instanceof HTMLElement) {
@@ -549,6 +555,21 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
         setDraggedShift(null);
         setDropTarget(null);
+    };
+
+    // Handle shift click - prevent modal opening during drag
+    const handleShiftClick = (e: React.MouseEvent, shift: Shift) => {
+        // Don't open modal if we're in the middle of a drag operation
+        if (isDragging) {
+            e.stopPropagation();
+            return;
+        }
+
+        e.stopPropagation();
+        setModalInitialData(shift);
+        setModalDefaultDate(undefined);
+        setModalDefaultEmployeeId(undefined);
+        setIsModalOpen(true);
     };
 
 
