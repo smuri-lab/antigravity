@@ -12,6 +12,8 @@ export const TimePicker: React.FC<TimePickerProps> = ({ label, value, onChange, 
     const [hours, setHours] = useState('08');
     const [minutes, setMinutes] = useState('00');
     const containerRef = useRef<HTMLDivElement>(null);
+    const hoursScrollRef = useRef<HTMLDivElement>(null);
+    const minutesScrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         if (value) {
@@ -37,10 +39,44 @@ export const TimePicker: React.FC<TimePickerProps> = ({ label, value, onChange, 
         };
     }, [isOpen]);
 
-    const handleTimeChange = (newHours: string, newMinutes: string) => {
-        setHours(newHours);
-        setMinutes(newMinutes);
-        onChange(`${newHours}:${newMinutes}`);
+    // Scroll to selected time when opening
+    useEffect(() => {
+        if (isOpen && hoursScrollRef.current && minutesScrollRef.current) {
+            const hourIndex = parseInt(hours);
+            const minuteIndex = parseInt(minutes);
+
+            // Each item is 40px (h-10), scroll to center it
+            // Add a small delay to ensure the DOM is rendered and scrollable
+            setTimeout(() => {
+                if (hoursScrollRef.current) {
+                    hoursScrollRef.current.scrollTop = hourIndex * 40;
+                }
+                if (minutesScrollRef.current) {
+                    minutesScrollRef.current.scrollTop = minuteIndex * 40;
+                }
+            }, 50);
+        }
+    }, [isOpen, hours, minutes]);
+
+    const handleScroll = (type: 'hours' | 'minutes', scrollTop: number) => {
+        // Each item is 40px high
+        const itemHeight = 40;
+        // Calculate index, accounting for the initial h-20 (which is 2 items high)
+        const index = Math.round((scrollTop - itemHeight * 0.5) / itemHeight); // Adjust for centering
+
+        if (type === 'hours') {
+            const newHour = Math.max(0, Math.min(23, index)).toString().padStart(2, '0');
+            if (newHour !== hours) {
+                setHours(newHour);
+                onChange(`${newHour}:${minutes}`);
+            }
+        } else {
+            const newMinute = Math.max(0, Math.min(59, index)).toString().padStart(2, '0');
+            if (newMinute !== minutes) {
+                setMinutes(newMinute);
+                onChange(`${hours}:${newMinute}`);
+            }
+        }
     };
 
     const hourOptions = Array.from({ length: 24 }, (_, i) => i.toString().padStart(2, '0'));
@@ -67,23 +103,26 @@ export const TimePicker: React.FC<TimePickerProps> = ({ label, value, onChange, 
                         <div className="flex flex-col items-center">
                             <div className="text-xs font-medium text-gray-600 mb-2">Stunden</div>
                             <div className="relative h-48 w-16 overflow-hidden">
-                                <div className="absolute inset-0 pointer-events-none">
+                                <div className="absolute inset-0 pointer-events-none z-10">
                                     <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white to-transparent"></div>
                                     <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
                                     <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 h-10 border-y-2 border-blue-500 bg-blue-50/30"></div>
                                 </div>
-                                <div className="h-full overflow-y-scroll scrollbar-hide snap-y snap-mandatory" style={{ scrollbarWidth: 'none' }}>
+                                <div
+                                    ref={hoursScrollRef}
+                                    className="h-full overflow-y-scroll scrollbar-hide snap-y snap-mandatory"
+                                    style={{ scrollbarWidth: 'none' }}
+                                    onScroll={(e) => handleScroll('hours', e.currentTarget.scrollTop)}
+                                >
                                     <div className="h-20"></div>
                                     {hourOptions.map((hour) => (
-                                        <button
+                                        <div
                                             key={hour}
-                                            type="button"
-                                            onClick={() => handleTimeChange(hour, minutes)}
-                                            className={`w-full h-10 flex items-center justify-center text-lg font-mono snap-center transition-all ${hour === hours ? 'text-blue-600 font-bold scale-110' : 'text-gray-600 hover:text-blue-500'
+                                            className={`w-full h-10 flex items-center justify-center text-lg font-mono snap-center transition-all ${hour === hours ? 'text-blue-600 font-bold scale-110' : 'text-gray-600'
                                                 }`}
                                         >
                                             {hour}
-                                        </button>
+                                        </div>
                                     ))}
                                     <div className="h-20"></div>
                                 </div>
@@ -96,23 +135,26 @@ export const TimePicker: React.FC<TimePickerProps> = ({ label, value, onChange, 
                         <div className="flex flex-col items-center">
                             <div className="text-xs font-medium text-gray-600 mb-2">Minuten</div>
                             <div className="relative h-48 w-16 overflow-hidden">
-                                <div className="absolute inset-0 pointer-events-none">
+                                <div className="absolute inset-0 pointer-events-none z-10">
                                     <div className="absolute top-0 left-0 right-0 h-16 bg-gradient-to-b from-white to-transparent"></div>
                                     <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-white to-transparent"></div>
                                     <div className="absolute top-1/2 left-0 right-0 -translate-y-1/2 h-10 border-y-2 border-blue-500 bg-blue-50/30"></div>
                                 </div>
-                                <div className="h-full overflow-y-scroll scrollbar-hide snap-y snap-mandatory" style={{ scrollbarWidth: 'none' }}>
+                                <div
+                                    ref={minutesScrollRef}
+                                    className="h-full overflow-y-scroll scrollbar-hide snap-y snap-mandatory"
+                                    style={{ scrollbarWidth: 'none' }}
+                                    onScroll={(e) => handleScroll('minutes', e.currentTarget.scrollTop)}
+                                >
                                     <div className="h-20"></div>
                                     {minuteOptions.map((minute) => (
-                                        <button
+                                        <div
                                             key={minute}
-                                            type="button"
-                                            onClick={() => handleTimeChange(hours, minute)}
-                                            className={`w-full h-10 flex items-center justify-center text-lg font-mono snap-center transition-all ${minute === minutes ? 'text-blue-600 font-bold scale-110' : 'text-gray-600 hover:text-blue-500'
+                                            className={`w-full h-10 flex items-center justify-center text-lg font-mono snap-center transition-all ${minute === minutes ? 'text-blue-600 font-bold scale-110' : 'text-gray-600'
                                                 }`}
                                         >
                                             {minute}
-                                        </button>
+                                        </div>
                                     ))}
                                     <div className="h-20"></div>
                                 </div>
