@@ -23,6 +23,11 @@ interface ShiftPatternGeneratorModalProps {
     deleteShift: (id: string) => void;
 }
 
+interface PatternBlock {
+    template: ShiftTemplate | null;
+    days: number;
+}
+
 // Helper to format date
 const formatDate = (dateString: string) => {
     if (!dateString) return '';
@@ -37,7 +42,11 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
     isOpen, onClose, templates, employees, shifts, onGenerate, deleteShift
 }) => {
     const [generationMode, setGenerationMode] = useState<'rotation' | 'weekly'>('rotation');
+    const [rotationInputMode, setRotationInputMode] = useState<'blocks' | 'individual'>('blocks');
     const [pattern, setPattern] = useState<(ShiftTemplate | null)[]>([null, null, null, null, null]);
+    const [patternBlocks, setPatternBlocks] = useState<PatternBlock[]>([
+        { template: null, days: 1 }
+    ]);
     const [weeklyPattern, setWeeklyPattern] = useState<Record<number, ShiftTemplate | null>>({
         1: null, 2: null, 3: null, 4: null, 5: null, 6: null, 0: null
     });
@@ -96,6 +105,52 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
         setIsTemplateSelectOpen({ index: -1, isOpen: false });
     };
 
+    // Block management functions
+    const addBlock = () => {
+        setPatternBlocks(prev => [...prev, { template: null, days: 1 }]);
+    };
+
+    const removeBlock = (index: number) => {
+        if (patternBlocks.length > 1) {
+            setPatternBlocks(prev => prev.filter((_, i) => i !== index));
+        }
+    };
+
+    const updateBlock = (index: number, field: 'template' | 'days', value: any) => {
+        setPatternBlocks(prev => {
+            const newBlocks = [...prev];
+            if (field === 'template') {
+                const template = templates.find(t => t.id === parseInt(value)) || null;
+                newBlocks[index].template = template;
+            } else {
+                newBlocks[index].days = Math.max(1, parseInt(value) || 1);
+            }
+            return newBlocks;
+        });
+    };
+
+    // Convert blocks to pattern array
+    const blocksToPattern = (blocks: PatternBlock[]): (ShiftTemplate | null)[] => {
+        const pattern: (ShiftTemplate | null)[] = [];
+        blocks.forEach(block => {
+            for (let i = 0; i < block.days; i++) {
+                pattern.push(block.template);
+            }
+        });
+        return pattern;
+    };
+
+    // Calculate total days for display
+    const totalDays = React.useMemo(() => {
+        if (generationMode === 'rotation') {
+            if (rotationInputMode === 'blocks') {
+                return patternBlocks.reduce((sum, block) => sum + block.days, 0);
+            }
+            return pattern.length;
+        }
+        return 0;
+    }, [generationMode, rotationInputMode, patternBlocks, pattern]);
+
     const handleGenerate = () => {
         if (!startDate || !endDate) {
             alert('Bitte wählen Sie einen Zeitraum aus.');
@@ -105,11 +160,22 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
             alert('Bitte wählen Sie mindestens einen Mitarbeiter aus.');
             return;
         }
-        if (generationMode === 'rotation' && pattern.length === 0) {
-            alert('Das Muster darf nicht leer sein.');
-            return;
-        }
-        if (generationMode === 'weekly' && Object.values(weeklyPattern).every(v => v === null)) {
+
+        // Get final pattern based on mode
+        let finalPattern: (ShiftTemplate | null)[] = [];
+
+        if (generationMode === 'rotation') {
+            if (rotationInputMode === 'blocks') {
+                finalPattern = blocksToPattern(patternBlocks);
+            } else {
+                finalPattern = pattern;
+            }
+
+            if (finalPattern.length === 0) {
+                alert('Das Muster darf nicht leer sein.');
+                return;
+            }
+        } else if (generationMode === 'weekly' && Object.values(weeklyPattern).every(v => v === null)) {
             alert('Bitte wählen Sie mindestens einen Tag für das Wochen-Muster aus.');
             return;
         }
@@ -139,8 +205,8 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                 let template: ShiftTemplate | null = null;
 
                 if (generationMode === 'rotation') {
-                    template = pattern[patternIdx];
-                    patternIdx = (patternIdx + 1) % pattern.length;
+                    template = finalPattern[patternIdx];
+                    patternIdx = (patternIdx + 1) % finalPattern.length;
                 } else {
                     const dayOfWeek = currentDate.getDay();
                     template = weeklyPattern[dayOfWeek];
@@ -253,168 +319,270 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                     <div className="space-y-4">
                         {generationMode === 'rotation' ? (
                             <>
-                                <div className="flex justify-between items-end">
-                                    <label className="block text-sm font-medium text-gray-700 font-display">Muster definieren ({pattern.length} Tage Zyklus)</label>
-                                    <button onClick={addToPattern} className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
-                                        <PlusIcon className="h-4 w-4" /> Tag hinzufügen
-                                    </button>
-                                </div>
-
-                                <div className="flex flex-wrap gap-2 items-start bg-gray-50 p-4 rounded-xl border border-gray-200">
-                                    {pattern.map((template, index) => (
-                                        <div key={index} className="relative group">
-                                            <div className="flex flex-col items-center gap-1">
-                                                <span className="text-[10px] uppercase font-bold text-gray-400">Tag {index + 1}</span>
-                                                <button
-                                                    onClick={() => setIsTemplateSelectOpen({ index, isOpen: true })}
-                                                    className={`w-24 h-12 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${template
-                                                        ? 'bg-white border-transparent shadow-sm'
-                                                        : 'bg-white border-dashed border-gray-300 text-gray-400 hover:border-gray-400'
-                                                        }`}
-                                                    style={template ? { borderColor: template.color, color: template.color } : {}}
-                                                >
-                                                    {template ? (
-                                                        <>
-                                                            <span className="font-bold text-sm truncate w-full text-center px-1 font-display">{template.name}</span>
-                                                            <span className="text-[10px] opacity-75 font-sans">{template.startTime}-{template.endTime}</span>
-                                                        </>
-                                                    ) : (
-                                                        <span className="text-sm">Frei</span>
-                                                    )}
-                                                </button>
-                                            </div>
-
-                                            {pattern.length > 1 && (
-                                                <button
-                                                    onClick={() => removeFromPattern(index)}
-                                                    className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
-                                                    title="Tag entfernen"
-                                                >
-                                                    <XIcon className="h-3 w-3" />
-                                                </button>
-                                            )}
-
-                                            {/* Template Selection Popover */}
-                                            {isTemplateSelectOpen.isOpen && isTemplateSelectOpen.index === index && (
-                                                <div className="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-50 p-2 max-h-60 overflow-y-auto">
-                                                    <div className="text-xs font-bold text-gray-400 mb-2 px-2 uppercase tracking-tight">Vorlage wählen</div>
-                                                    <button
-                                                        onClick={() => setPatternItem(index, null)}
-                                                        className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded-lg text-sm text-gray-600 mb-1"
-                                                    >
-                                                        Frei / Keine Schicht
-                                                    </button>
-                                                    {templates.map(t => (
-                                                        <button
-                                                            key={t.id}
-                                                            onClick={() => setPatternItem(index, t)}
-                                                            className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded-lg text-sm flex items-center gap-2"
-                                                        >
-                                                            <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: t.color }}></div>
-                                                            <span className="truncate">{t.name}</span>
-                                                        </button>
-                                                    ))}
-                                                    <div className="border-t mt-1 pt-1">
-                                                        <button onClick={() => setIsTemplateSelectOpen({ index: -1, isOpen: false })} className="w-full text-center text-xs text-gray-400 hover:text-gray-600 py-2">Abbrechen</button>
-                                                    </div>
-                                                </div>
-                                            )}
-                                        </div>
-                                    ))}
-
+                                {/* Mode Toggle */}
+                                <div className="flex gap-2">
                                     <button
-                                        onClick={addToPattern}
-                                        className="w-8 h-12 mt-4 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 hover:border-blue-300 hover:text-blue-500 transition-colors bg-white/50"
-                                        title="Tag hinzufügen"
+                                        onClick={() => setRotationInputMode('blocks')}
+                                        className={`flex-1 py-2 px-4 rounded-lg font-medium text-sm transition-all ${rotationInputMode === 'blocks'
+                                            ? 'bg-blue-600 text-white shadow-sm'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
                                     >
-                                        <PlusIcon className="h-5 w-5" />
+                                        📦 Block-Eingabe
+                                    </button>
+                                    <button
+                                        onClick={() => setRotationInputMode('individual')}
+                                        className={`flex-1 py-2 px-4 rounded-lg font-medium text-sm transition-all ${rotationInputMode === 'individual'
+                                            ? 'bg-blue-600 text-white shadow-sm'
+                                            : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
+                                            }`}
+                                    >
+                                        📅 Tag-für-Tag
                                     </button>
                                 </div>
-                            </>
-                        ) : (
-                            <>
-                                <label className="block text-sm font-medium text-gray-700 font-display">Wochen-Muster festlegen (Feste Tage)</label>
-                                <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
-                                    {[1, 2, 3, 4, 5, 6, 0].map((dayIdx) => {
-                                        const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
-                                        const template = weeklyPattern[dayIdx];
-                                        return (
-                                            <div key={dayIdx} className="relative group">
-                                                <div className="flex flex-col items-center gap-1">
-                                                    <span className={`text-[10px] uppercase font-bold ${dayIdx === 0 || dayIdx === 6 ? 'text-red-400' : 'text-gray-400'}`}>
-                                                        {days[dayIdx]}
-                                                    </span>
-                                                    <button
-                                                        onClick={() => setIsTemplateSelectOpen({ index: dayIdx, isOpen: true })}
-                                                        className={`w-full h-12 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${template
-                                                            ? 'bg-white border-transparent shadow-sm'
-                                                            : 'bg-white border-dashed border-gray-300 text-gray-400 hover:border-gray-400'
-                                                            }`}
-                                                        style={template ? { borderColor: template.color, color: template.color } : {}}
+
+                                {rotationInputMode === 'blocks' ? (
+                                    /* Block Mode UI */
+                                    <>
+                                        <div className="flex justify-between items-center">
+                                            <label className="block text-sm font-medium text-gray-700 font-display">
+                                                Rotation Pattern (Blöcke)
+                                            </label>
+                                            <span className="text-xs text-gray-500 font-medium">
+                                                Gesamt: {totalDays} {totalDays === 1 ? 'Tag' : 'Tage'}
+                                            </span>
+                                        </div>
+
+                                        <div className="space-y-2 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                            {patternBlocks.map((block, idx) => (
+                                                <div key={idx} className="flex items-center gap-2 bg-white p-2 rounded-lg shadow-sm">
+                                                    {/* Template Select */}
+                                                    <select
+                                                        value={block.template?.id || ''}
+                                                        onChange={(e) => updateBlock(idx, 'template', e.target.value)}
+                                                        className="flex-1 px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm"
+                                                        style={block.template ? {
+                                                            borderColor: block.template.color,
+                                                            color: block.template.color,
+                                                            fontWeight: 600
+                                                        } : {}}
                                                     >
-                                                        {template ? (
-                                                            <>
-                                                                <span className="font-bold text-xs truncate w-full text-center px-1 font-display">{template.name}</span>
-                                                                <span className="text-[10px] opacity-75 font-sans">{template.startTime}-{template.endTime}</span>
-                                                            </>
-                                                        ) : (
-                                                            <span className="text-xs">Frei</span>
-                                                        )}
+                                                        <option value="">-- Frei --</option>
+                                                        <option value="" disabled>────────────</option>
+                                                        {templates.map(t => (
+                                                            <option key={t.id} value={t.id}>{t.name}</option>
+                                                        ))}
+                                                    </select>
+
+                                                    {/* Days Input */}
+                                                    <input
+                                                        type="number"
+                                                        min="1"
+                                                        max="365"
+                                                        value={block.days}
+                                                        onChange={(e) => updateBlock(idx, 'days', e.target.value)}
+                                                        className="w-16 text-center px-2 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent text-sm font-medium"
+                                                    />
+                                                    <span className="text-sm text-gray-600 w-12">
+                                                        {block.days === 1 ? 'Tag' : 'Tage'}
+                                                    </span>
+
+                                                    {/* Delete Button */}
+                                                    <button
+                                                        onClick={() => removeBlock(idx)}
+                                                        disabled={patternBlocks.length === 1}
+                                                        className={`p-2 rounded-lg transition-colors ${patternBlocks.length === 1
+                                                            ? 'text-gray-300 cursor-not-allowed'
+                                                            : 'text-red-600 hover:bg-red-50 hover:text-red-700'
+                                                            }`}
+                                                        title={patternBlocks.length === 1 ? 'Mindestens ein Block erforderlich' : 'Block löschen'}
+                                                    >
+                                                        <TrashIcon className="h-4 w-4" />
                                                     </button>
                                                 </div>
+                                            ))}
 
-                                                {isTemplateSelectOpen.isOpen && isTemplateSelectOpen.index === dayIdx && (
-                                                    <div className="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-50 p-2 max-h-60 overflow-y-auto">
-                                                        <div className="text-xs font-bold text-gray-400 mb-2 px-2 uppercase tracking-tight">Vorlage wählen</div>
-                                                        <button
-                                                            onClick={() => setPatternItem(dayIdx, null)}
-                                                            className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded-lg text-sm text-gray-600 mb-1"
-                                                        >
-                                                            Frei / Keine Schicht
-                                                        </button>
-                                                        {templates.map(t => (
-                                                            <button
-                                                                key={t.id}
-                                                                onClick={() => setPatternItem(dayIdx, t)}
-                                                                className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded-lg text-sm flex items-center gap-2"
-                                                            >
-                                                                <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: t.color }}></div>
-                                                                <span className="truncate">{t.name}</span>
-                                                            </button>
-                                                        ))}
-                                                        <div className="border-t mt-1 pt-1">
-                                                            <button onClick={() => setIsTemplateSelectOpen({ index: -1, isOpen: false })} className="w-full text-center text-xs text-gray-400 hover:text-gray-600 py-2">Abbrechen</button>
-                                                        </div>
-                                                    </div>
-                                                )}
+                                            <button
+                                                onClick={addBlock}
+                                                className="w-full py-2 px-4 bg-white border-2 border-dashed border-gray-300 rounded-lg text-gray-600 hover:border-blue-500 hover:text-blue-600 hover:bg-blue-50 transition-all font-medium text-sm flex items-center justify-center gap-2"
+                                            >
+                                                <PlusIcon className="h-4 w-4" />
+                                                Block hinzufügen
+                                            </button>
+                                        </div>
+
+                                        {totalDays > 0 && (
+                                            <div className="mt-2 p-3 bg-blue-50 rounded-lg text-sm text-blue-700 font-medium">
+                                                📊 Rotationszyklus: <strong>{totalDays} Tage</strong>
                                             </div>
-                                        );
-                                    })}
-                                </div>
-                            </>
+                                        )}
+                                    </>
+                                ) : (
+                                    /* Individual Day Mode UI (existing) */
+                                    <>
+                                        <div className="flex justify-between items-end">
+                                            <label className="block text-sm font-medium text-gray-700 font-display">Muster definieren ({pattern.length} Tage Zyklus)</label>
+                                            <button onClick={addToPattern} className="text-sm text-blue-600 hover:text-blue-800 font-medium flex items-center gap-1">
+                                                <PlusIcon className="h-4 w-4" /> Tag hinzufügen
+                                            </button>
+                                        </div>
+
+                                        <div className="flex flex-wrap gap-2 items-start bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                            {pattern.map((template, index) => (
+                                                <div key={index} className="relative group">
+                                                    <div className="flex flex-col items-center gap-1">
+                                                        <span className="text-[10px] uppercase font-bold text-gray-400">Tag {index + 1}</span>
+                                                        <button
+                                                            onClick={() => setIsTemplateSelectOpen({ index, isOpen: true })}
+                                                            className={`w-24 h-12 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${template
+                                                                ? 'bg-white border-transparent shadow-sm'
+                                                                : 'bg-white border-dashed border-gray-300 text-gray-400 hover:border-gray-400'
+                                                                }`}
+                                                            style={template ? { borderColor: template.color, color: template.color } : {}}
+                                                        >
+                                                            {template ? (
+                                                                <>
+                                                                    <span className="font-bold text-sm truncate w-full text-center px-1 font-display">{template.name}</span>
+                                                                    <span className="text-[10px] opacity-75 font-sans">{template.startTime}-{template.endTime}</span>
+                                                                </>
+                                                            ) : (
+                                                                <span className="text-sm">Frei</span>
+                                                            )}
+                                                        </button>
+                                                    </div>
+
+                                                    {pattern.length > 1 && (
+                                                        <button
+                                                            onClick={() => removeFromPattern(index)}
+                                                            className="absolute -top-1 -right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow-sm"
+                                                            title="Tag entfernen"
+                                                        >
+                                                            <XIcon className="h-3 w-3" />
+                                                        </button>
+                                                    )}
+
+                                                    {/* Template Selection Popover */}
+                                                    {isTemplateSelectOpen.isOpen && isTemplateSelectOpen.index === index && (
+                                                        <div className="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-50 p-2 max-h-60 overflow-y-auto">
+                                                            <div className="text-xs font-bold text-gray-400 mb-2 px-2 uppercase tracking-tight">Vorlage wählen</div>
+                                                            <button
+                                                                onClick={() => setPatternItem(index, null)}
+                                                                className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded-lg text-sm text-gray-600 mb-1"
+                                                            >
+                                                                Frei / Keine Schicht
+                                                            </button>
+                                                            {templates.map(t => (
+                                                                <button
+                                                                    key={t.id}
+                                                                    onClick={() => setPatternItem(index, t)}
+                                                                    className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded-lg text-sm flex items-center gap-2"
+                                                                >
+                                                                    <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: t.color }}></div>
+                                                                    <span className="truncate">{t.name}</span>
+                                                                </button>
+                                                            ))}
+                                                            <div className="border-t mt-1 pt-1">
+                                                                <button onClick={() => setIsTemplateSelectOpen({ index: -1, isOpen: false })} className="w-full text-center text-xs text-gray-400 hover:text-gray-600 py-2">Abbrechen</button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            ))}
+
+                                            <button
+                                                onClick={addToPattern}
+                                                className="w-8 h-12 mt-4 rounded-xl border-2 border-dashed border-gray-200 flex items-center justify-center text-gray-400 hover:border-blue-300 hover:text-blue-500 transition-colors bg-white/50"
+                                                title="Tag hinzufügen"
+                                            >
+                                                <PlusIcon className="h-5 w-5" />
+                                            </button>
+                                        </div>
+                                    </>
+                                )}
+                                ) : (
+                                <>
+                                    <label className="block text-sm font-medium text-gray-700 font-display">Wochen-Muster festlegen (Feste Tage)</label>
+                                    <div className="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-7 gap-3 bg-gray-50 p-4 rounded-xl border border-gray-200">
+                                        {[1, 2, 3, 4, 5, 6, 0].map((dayIdx) => {
+                                            const days = ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa'];
+                                            const template = weeklyPattern[dayIdx];
+                                            return (
+                                                <div key={dayIdx} className="relative group">
+                                                    <div className="flex flex-col items-center gap-1">
+                                                        <span className={`text-[10px] uppercase font-bold ${dayIdx === 0 || dayIdx === 6 ? 'text-red-400' : 'text-gray-400'}`}>
+                                                            {days[dayIdx]}
+                                                        </span>
+                                                        <button
+                                                            onClick={() => setIsTemplateSelectOpen({ index: dayIdx, isOpen: true })}
+                                                            className={`w-full h-12 rounded-xl border-2 flex flex-col items-center justify-center transition-all ${template
+                                                                ? 'bg-white border-transparent shadow-sm'
+                                                                : 'bg-white border-dashed border-gray-300 text-gray-400 hover:border-gray-400'
+                                                                }`}
+                                                            style={template ? { borderColor: template.color, color: template.color } : {}}
+                                                        >
+                                                            {template ? (
+                                                                <>
+                                                                    <span className="font-bold text-xs truncate w-full text-center px-1 font-display">{template.name}</span>
+                                                                    <span className="text-[10px] opacity-75 font-sans">{template.startTime}-{template.endTime}</span>
+                                                                </>
+                                                            ) : (
+                                                                <span className="text-xs">Frei</span>
+                                                            )}
+                                                        </button>
+                                                    </div>
+
+                                                    {isTemplateSelectOpen.isOpen && isTemplateSelectOpen.index === dayIdx && (
+                                                        <div className="absolute bottom-full left-0 mb-2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 z-50 p-2 max-h-60 overflow-y-auto">
+                                                            <div className="text-xs font-bold text-gray-400 mb-2 px-2 uppercase tracking-tight">Vorlage wählen</div>
+                                                            <button
+                                                                onClick={() => setPatternItem(dayIdx, null)}
+                                                                className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded-lg text-sm text-gray-600 mb-1"
+                                                            >
+                                                                Frei / Keine Schicht
+                                                            </button>
+                                                            {templates.map(t => (
+                                                                <button
+                                                                    key={t.id}
+                                                                    onClick={() => setPatternItem(dayIdx, t)}
+                                                                    className="w-full text-left px-2 py-2 hover:bg-gray-100 rounded-lg text-sm flex items-center gap-2"
+                                                                >
+                                                                    <div className="w-3 h-3 rounded-full shrink-0" style={{ backgroundColor: t.color }}></div>
+                                                                    <span className="truncate">{t.name}</span>
+                                                                </button>
+                                                            ))}
+                                                            <div className="border-t mt-1 pt-1">
+                                                                <button onClick={() => setIsTemplateSelectOpen({ index: -1, isOpen: false })} className="w-full text-center text-xs text-gray-400 hover:text-gray-600 py-2">Abbrechen</button>
+                                                            </div>
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                </>
                         )}
+                            </div>
+
+                        <div className="flex items-center gap-2 p-2 bg-yellow-50 rounded-md text-sm text-yellow-800">
+                            <input
+                                type="checkbox"
+                                id="clearExisting"
+                                checked={clearExisting}
+                                onChange={e => setClearExisting(e.target.checked)}
+                                className="h-4 w-4 text-yellow-600 rounded border-yellow-300 focus:ring-yellow-500"
+                            />
+                            <label htmlFor="clearExisting">Bestehende Schichten im gewählten Zeitraum für diese Mitarbeiter löschen?</label>
+                        </div>
+
                     </div>
 
-                    <div className="flex items-center gap-2 p-2 bg-yellow-50 rounded-md text-sm text-yellow-800">
-                        <input
-                            type="checkbox"
-                            id="clearExisting"
-                            checked={clearExisting}
-                            onChange={e => setClearExisting(e.target.checked)}
-                            className="h-4 w-4 text-yellow-600 rounded border-yellow-300 focus:ring-yellow-500"
-                        />
-                        <label htmlFor="clearExisting">Bestehende Schichten im gewählten Zeitraum für diese Mitarbeiter löschen?</label>
+                    <div className="flex justify-end gap-4 pt-4 mt-2 border-t">
+                        <Button onClick={handleClose} className="bg-gray-200 hover:bg-gray-300 text-gray-800">Abbrechen</Button>
+                        <Button onClick={handleGenerate} className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2">
+                            <SparklesIcon className="h-5 w-5" />
+                            Schichten generieren
+                        </Button>
                     </div>
-
-                </div>
-
-                <div className="flex justify-end gap-4 pt-4 mt-2 border-t">
-                    <Button onClick={handleClose} className="bg-gray-200 hover:bg-gray-300 text-gray-800">Abbrechen</Button>
-                    <Button onClick={handleGenerate} className="bg-indigo-600 hover:bg-indigo-700 text-white flex items-center gap-2">
-                        <SparklesIcon className="h-5 w-5" />
-                        Schichten generieren
-                    </Button>
-                </div>
             </Card>
 
             {/* Sub-Modals */}
