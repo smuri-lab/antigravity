@@ -245,28 +245,7 @@ export const ShiftFormModal: React.FC<ShiftFormModalProps> = ({
                             />
                         )}
 
-                        <Input
-                            label="Notiz / Label (Optional)"
-                            placeholder="z.B. Frühschicht"
-                            value={formData.label || ''}
-                            onChange={e => setFormData(prev => ({ ...prev, label: e.target.value }))}
-                        />
 
-                        <div>
-                            <label className="block text-sm font-medium text-gray-700 mb-2">Farbe</label>
-                            <div className="flex gap-2">
-                                {colors.map(c => (
-                                    <button
-                                        key={c.hex}
-                                        type="button"
-                                        onClick={() => setFormData(prev => ({ ...prev, color: c.hex }))}
-                                        className={`w-8 h-8 rounded-full border-2 transition-all ${formData.color === c.hex ? 'border-gray-600 scale-110' : 'border-transparent hover:scale-105'}`}
-                                        style={{ backgroundColor: c.hex }}
-                                        title={c.name}
-                                    />
-                                ))}
-                            </div>
-                        </div>
 
                         <div className="flex justify-between items-center pt-6 border-t mt-4">
                             <div>
