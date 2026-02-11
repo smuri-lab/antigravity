@@ -222,9 +222,6 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const [draggedShift, setDraggedShift] = useState<Shift | null>(null);
     const [dropTarget, setDropTarget] = useState<{ employeeId: number; date: string } | null>(null);
 
-    // Employee deletion confirmation
-    const [employeeToDelete, setEmployeeToDelete] = useState<{ id: number; name: string; shiftCount: number } | null>(null);
-
 
     // --- PLANNER HELPERS ---
 
