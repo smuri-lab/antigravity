@@ -30,6 +30,7 @@ import { SparklesIcon } from '../icons/SparklesIcon';
 import { ClockIcon } from '../icons/ClockIcon';
 import { CalendarIcon } from '../icons/CalendarIcon';
 import { ConfirmModal } from '../ui/ConfirmModal';
+import { ExclamationTriangleIcon } from '../icons/ExclamationTriangleIcon';
 
 interface ShiftPlannerViewProps {
     employees: Employee[];
@@ -62,6 +63,35 @@ const getStartOfWeek = (date: Date): Date => {
 };
 
 const formatDate = (date: Date) => date.toLocaleDateString('de-DE', { day: '2-digit', month: '2-digit', year: 'numeric' });
+
+// Helper to check if a shift conflicts with an approved absence
+const hasAbsenceConflict = (shift: Shift, absenceRequests: AbsenceRequest[]): AbsenceRequest | null => {
+    const shiftDate = new Date(shift.start);
+    const shiftDateStr = shiftDate.toISOString().split('T')[0]; // YYYY-MM-DD
+
+    const conflict = absenceRequests.find(absence => {
+        if (absence.employeeId !== shift.employeeId) return false;
+        if (absence.status !== 'approved') return false;
+
+        const startDate = new Date(absence.startDate);
+        const endDate = new Date(absence.endDate);
+
+        // Check if shift date falls within absence period
+        return shiftDate >= startDate && shiftDate <= endDate;
+    });
+
+    return conflict || null;
+};
+
+// Helper to get absence type label in German
+const getAbsenceTypeLabel = (type: AbsenceType): string => {
+    switch (type) {
+        case AbsenceType.Vacation: return 'Urlaub';
+        case AbsenceType.SickLeave: return 'Krankheit';
+        case AbsenceType.TimeOff: return 'Freizeitausgleich';
+        default: return 'Abwesenheit';
+    }
+};
 
 type ViewMode = 'timeline' | 'week' | 'month';
 
@@ -723,14 +753,24 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                                 const start = new Date(shift.start);
                                                                 const end = new Date(shift.end);
                                                                 const pos = getPositionStyle(start, end);
+                                                                const conflict = hasAbsenceConflict(shift, absenceRequests);
+                                                                const hasConflict = !!conflict;
+
                                                                 return (
                                                                     <div
                                                                         key={shift.id}
-                                                                        className="absolute top-2 bottom-2 z-10 shadow-sm flex items-center px-2 cursor-pointer hover:brightness-110 overflow-hidden text-white text-xs border border-black/10 rounded"
+                                                                        className={`absolute top-2 bottom-2 z-10 shadow-sm flex items-center px-2 cursor-pointer hover:brightness-110 overflow-hidden text-white text-xs rounded ${hasConflict ? 'border-2 border-red-600' : 'border border-black/10'
+                                                                            }`}
                                                                         style={{ ...pos, backgroundColor: shift.color || '#3b82f6' }}
                                                                         onClick={(e) => handleShiftClick(e, shift)}
-                                                                        title={getShiftLabel(shift)}
+                                                                        title={hasConflict
+                                                                            ? `⚠️ KONFLIKT: Mitarbeiter ist im ${getAbsenceTypeLabel(conflict.type)}\n${getShiftLabel(shift)}`
+                                                                            : getShiftLabel(shift)
+                                                                        }
                                                                     >
+                                                                        {hasConflict && (
+                                                                            <ExclamationTriangleIcon className="h-3 w-3 mr-1 flex-shrink-0 text-red-200" />
+                                                                        )}
                                                                         <div className="font-semibold truncate mr-1">{start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-{end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
                                                                     </div>
                                                                 );
@@ -796,25 +836,38 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                                         )}
 
                                                                         {/* Shifts */}
-                                                                        {dayShifts.map(shift => (
-                                                                            <div
-                                                                                key={shift.id}
-                                                                                className={`relative z-10 text-xs text-white rounded px-1.5 py-0.5 shadow-sm truncate cursor-pointer hover:scale-105 transition-transform ${viewMode === 'month' ? 'h-full flex items-center justify-center' : ''}`}
-                                                                                style={{ backgroundColor: shift.color || '#3b82f6' }}
-                                                                                onClick={(e) => handleShiftClick(e, shift)}
-                                                                                title={`${getShiftLabel(shift)} (${new Date(shift.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-${new Date(shift.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`}
-                                                                            >
-                                                                                {viewMode === 'week' ? (
-                                                                                    <>
-                                                                                        <div className="font-bold">{new Date(shift.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                                                                                        <div className="truncate opacity-90 text-[10px]">{getShiftLabel(shift)}</div>
-                                                                                    </>
-                                                                                ) : (
-                                                                                    // Compact for Month
-                                                                                    <div className="font-bold text-center">{shift.label ? shift.label.substring(0, 3) : new Date(shift.start).getHours()}</div>
-                                                                                )}
-                                                                            </div>
-                                                                        ))}
+                                                                        {dayShifts.map(shift => {
+                                                                            const conflict = hasAbsenceConflict(shift, absenceRequests);
+                                                                            const hasConflict = !!conflict;
+
+                                                                            return (
+                                                                                <div
+                                                                                    key={shift.id}
+                                                                                    className={`relative z-10 text-xs text-white rounded px-1.5 py-0.5 shadow-sm truncate cursor-pointer hover:scale-105 transition-transform ${viewMode === 'month' ? 'h-full flex items-center justify-center' : ''
+                                                                                        } ${hasConflict ? 'ring-2 ring-red-600 ring-inset' : ''
+                                                                                        }`}
+                                                                                    style={{ backgroundColor: shift.color || '#3b82f6' }}
+                                                                                    onClick={(e) => handleShiftClick(e, shift)}
+                                                                                    title={hasConflict
+                                                                                        ? `⚠️ KONFLIKT: Mitarbeiter ist im ${getAbsenceTypeLabel(conflict.type)}\n${getShiftLabel(shift)} (${new Date(shift.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-${new Date(shift.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`
+                                                                                        : `${getShiftLabel(shift)} (${new Date(shift.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-${new Date(shift.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`
+                                                                                    }
+                                                                                >
+                                                                                    {viewMode === 'week' ? (
+                                                                                        <>
+                                                                                            <div className="flex items-center gap-1">
+                                                                                                {hasConflict && <ExclamationTriangleIcon className="h-3 w-3 flex-shrink-0 text-red-200" />}
+                                                                                                <div className="font-bold">{new Date(shift.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                                                                            </div>
+                                                                                            <div className="truncate opacity-90 text-[10px]">{getShiftLabel(shift)}</div>
+                                                                                        </>
+                                                                                    ) : (
+                                                                                        // Compact for Month
+                                                                                        <div className="font-bold text-center">{shift.label ? shift.label.substring(0, 3) : new Date(shift.start).getHours()}</div>
+                                                                                    )}
+                                                                                </div>
+                                                                            );
+                                                                        })}
                                                                     </div>
                                                                 );
                                                             })}
