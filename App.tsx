@@ -248,6 +248,7 @@ const App: React.FC = () => {
     addShiftTemplate, updateShiftTemplate, deleteShiftTemplate,
     deleteShiftsByEmployee,
     rotationPatterns, addRotationPattern, updateRotationPattern, deleteRotationPattern,
+    employeeGroups, addEmployeeGroup, updateEmployeeGroup, deleteEmployeeGroup,
   } = useStore();
 
   const [timeTrackingMethod, setTimeTrackingMethod] = useLocalStorage<'all' | 'manual'>('timepro-method', 'all');
