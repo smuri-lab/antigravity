@@ -144,7 +144,7 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
                 </button>
             </div>
 
-            <Button onClick={handleCreate} className="mb-6 w-full">
+            <Button onClick={handleCreate} className="mb-6 w-full" variant="primary">
                 <PlusIcon className="h-5 w-5 mr-2" />
                 Neues Rotationsmuster
             </Button>
@@ -321,7 +321,7 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
                     <Button variant="secondary" onClick={handleCloseEdit} className="flex-1">
                         Abbrechen
                     </Button>
-                    <Button onClick={handleSave} className="flex-1">
+                    <Button onClick={handleSave} className="flex-1" variant="primary">
                         Speichern
                     </Button>
                 </div>

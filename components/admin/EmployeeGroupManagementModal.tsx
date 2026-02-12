@@ -128,7 +128,7 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
                 </button>
             </div>
 
-            <Button onClick={handleCreate} className="mb-6 w-full">
+            <Button onClick={handleCreate} className="mb-6 w-full" variant="primary">
                 <PlusIcon className="h-5 w-5 mr-2" />
                 Neue Gruppe
             </Button>
@@ -288,7 +288,7 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
                     <Button variant="secondary" onClick={handleCloseEdit} className="flex-1">
                         Abbrechen
                     </Button>
-                    <Button onClick={handleSave} className="flex-1">
+                    <Button onClick={handleSave} className="flex-1" variant="primary">
                         Speichern
                     </Button>
                 </div>
