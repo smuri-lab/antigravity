@@ -1,6 +1,6 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
-import type { Employee, Shift, Customer, Activity, CompanySettings, AbsenceRequest, ShiftTemplate } from '../../types';
+import type { Employee, Shift, Customer, Activity, CompanySettings, AbsenceRequest, ShiftTemplate, RotationTemplate } from '../../types';
 import { AbsenceType } from '../../types';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -24,6 +24,7 @@ import { PlannerDateRangeModal, type Preset } from './PlannerDateRangeModal';
 import { DocumentTextIcon } from '../icons/DocumentTextIcon';
 import { ShiftTemplateManagementModal } from './ShiftTemplateManagementModal';
 import { ShiftPatternGeneratorModal } from './ShiftPatternGeneratorModal';
+import { RotationPatternManagementModal } from './RotationPatternManagementModal';
 import { CogIcon } from '../icons/CogIcon';
 import { XIcon } from '../icons/XIcon';
 import { SparklesIcon } from '../icons/SparklesIcon';
@@ -48,6 +49,10 @@ interface ShiftPlannerViewProps {
     updateShiftTemplate: (template: ShiftTemplate) => void;
     deleteShiftTemplate: (id: string) => void;
     deleteShiftsByEmployee: (employeeId: number) => void;
+    rotationPatterns: RotationTemplate[];
+    addRotationPattern: (pattern: Omit<RotationTemplate, 'id' | 'createdAt'>) => void;
+    updateRotationPattern: (pattern: RotationTemplate) => void;
+    deleteRotationPattern: (id: string) => void;
 }
 
 // Helper to check if a shift overlaps with the visible time window
@@ -140,7 +145,11 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     addShiftTemplate = () => { },
     updateShiftTemplate = () => { },
     deleteShiftTemplate = () => { },
-    deleteShiftsByEmployee = (_id: number) => { }
+    deleteShiftsByEmployee = (_id: number) => { },
+    rotationPatterns = [],
+    addRotationPattern = () => { },
+    updateRotationPattern = () => { },
+    deleteRotationPattern = () => { }
 }) => {
     // Verify prop is correctly passed
     console.log('ShiftPlannerView: deleteShiftsByEmployee prop:', deleteShiftsByEmployee);
@@ -192,6 +201,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [isTemplateModalOpen, setIsTemplateModalOpen] = useState(false);
     const [isGeneratorModalOpen, setIsGeneratorModalOpen] = useState(false);
+    const [isRotationPatternManagementOpen, setIsRotationPatternManagementOpen] = useState(false);
 
     // "Paint Mode" State
     const [activeTemplate, setActiveTemplate] = useState<ShiftTemplate | null>(null);

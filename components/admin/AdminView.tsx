@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import type { AbsenceRequest, TimeEntry, Employee, Customer, Activity, Holiday, CompanySettings, TimeBalanceAdjustment, HolidaysByYear, Shift, ShiftTemplate } from '../../types';
+import type { AbsenceRequest, TimeEntry, Employee, Customer, Activity, Holiday, CompanySettings, TimeBalanceAdjustment, HolidaysByYear, Shift, ShiftTemplate, RotationTemplate } from '../../types';
 import { AdminViewType } from '../../types';
 import { AdminNav } from './AdminNav';
 import { SettingsView } from './SettingsView';
@@ -60,6 +60,11 @@ interface AdminViewProps {
   updateShiftTemplate: (template: ShiftTemplate) => void;
   deleteShiftTemplate: (id: string) => void;
   deleteShiftsByEmployee: (employeeId: number) => void;
+  // Rotation Patterns
+  rotationPatterns: RotationTemplate[];
+  addRotationPattern: (pattern: Omit<RotationTemplate, 'id' | 'createdAt'>) => void;
+  updateRotationPattern: (pattern: RotationTemplate) => void;
+  deleteRotationPattern: (id: string) => void;
 }
 
 export const AdminView: React.FC<AdminViewProps> = (props) => {
@@ -92,6 +97,10 @@ export const AdminView: React.FC<AdminViewProps> = (props) => {
           updateShiftTemplate={props.updateShiftTemplate}
           deleteShiftTemplate={props.deleteShiftTemplate}
           deleteShiftsByEmployee={props.deleteShiftsByEmployee}
+          rotationPatterns={props.rotationPatterns || []}
+          addRotationPattern={props.addRotationPattern}
+          updateRotationPattern={props.updateRotationPattern}
+          deleteRotationPattern={props.deleteRotationPattern}
         />;
       case AdminViewType.TimeTracking:
         return <TimeTrackingManagement {...props} />;
