@@ -165,7 +165,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     console.log('ShiftPlannerView: Is default function?', deleteShiftsByEmployee.toString().includes('{ }'));
 
     // --- GENERAL STATE ---
-    const [activeTab, setActiveTab] = useState<'planner' | 'report'>('planner');
+    const [activeTab, setActiveTab] = useState<'planner' | 'management' | 'report'>('planner');
     const [employeeToDelete, setEmployeeToDelete] = useState<{ id: number; name: string; shiftCount: number } | null>(null);
 
     // --- PLANNER TAB STATE ---
@@ -729,7 +729,17 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
                     >
                         <CalendarDaysIcon className="h-5 w-5" />
-                        Interaktiver Planer
+                        Planer
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('management')}
+                        className={`${activeTab === 'management'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
+                    >
+                        <CogIcon className="h-5 w-5" />
+                        Verwaltung
                     </button>
                     <button
                         onClick={() => setActiveTab('report')}
@@ -794,27 +804,9 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                         {/* HEADER: Filter & Navigation */}
                         <div className="flex flex-col xl:flex-row justify-between items-center p-4 pb-4 border-b border-gray-100 gap-4 relative">
                             <div className="flex items-center gap-2 w-full xl:w-auto">
-                                <Button onClick={() => setIsTemplateModalOpen(true)} className="bg-white text-gray-700 border border-gray-300 hover:bg-gray-50 flex items-center gap-2 text-sm px-3 py-2 flex-1 xl:flex-initial justify-center">
-                                    <CogIcon className="h-4 w-4" />
-                                    <span className="hidden sm:inline">Vorlagen</span>
-                                    <span className="sm:hidden">Vorlagen</span>
-                                </Button>
-
-                                <Button onClick={() => setIsGeneratorModalOpen(true)} className="bg-indigo-50 text-indigo-700 border border-indigo-200 hover:bg-indigo-100 flex items-center gap-2 text-sm px-3 py-2 flex-1 xl:flex-initial justify-center">
+                                <Button onClick={() => setIsGeneratorModalOpen(true)} className="bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-2 text-sm px-4 py-2 flex-1 xl:flex-initial justify-center">
                                     <SparklesIcon className="h-4 w-4" />
-                                    <span>Automatik</span>
-                                </Button>
-
-                                <Button onClick={() => setIsRotationPatternManagementOpen(true)} className="bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 flex items-center gap-2 text-sm px-3 py-2 flex-1 xl:flex-initial justify-center">
-                                    🔄
-                                    <span className="hidden sm:inline">Rotationsmuster</span>
-                                    <span className="sm:hidden">Muster</span>
-                                </Button>
-
-                                <Button onClick={() => setIsEmployeeGroupManagementOpen(true)} className="bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 flex items-center gap-2 text-sm px-3 py-2 flex-1 xl:flex-initial justify-center">
-                                    👥
-                                    <span className="hidden sm:inline">Gruppen</span>
-                                    <span className="sm:hidden">Gruppen</span>
+                                    <span>Schicht-Automatik</span>
                                 </Button>
 
                                 {viewMode === 'week' && (
