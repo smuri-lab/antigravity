@@ -805,6 +805,18 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                     <span>Automatik</span>
                                 </Button>
 
+                                <Button onClick={() => setIsRotationPatternManagementOpen(true)} className="bg-purple-50 text-purple-700 border border-purple-200 hover:bg-purple-100 flex items-center gap-2 text-sm px-3 py-2 flex-1 xl:flex-initial justify-center">
+                                    🔄
+                                    <span className="hidden sm:inline">Rotationsmuster</span>
+                                    <span className="sm:hidden">Muster</span>
+                                </Button>
+
+                                <Button onClick={() => setIsEmployeeGroupManagementOpen(true)} className="bg-green-50 text-green-700 border border-green-200 hover:bg-green-100 flex items-center gap-2 text-sm px-3 py-2 flex-1 xl:flex-initial justify-center">
+                                    👥
+                                    <span className="hidden sm:inline">Gruppen</span>
+                                    <span className="sm:hidden">Gruppen</span>
+                                </Button>
+
                                 {viewMode === 'week' && (
                                     <Button
                                         onClick={() => setIsWeekCopyModalOpen(true)}
