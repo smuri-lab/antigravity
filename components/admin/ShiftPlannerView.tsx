@@ -701,171 +701,171 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
             setDraggedTemplate(null);
             setDropTarget(null);
         }
-    };
+
         // Handle template drag & drop
         else if (draggedTemplate) {
-    const [startHour, startMin] = draggedTemplate.startTime.split(':').map(Number);
-    const [endHour, endMin] = draggedTemplate.endTime.split(':').map(Number);
+            const [startHour, startMin] = draggedTemplate.startTime.split(':').map(Number);
+            const [endHour, endMin] = draggedTemplate.endTime.split(':').map(Number);
 
-    const [year, month, day] = targetDate.split('-').map(Number);
-    const start = new Date(year, month - 1, day, startHour, startMin);
-    const end = new Date(year, month - 1, day, endHour, endMin);
+            const [year, month, day] = targetDate.split('-').map(Number);
+            const start = new Date(year, month - 1, day, startHour, startMin);
+            const end = new Date(year, month - 1, day, endHour, endMin);
 
-    // Handle overnight shifts
-    if (end < start) {
-        end.setDate(end.getDate() + 1);
-    }
+            // Handle overnight shifts
+            if (end < start) {
+                end.setDate(end.getDate() + 1);
+            }
 
-    // Create shift from template
-    addShift({
-        employeeId: targetEmployeeId,
-        start: start.toISOString(),
-        end: end.toISOString(),
-        label: draggedTemplate.name,
-        color: draggedTemplate.color,
-        customerId: draggedTemplate.customerId,
-        activityId: draggedTemplate.activityId,
-    } as Omit<Shift, 'id'>);
+            // Create shift from template
+            addShift({
+                employeeId: targetEmployeeId,
+                start: start.toISOString(),
+                end: end.toISOString(),
+                label: draggedTemplate.name,
+                color: draggedTemplate.color,
+                customerId: draggedTemplate.customerId,
+                activityId: draggedTemplate.activityId,
+            } as Omit<Shift, 'id'>);
 
-    setDraggedTemplate(null);
-    setDropTarget(null);
-}
+            setDraggedTemplate(null);
+            setDropTarget(null);
+        }
     };
 
-// Template drag handlers
-const handleTemplateDragStart = (e: React.DragEvent, template: ShiftTemplate) => {
-    setDraggedTemplate(template);
-    e.dataTransfer.effectAllowed = 'copy';
-    if (e.currentTarget instanceof HTMLElement) {
-        e.currentTarget.style.opacity = '0.5';
-    }
-};
+    // Template drag handlers
+    const handleTemplateDragStart = (e: React.DragEvent, template: ShiftTemplate) => {
+        setDraggedTemplate(template);
+        e.dataTransfer.effectAllowed = 'copy';
+        if (e.currentTarget instanceof HTMLElement) {
+            e.currentTarget.style.opacity = '0.5';
+        }
+    };
 
-const handleTemplateDragEnd = (e: React.DragEvent) => {
-    setDraggedTemplate(null);
-    if (e.currentTarget instanceof HTMLElement) {
-        e.currentTarget.style.opacity = '1';
-    }
-};
+    const handleTemplateDragEnd = (e: React.DragEvent) => {
+        setDraggedTemplate(null);
+        if (e.currentTarget instanceof HTMLElement) {
+            e.currentTarget.style.opacity = '1';
+        }
+    };
 
 
-// --- REPORT HELPERS ---
-const getReportEmployeeSelectorLabel = () => {
-    if (reportEmployeeIds.length === 0) return 'Keine Mitarbeiter ausgewählt';
-    if (reportEmployeeIds.length === employees.length) return 'Alle Mitarbeiter';
-    if (reportEmployeeIds.length === 1) {
-        const emp = employees.find(e => e.id === reportEmployeeIds[0]);
-        return emp ? `${emp.firstName} ${emp.lastName}` : '1 Mitarbeiter';
-    }
-    return `${reportEmployeeIds.length} Mitarbeiter ausgewählt`;
-};
+    // --- REPORT HELPERS ---
+    const getReportEmployeeSelectorLabel = () => {
+        if (reportEmployeeIds.length === 0) return 'Keine Mitarbeiter ausgewählt';
+        if (reportEmployeeIds.length === employees.length) return 'Alle Mitarbeiter';
+        if (reportEmployeeIds.length === 1) {
+            const emp = employees.find(e => e.id === reportEmployeeIds[0]);
+            return emp ? `${emp.firstName} ${emp.lastName}` : '1 Mitarbeiter';
+        }
+        return `${reportEmployeeIds.length} Mitarbeiter ausgewählt`;
+    };
 
-const reportData = useMemo(() => {
-    const selectedEmployees = employees.filter(e => reportEmployeeIds.includes(e.id))
-        .sort((a, b) => a.lastName.localeCompare(b.lastName));
+    const reportData = useMemo(() => {
+        const selectedEmployees = employees.filter(e => reportEmployeeIds.includes(e.id))
+            .sort((a, b) => a.lastName.localeCompare(b.lastName));
 
-    return selectedEmployees.map(emp => {
-        const empShifts = shifts.filter(s => {
-            if (s.employeeId !== emp.id) return false;
-            const sStart = new Date(s.start);
-            // Check if shift falls within range (even partially)
-            return sStart >= reportStartDate && sStart <= reportEndDate;
-        }).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
+        return selectedEmployees.map(emp => {
+            const empShifts = shifts.filter(s => {
+                if (s.employeeId !== emp.id) return false;
+                const sStart = new Date(s.start);
+                // Check if shift falls within range (even partially)
+                return sStart >= reportStartDate && sStart <= reportEndDate;
+            }).sort((a, b) => new Date(a.start).getTime() - new Date(b.start).getTime());
 
-        // Generate Calendar Days for this employee
-        const weeks = [];
-        let current = new Date(reportStartDate);
-        // Normalize start to Monday just in case reportStartDate isn't one (though default is)
-        const day = current.getDay();
-        const diff = current.getDate() - day + (day === 0 ? -6 : 1);
-        current.setDate(diff);
+            // Generate Calendar Days for this employee
+            const weeks = [];
+            let current = new Date(reportStartDate);
+            // Normalize start to Monday just in case reportStartDate isn't one (though default is)
+            const day = current.getDay();
+            const diff = current.getDate() - day + (day === 0 ? -6 : 1);
+            current.setDate(diff);
 
-        const end = new Date(reportEndDate);
+            const end = new Date(reportEndDate);
 
-        while (current <= end) {
-            const weekRow = [];
-            for (let i = 0; i < 7; i++) {
-                const dayDate = new Date(current);
-                const dayShifts = empShifts.filter(s => {
-                    const shiftDate = new Date(s.start).toLocaleDateString('sv-SE');
-                    return shiftDate === dayDate.toLocaleDateString('sv-SE');
-                });
+            while (current <= end) {
+                const weekRow = [];
+                for (let i = 0; i < 7; i++) {
+                    const dayDate = new Date(current);
+                    const dayShifts = empShifts.filter(s => {
+                        const shiftDate = new Date(s.start).toLocaleDateString('sv-SE');
+                        return shiftDate === dayDate.toLocaleDateString('sv-SE');
+                    });
 
-                weekRow.push({
-                    date: dayDate,
-                    shifts: dayShifts
-                });
-                current.setDate(current.getDate() + 1);
+                    weekRow.push({
+                        date: dayDate,
+                        shifts: dayShifts
+                    });
+                    current.setDate(current.getDate() + 1);
+                }
+                weeks.push(weekRow);
             }
-            weeks.push(weekRow);
-        }
 
-        return {
-            employee: emp,
-            weeks: weeks
-        };
-    });
-}, [employees, reportEmployeeIds, shifts, reportStartDate, reportEndDate]);
+            return {
+                employee: emp,
+                weeks: weeks
+            };
+        });
+    }, [employees, reportEmployeeIds, shifts, reportStartDate, reportEndDate]);
 
-const handleExportPdf = () => {
-    const employeesToExport = employees.filter(e => reportEmployeeIds.includes(e.id));
-    if (employeesToExport.length === 0) return;
+    const handleExportPdf = () => {
+        const employeesToExport = employees.filter(e => reportEmployeeIds.includes(e.id));
+        if (employeesToExport.length === 0) return;
 
-    exportShiftPlanAsPdf({
-        employees: employeesToExport,
-        shifts,
-        startDate: reportStartDate,
-        endDate: reportEndDate,
-        customers,
-        activities,
-        companySettings
-    });
-};
+        exportShiftPlanAsPdf({
+            employees: employeesToExport,
+            shifts,
+            startDate: reportStartDate,
+            endDate: reportEndDate,
+            customers,
+            activities,
+            companySettings
+        });
+    };
 
-// --- GROUP ASSIGNMENT HANDLERS ---
-const handleGroupAssignAll = () => {
-    if (!groupAssignData) return;
-    const { groupId, shiftData } = groupAssignData;
-    const group = employeeGroups.find(g => g.id === groupId);
-    if (!group) return;
+    // --- GROUP ASSIGNMENT HANDLERS ---
+    const handleGroupAssignAll = () => {
+        if (!groupAssignData) return;
+        const { groupId, shiftData } = groupAssignData;
+        const group = employeeGroups.find(g => g.id === groupId);
+        if (!group) return;
 
-    group.employeeIds.forEach(empId => {
-        // Check if employee exists
-        if (employees.find(e => e.id === empId)) {
-            addShift({
-                ...shiftData,
-                employeeId: empId,
-                start: shiftData.start!,
-                end: shiftData.end!,
-                label: shiftData.label || 'Schicht',
-                color: shiftData.color || '#3b82f6',
-            } as Shift);
-        }
-    });
-    setShowGroupAssignModal(false);
-    setGroupAssignData(null);
-};
+        group.employeeIds.forEach(empId => {
+            // Check if employee exists
+            if (employees.find(e => e.id === empId)) {
+                addShift({
+                    ...shiftData,
+                    employeeId: empId,
+                    start: shiftData.start!,
+                    end: shiftData.end!,
+                    label: shiftData.label || 'Schicht',
+                    color: shiftData.color || '#3b82f6',
+                } as Shift);
+            }
+        });
+        setShowGroupAssignModal(false);
+        setGroupAssignData(null);
+    };
 
-const handleGroupAssignOne = (employeeId: number) => {
-    if (!groupAssignData) return;
-    const { shiftData } = groupAssignData;
+    const handleGroupAssignOne = (employeeId: number) => {
+        if (!groupAssignData) return;
+        const { shiftData } = groupAssignData;
 
-    addShift({
-        ...shiftData,
-        employeeId: employeeId,
-        start: shiftData.start!,
-        end: shiftData.end!,
-        label: shiftData.label || 'Schicht',
-        color: shiftData.color || '#3b82f6',
-    } as Shift);
-    setShowGroupAssignModal(false);
-    setGroupAssignData(null);
-};
+        addShift({
+            ...shiftData,
+            employeeId: employeeId,
+            start: shiftData.start!,
+            end: shiftData.end!,
+            label: shiftData.label || 'Schicht',
+            color: shiftData.color || '#3b82f6',
+        } as Shift);
+        setShowGroupAssignModal(false);
+        setGroupAssignData(null);
+    };
 
-// --- RENDER ---
-return (
-    <div className="space-y-4">
-        <style>{`
+    // --- RENDER ---
+    return (
+        <div className="space-y-4">
+            <style>{`
                 .hide-scroll::-webkit-scrollbar { display: none; }
                 .hide-scroll { -ms-overflow-style: none; scrollbar-width: none; }
                 .absence-pattern {
@@ -874,782 +874,790 @@ return (
                 .cursor-copy { cursor: copy; }
             `}</style>
 
-        <div className="border-b border-gray-200">
-            <nav className="-mb-px flex space-x-6" aria-label="Tabs">
-                <button
-                    onClick={() => setActiveTab('planner')}
-                    className={`${activeTab === 'planner'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                        } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
-                >
-                    <CalendarDaysIcon className="h-5 w-5" />
-                    Planer
-                </button>
-                <button
-                    onClick={() => setActiveTab('management')}
-                    className={`${activeTab === 'management'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                        } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
-                >
-                    <CogIcon className="h-5 w-5" />
-                    Verwaltung
-                </button>
-                <button
-                    onClick={() => setActiveTab('report')}
-                    className={`${activeTab === 'report'
-                        ? 'border-blue-500 text-blue-600'
-                        : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                        } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
-                >
-                    <DocumentTextIcon className="h-5 w-5" />
-                    Bericht & Export
-                </button>
-            </nav>
-        </div>
+            <div className="border-b border-gray-200">
+                <nav className="-mb-px flex space-x-6" aria-label="Tabs">
+                    <button
+                        onClick={() => setActiveTab('planner')}
+                        className={`${activeTab === 'planner'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
+                    >
+                        <CalendarDaysIcon className="h-5 w-5" />
+                        Planer
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('management')}
+                        className={`${activeTab === 'management'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
+                    >
+                        <CogIcon className="h-5 w-5" />
+                        Verwaltung
+                    </button>
+                    <button
+                        onClick={() => setActiveTab('report')}
+                        className={`${activeTab === 'report'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
+                    >
+                        <DocumentTextIcon className="h-5 w-5" />
+                        Bericht & Export
+                    </button>
+                </nav>
+            </div>
 
-        {activeTab === 'planner' && (
-            <div className="animate-fade-in space-y-4">
-                <Card className="overflow-hidden flex flex-col h-full !p-0">
-                    {/* TEMPLATE QUICK SELECT */}
-                    {shiftTemplates.length > 0 && (
-                        <div className="bg-gray-50 p-3 border-b border-gray-200 flex gap-2 overflow-x-auto items-center hide-scroll">
-                            <span className="text-xs font-bold text-gray-500 uppercase tracking-wider mr-2 whitespace-nowrap">
-                                Schnell-Zuweisung:
-                            </span>
-                            {shiftTemplates.map(t => {
-                                const isActive = activeTemplate?.id === t.id;
-                                return (
+            {activeTab === 'planner' && (
+                <div className="animate-fade-in space-y-4">
+                    <Card className="overflow-hidden flex flex-col h-full !p-0">
+                        {/* TEMPLATE QUICK SELECT */}
+                        {shiftTemplates.length > 0 && (
+                            <div className="bg-gray-50 p-3 border-b border-gray-200 flex gap-2 overflow-x-auto items-center hide-scroll">
+                                <span className="text-xs font-bold text-gray-500 uppercase tracking-wider mr-2 whitespace-nowrap">
+                                    Schnell-Zuweisung:
+                                </span>
+                                {shiftTemplates.map(t => {
+                                    const isActive = activeTemplate?.id === t.id;
+                                    return (
+                                        <button
+                                            key={t.id}
+                                            draggable={true}
+                                            onDragStart={(e) => handleTemplateDragStart(e, t)}
+                                            onDragEnd={handleTemplateDragEnd}
+                                            onClick={() => setActiveTemplate(isActive ? null : t)}
+                                            className={`px-3 py-1.5 text-xs font-semibold rounded-full border shadow-sm transition-all flex items-center gap-2 whitespace-nowrap cursor-grab active:cursor-grabbing ${isActive
+                                                ? 'ring-2 ring-offset-1 scale-105'
+                                                : 'hover:bg-white hover:shadow-md opacity-80 hover:opacity-100'
+                                                }`}
+                                            style={{
+                                                backgroundColor: t.color + (isActive ? '' : '20'),
+                                                color: isActive ? '#fff' : t.color,
+                                                borderColor: t.color,
+                                                ringColor: t.color
+                                            }}
+                                        >
+                                            {t.name}
+                                            <span className="opacity-70 text-[10px]">({t.startTime}-{t.endTime})</span>
+                                            {isActive && <span className="ml-1 bg-white text-black rounded-full w-4 h-4 flex items-center justify-center text-[10px]">✓</span>}
+                                        </button>
+                                    );
+                                })}
+                                {activeTemplate && (
                                     <button
-                                        key={t.id}
-                                        draggable={true}
-                                        onDragStart={(e) => handleTemplateDragStart(e, t)}
-                                        onDragEnd={handleTemplateDragEnd}
-                                        onClick={() => setActiveTemplate(isActive ? null : t)}
-                                        className={`px-3 py-1.5 text-xs font-semibold rounded-full border shadow-sm transition-all flex items-center gap-2 whitespace-nowrap cursor-grab active:cursor-grabbing ${isActive
-                                            ? 'ring-2 ring-offset-1 scale-105'
-                                            : 'hover:bg-white hover:shadow-md opacity-80 hover:opacity-100'
-                                            }`}
-                                        style={{
-                                            backgroundColor: t.color + (isActive ? '' : '20'),
-                                            color: isActive ? '#fff' : t.color,
-                                            borderColor: t.color,
-                                            ringColor: t.color
-                                        }}
+                                        onClick={() => setActiveTemplate(null)}
+                                        className="ml-auto text-xs text-gray-500 hover:text-red-600 flex items-center gap-1 bg-white px-2 py-1 rounded border border-gray-200 shadow-sm"
                                     >
-                                        {t.name}
-                                        <span className="opacity-70 text-[10px]">({t.startTime}-{t.endTime})</span>
-                                        {isActive && <span className="ml-1 bg-white text-black rounded-full w-4 h-4 flex items-center justify-center text-[10px]">✓</span>}
+                                        <XIcon className="h-3 w-3" />
+                                        Abbrechen
                                     </button>
-                                );
-                            })}
-                            {activeTemplate && (
-                                <button
-                                    onClick={() => setActiveTemplate(null)}
-                                    className="ml-auto text-xs text-gray-500 hover:text-red-600 flex items-center gap-1 bg-white px-2 py-1 rounded border border-gray-200 shadow-sm"
-                                >
-                                    <XIcon className="h-3 w-3" />
-                                    Abbrechen
-                                </button>
-                            )}
-                        </div>
-                    )}
+                                )}
+                            </div>
+                        )}
 
-                    {/* HEADER: Filter & Navigation */}
-                    <div className="flex flex-col xl:flex-row justify-between items-center p-4 pb-4 border-b border-gray-100 gap-4 relative">
-                        <div className="flex items-center gap-2 w-full xl:w-auto">
-                            <Button onClick={() => setIsGeneratorModalOpen(true)} className="bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-2 text-sm px-4 py-2 flex-1 xl:flex-initial justify-center">
-                                <SparklesIcon className="h-4 w-4" />
-                                <span>Schicht-Automatik</span>
-                            </Button>
-
-                            {viewMode === 'week' && (
-                                <Button
-                                    onClick={() => setIsWeekCopyModalOpen(true)}
-                                    className="bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2 text-sm px-3 py-2 flex-1 xl:flex-initial justify-center"
-                                    disabled={shifts.filter(s => {
-                                        const shiftDate = new Date(s.start);
-                                        const weekStart = getStartOfWeek(viewStartDateTime);
-                                        const weekEnd = new Date(weekStart);
-                                        weekEnd.setDate(weekEnd.getDate() + 7);
-                                        return shiftDate >= weekStart && shiftDate < weekEnd;
-                                    }).length === 0}
-                                >
-                                    📋 Woche kopieren
+                        {/* HEADER: Filter & Navigation */}
+                        <div className="flex flex-col xl:flex-row justify-between items-center p-4 pb-4 border-b border-gray-100 gap-4 relative">
+                            <div className="flex items-center gap-2 w-full xl:w-auto">
+                                <Button onClick={() => setIsGeneratorModalOpen(true)} className="bg-indigo-600 text-white hover:bg-indigo-700 flex items-center gap-2 text-sm px-4 py-2 flex-1 xl:flex-initial justify-center">
+                                    <SparklesIcon className="h-4 w-4" />
+                                    <span>Schicht-Automatik</span>
                                 </Button>
-                            )}
-                        </div>
 
-                        <div className="flex items-center justify-center gap-2 sm:gap-4 w-full xl:w-auto">
-                            <button onClick={() => shiftView(-1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Zurück">
-                                <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
-                            </button>
-
-                            <button onClick={() => setIsDatePickModalOpen(true)} className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
-                                <CalendarDaysIcon className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
-                                <h2 className="text-lg font-bold text-gray-800 whitespace-nowrap font-display tracking-tight">
-                                    {dateRangeLabel}
-                                </h2>
-                            </button>
-
-                            <button onClick={() => shiftView(1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Vor">
-                                <ChevronRightIcon className="h-5 w-5 text-gray-600" />
-                            </button>
-                        </div>
-
-                        {/* VIEW MODE SWITCHER */}
-                        <div className="flex bg-gray-100 p-1 rounded-lg w-full xl:w-auto justify-center">
-                            <button
-                                onClick={() => setViewMode('timeline')}
-                                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all flex-1 xl:flex-initial ${viewMode === 'timeline' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
-                            >
-                                Stunden
-                            </button>
-                            <button
-                                onClick={() => setViewMode('week')}
-                                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all flex-1 xl:flex-initial ${viewMode === 'week' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
-                            >
-                                Woche
-                            </button>
-                            <button
-                                onClick={() => setViewMode('month')}
-                                className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all flex-1 xl:flex-initial ${viewMode === 'month' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
-                            >
-                                Monat
-                            </button>
-                        </div>
-                    </div>
-
-                    {/* MAIN GRID */}
-                    <div className="overflow-x-auto relative hide-scroll border-t border-gray-200">
-                        <div className="min-w-[800px]">
-                            {/* Header: Time Slots / Days */}
-                            <div className="flex bg-white border-b border-gray-200 sticky top-0 z-20 h-12 shadow-sm">
-                                {/* Employee Header with Filter */}
-                                <div
-                                    className="w-48 shrink-0 p-3 border-r border-gray-200 font-semibold text-gray-800 bg-white sticky left-0 z-30 flex items-center justify-between group cursor-pointer hover:bg-gray-50 transition-colors"
-                                    onClick={() => setIsFilterModalOpen(true)}
-                                >
-                                    <span>Mitarbeiter</span>
-                                    <AdjustmentsHorizontalIcon className={`h-5 w-5 ${plannerVisibleEmployeeIds.length !== employees.length ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600'}`} />
-                                </div>
-
-                                {/* Columns Header (Timeline or Days) */}
-                                <div className="flex-1 flex relative">
-                                    {viewMode === 'timeline' ? (
-                                        timelineSlots.map((date, i) => {
-                                            const hour = date.getHours();
-                                            const isNewDay = hour === 0;
-                                            const displayHour = hour.toString().padStart(2, '0');
-
-                                            return (
-                                                <div key={i} className={`flex-1 border-r border-gray-200 last:border-r-0 flex flex-col justify-center items-center relative ${isNewDay ? 'bg-blue-50/50' : 'bg-gray-50/30'}`}>
-                                                    <span className={`text-xs font-medium ${isNewDay ? 'text-blue-700 font-bold' : 'text-gray-500'}`}>
-                                                        {displayHour}:00
-                                                    </span>
-                                                    {isNewDay && (
-                                                        <span className="text-[10px] text-blue-600 absolute bottom-0.5 leading-none">
-                                                            {date.toLocaleDateString('de-DE', { weekday: 'short' })}
-                                                        </span>
-                                                    )}
-                                                    <div className="absolute bottom-0 h-1 w-px bg-gray-300 left-1/2"></div>
-                                                </div>
-                                            );
-                                        })
-                                    ) : (
-                                        gridDays.map((date, i) => {
-                                            const isToday = date.toDateString() === new Date().toDateString();
-                                            const isWeekend = date.getDay() === 0 || date.getDay() === 6;
-                                            return (
-                                                <div key={i} className={`flex-1 border-r border-gray-200 last:border-r-0 flex flex-col justify-center items-center relative ${isToday ? 'bg-blue-100' : isWeekend ? 'bg-gray-100' : 'bg-white'}`}>
-                                                    <span className={`text-xs font-medium ${isToday ? 'text-blue-800 font-bold' : 'text-gray-700'}`}>
-                                                        {date.toLocaleDateString('de-DE', { weekday: 'short' })}
-                                                    </span>
-                                                    <span className={`text-sm ${isToday ? 'font-bold text-blue-800' : 'text-gray-900'}`}>
-                                                        {date.getDate()}
-                                                    </span>
-                                                </div>
-                                            );
-                                        })
-                                    )}
-                                </div>
+                                {viewMode === 'week' && (
+                                    <Button
+                                        onClick={() => setIsWeekCopyModalOpen(true)}
+                                        className="bg-blue-600 text-white hover:bg-blue-700 flex items-center gap-2 text-sm px-3 py-2 flex-1 xl:flex-initial justify-center"
+                                        disabled={shifts.filter(s => {
+                                            const shiftDate = new Date(s.start);
+                                            const weekStart = getStartOfWeek(viewStartDateTime);
+                                            const weekEnd = new Date(weekStart);
+                                            weekEnd.setDate(weekEnd.getDate() + 7);
+                                            return shiftDate >= weekStart && shiftDate < weekEnd;
+                                        }).length === 0}
+                                    >
+                                        📋 Woche kopieren
+                                    </Button>
+                                )}
                             </div>
 
-                            {/* Body: Employee Rows */}
-                            <div className={`divide-y divide-gray-100 ${activeTemplate ? 'cursor-copy' : ''}`}>
-                                {displayRows.map(row => {
-                                    // Common: Filter Absences for this row
-                                    // For simplicity in rendering, we fetch overlapping absences.
-                                    // Ideally, fetch range based on viewMode start/end.
+                            <div className="flex items-center justify-center gap-2 sm:gap-4 w-full xl:w-auto">
+                                <button onClick={() => shiftView(-1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Zurück">
+                                    <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
+                                </button>
 
-                                    const rowStart = viewMode === 'timeline' ? viewStartDateTime : gridDays[0];
-                                    const rowEnd = viewMode === 'timeline' ? timelineEndDateTime : gridDays[gridDays.length - 1];
+                                <button onClick={() => setIsDatePickModalOpen(true)} className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors">
+                                    <CalendarDaysIcon className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                                    <h2 className="text-lg font-bold text-gray-800 whitespace-nowrap font-display tracking-tight">
+                                        {dateRangeLabel}
+                                    </h2>
+                                </button>
 
-                                    // Safety check if rowEnd is invalid (empty gridDays)
-                                    if (!rowEnd) return null;
+                                <button onClick={() => shiftView(1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors" title="Vor">
+                                    <ChevronRightIcon className="h-5 w-5 text-gray-600" />
+                                </button>
+                            </div>
 
-                                    return (
-                                        <div key={employee.id} className="flex h-16 group hover:bg-gray-50/50 transition-colors">
-                                            {/* Employee Column */}
-                                            <div className="w-48 shrink-0 p-3 border-r border-gray-200 sticky left-0 z-20 bg-white group-hover:bg-gray-50 flex flex-col justify-center shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
-                                                <div className="flex items-center w-full gap-2">
-                                                    <div className="text-base font-normal text-gray-900 truncate flex-1 leading-tight">
-                                                        {employee.firstName} {employee.lastName}
+                            {/* VIEW MODE SWITCHER */}
+                            <div className="flex bg-gray-100 p-1 rounded-lg w-full xl:w-auto justify-center">
+                                <button
+                                    onClick={() => setViewMode('timeline')}
+                                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all flex-1 xl:flex-initial ${viewMode === 'timeline' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                                >
+                                    Stunden
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('week')}
+                                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all flex-1 xl:flex-initial ${viewMode === 'week' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                                >
+                                    Woche
+                                </button>
+                                <button
+                                    onClick={() => setViewMode('month')}
+                                    className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all flex-1 xl:flex-initial ${viewMode === 'month' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
+                                >
+                                    Monat
+                                </button>
+                            </div>
+                        </div>
+
+                        {/* MAIN GRID */}
+                        <div className="overflow-x-auto relative hide-scroll border-t border-gray-200">
+                            <div className="min-w-[800px]">
+                                {/* Header: Time Slots / Days */}
+                                <div className="flex bg-white border-b border-gray-200 sticky top-0 z-20 h-12 shadow-sm">
+                                    {/* Employee Header with Filter */}
+                                    <div
+                                        className="w-48 shrink-0 p-3 border-r border-gray-200 font-semibold text-gray-800 bg-white sticky left-0 z-30 flex items-center justify-between group cursor-pointer hover:bg-gray-50 transition-colors"
+                                        onClick={() => setIsFilterModalOpen(true)}
+                                    >
+                                        <span>Mitarbeiter</span>
+                                        <AdjustmentsHorizontalIcon className={`h-5 w-5 ${plannerVisibleEmployeeIds.length !== employees.length ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600'}`} />
+                                    </div>
+
+                                    {/* Columns Header (Timeline or Days) */}
+                                    <div className="flex-1 flex relative">
+                                        {viewMode === 'timeline' ? (
+                                            timelineSlots.map((date, i) => {
+                                                const hour = date.getHours();
+                                                const isNewDay = hour === 0;
+                                                const displayHour = hour.toString().padStart(2, '0');
+
+                                                return (
+                                                    <div key={i} className={`flex-1 border-r border-gray-200 last:border-r-0 flex flex-col justify-center items-center relative ${isNewDay ? 'bg-blue-50/50' : 'bg-gray-50/30'}`}>
+                                                        <span className={`text-xs font-medium ${isNewDay ? 'text-blue-700 font-bold' : 'text-gray-500'}`}>
+                                                            {displayHour}:00
+                                                        </span>
+                                                        {isNewDay && (
+                                                            <span className="text-[10px] text-blue-600 absolute bottom-0.5 leading-none">
+                                                                {date.toLocaleDateString('de-DE', { weekday: 'short' })}
+                                                            </span>
+                                                        )}
+                                                        <div className="absolute bottom-0 h-1 w-px bg-gray-300 left-1/2"></div>
                                                     </div>
-                                                    <button
-                                                        onClick={(e) => {
-                                                            e.stopPropagation();
-                                                            e.preventDefault();
-                                                            const empId = Number(employee.id);
-                                                            const shiftsToDelete = shifts.filter(s => Number(s.employeeId) === empId);
-                                                            setEmployeeToDelete({
-                                                                id: empId,
-                                                                name: `${employee.firstName} ${employee.lastName}`,
-                                                                shiftCount: shiftsToDelete.length
-                                                            });
-                                                        }}
-                                                        className="shrink-0 p-1.5 text-gray-300 hover:text-red-600 transition-all rounded hover:bg-red-50 opacity-40 group-hover:opacity-100"
-                                                        title="Alle Schichten dieses Mitarbeiters löschen"
-                                                    >
-                                                        <TrashIcon className="h-4 w-4" />
-                                                    </button>
+                                                );
+                                            })
+                                        ) : (
+                                            gridDays.map((date, i) => {
+                                                const isToday = date.toDateString() === new Date().toDateString();
+                                                const isWeekend = date.getDay() === 0 || date.getDay() === 6;
+                                                return (
+                                                    <div key={i} className={`flex-1 border-r border-gray-200 last:border-r-0 flex flex-col justify-center items-center relative ${isToday ? 'bg-blue-100' : isWeekend ? 'bg-gray-100' : 'bg-white'}`}>
+                                                        <span className={`text-xs font-medium ${isToday ? 'text-blue-800 font-bold' : 'text-gray-700'}`}>
+                                                            {date.toLocaleDateString('de-DE', { weekday: 'short' })}
+                                                        </span>
+                                                        <span className={`text-sm ${isToday ? 'font-bold text-blue-800' : 'text-gray-900'}`}>
+                                                            {date.getDate()}
+                                                        </span>
+                                                    </div>
+                                                );
+                                            })
+                                        )}
+                                    </div>
+                                </div>
+
+                                {/* Body: Employee Rows */}
+                                <div className={`divide-y divide-gray-100 ${activeTemplate ? 'cursor-copy' : ''}`}>
+                                    {displayRows.map(row => {
+                                        // Common: Filter Absences for this row
+                                        const rowStart = viewMode === 'timeline' ? viewStartDateTime : gridDays[0];
+                                        const rowEnd = viewMode === 'timeline' ? timelineEndDateTime : gridDays[gridDays.length - 1];
+
+                                        // Safety check if rowEnd is invalid (empty gridDays)
+                                        if (!rowEnd) return null;
+
+                                        const isGroup = row.type === 'group';
+                                        const rowIdNum = isGroup ? -1 : Number(row.id);
+
+                                        return (
+                                            <div key={`${row.type}-${row.id}`} className={`flex h-16 group hover:bg-gray-50/50 transition-colors ${isGroup ? 'bg-gray-50/30' : ''}`}>
+                                                {/* Label Column */}
+                                                <div
+                                                    className={`w-48 shrink-0 p-3 border-r border-gray-200 sticky left-0 z-20 bg-white group-hover:bg-gray-50 flex flex-col justify-center shadow-[2px_0_5px_rgba(0,0,0,0.02)] ${isGroup ? 'bg-gray-50' : ''}`}
+                                                    style={isGroup && row.color ? { borderLeft: `4px solid ${row.color}` } : {}}
+                                                >
+                                                    <div className="flex items-center w-full gap-2">
+                                                        <div className="text-base font-normal text-gray-900 truncate flex-1 leading-tight">
+                                                            {row.label}
+                                                        </div>
+                                                        {!isGroup && (
+                                                            <button
+                                                                onClick={(e) => {
+                                                                    e.stopPropagation();
+                                                                    e.preventDefault();
+                                                                    const empId = Number(row.id);
+                                                                    const shiftsToDelete = shifts.filter(s => Number(s.employeeId) === empId);
+                                                                    setEmployeeToDelete({
+                                                                        id: empId,
+                                                                        name: row.label,
+                                                                        shiftCount: shiftsToDelete.length
+                                                                    });
+                                                                }}
+                                                                className="shrink-0 p-1.5 text-gray-300 hover:text-red-600 transition-all rounded hover:bg-red-50 opacity-40 group-hover:opacity-100"
+                                                                title="Alle Schichten dieses Mitarbeiters löschen"
+                                                            >
+                                                                <TrashIcon className="h-4 w-4" />
+                                                            </button>
+                                                        )}
+                                                    </div>
+                                                    {row.subLabel && (
+                                                        <div className="text-xs text-gray-400 truncate mt-0.5">
+                                                            {row.subLabel}
+                                                        </div>
+                                                    )}
                                                 </div>
-                                            </div>
 
-                                            {/* Track / Grid */}
-                                            <div className="flex-1 relative bg-white group-hover:bg-gray-50">
+                                                {/* Track / Grid */}
+                                                <div className="flex-1 relative bg-white group-hover:bg-gray-50">
 
-                                                {viewMode === 'timeline' ? (
-                                                    // --- TIMELINE RENDERING ---
-                                                    <>
-                                                        {/* Grid Lines */}
-                                                        <div className="absolute inset-0 flex pointer-events-none">
-                                                            {timelineSlots.map((d, i) => (
-                                                                <div key={i} className={`flex-1 border-r border-gray-100 last:border-r-0 ${d.getHours() === 0 ? 'border-l border-l-blue-200' : ''}`}></div>
-                                                            ))}
-                                                        </div>
-                                                        {/* Click Areas */}
-                                                        <div className="absolute inset-0 flex z-0">
-                                                            {timelineSlots.map((d, i) => (
-                                                                <div
-                                                                    key={i}
-                                                                    className={`flex-1 transition-colors border-r border-transparent relative group/cell ${activeTemplate ? 'hover:bg-green-100/50' : 'hover:bg-blue-50/30 cursor-pointer'}`}
-                                                                    onClick={() => handleTrackClick(employee.id, d)}
-                                                                    title={activeTemplate ? `Vorlage anwenden` : `${d.toLocaleTimeString([], { hour: '2-digit' })} - Klicken`}
-                                                                >
-                                                                    <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/cell:opacity-100 transition-opacity duration-150 pointer-events-none">
-                                                                        <PlusIcon className="h-4 w-4 text-gray-400" />
+                                                    {viewMode === 'timeline' ? (
+                                                        // --- TIMELINE RENDERING ---
+                                                        <>
+                                                            {/* Grid Lines */}
+                                                            <div className="absolute inset-0 flex pointer-events-none">
+                                                                {timelineSlots.map((d, i) => (
+                                                                    <div key={i} className={`flex-1 border-r border-gray-100 last:border-r-0 ${d.getHours() === 0 ? 'border-l border-l-blue-200' : ''}`}></div>
+                                                                ))}
+                                                            </div>
+                                                            {/* Click Areas */}
+                                                            <div className="absolute inset-0 flex z-0">
+                                                                {timelineSlots.map((d, i) => (
+                                                                    <div
+                                                                        key={i}
+                                                                        className={`flex-1 transition-colors border-r border-transparent relative group/cell ${!isGroup && (activeTemplate ? 'hover:bg-green-100/50' : 'hover:bg-blue-50/30 cursor-pointer')}`}
+                                                                        onClick={() => !isGroup && handleTrackClick(rowIdNum, d)}
+                                                                        title={!isGroup ? (activeTemplate ? `Vorlage anwenden` : `${d.toLocaleTimeString([], { hour: '2-digit' })} - Klicken`) : undefined}
+                                                                    >
+                                                                        {!isGroup && (
+                                                                            <div className="absolute inset-0 flex items-center justify-center opacity-0 group-hover/cell:opacity-100 transition-opacity duration-150 pointer-events-none">
+                                                                                <PlusIcon className="h-4 w-4 text-gray-400" />
+                                                                            </div>
+                                                                        )}
                                                                     </div>
-                                                                </div>
-                                                            ))}
-                                                        </div>
-                                                        {/* Shifts & Absences (Timeline Logic) */}
-                                                        {/* (Reusing logic from previous implementation for Timeline) */}
-                                                        {/* Filter Shifts */}
-                                                        {shifts.filter(s => s.employeeId === employee.id && isShiftVisible(new Date(s.start), new Date(s.end), viewStartDateTime, timelineEndDateTime)).map(shift => {
-                                                            const start = new Date(shift.start);
-                                                            const end = new Date(shift.end);
-                                                            const pos = getPositionStyle(start, end);
-                                                            const conflict = hasAbsenceConflict(shift, absenceRequests);
-                                                            const hasConflict = !!conflict;
+                                                                ))}
+                                                            </div>
+                                                            {/* Shifts Rendering (Using row.shifts) */}
+                                                            {row.shifts.filter(s => isShiftVisible(new Date(s.start), new Date(s.end), viewStartDateTime, timelineEndDateTime)).map(shift => {
+                                                                const start = new Date(shift.start);
+                                                                const end = new Date(shift.end);
+                                                                const pos = getPositionStyle(start, end);
+                                                                const conflict = hasAbsenceConflict(shift, absenceRequests);
+                                                                const hasConflict = !!conflict;
 
-                                                            return (
-                                                                <div
-                                                                    key={shift.id}
-                                                                    className={`absolute top-2 bottom-2 z-10 shadow-sm flex items-center px-2 cursor-pointer hover:brightness-110 overflow-hidden text-white text-xs rounded ${hasConflict ? 'border-2 border-red-600' : 'border border-black/10'
-                                                                        }`}
-                                                                    style={{ ...pos, backgroundColor: shift.color || '#3b82f6' }}
-                                                                    onClick={(e) => handleShiftClick(e, shift)}
-                                                                    title={hasConflict
-                                                                        ? `⚠️ KONFLIKT: Mitarbeiter ist im ${getAbsenceTypeLabel(conflict.type)}\n${getShiftLabel(shift)}`
-                                                                        : getShiftLabel(shift)
-                                                                    }
-                                                                >
-                                                                    {hasConflict && (
-                                                                        <ExclamationTriangleIcon className="h-3 w-3 mr-1 flex-shrink-0 text-red-200" />
-                                                                    )}
-                                                                    <div className="font-semibold truncate mr-1">{start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-{end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                                                                </div>
-                                                            );
-                                                        })}
+                                                                return (
+                                                                    <div
+                                                                        key={shift.id}
+                                                                        className={`absolute top-2 bottom-2 z-10 shadow-sm flex items-center px-2 cursor-pointer hover:brightness-110 overflow-hidden text-white text-xs rounded ${hasConflict ? 'border-2 border-red-600' : 'border border-black/10'
+                                                                            }`}
+                                                                        style={{ ...pos, backgroundColor: shift.color || '#3b82f6' }}
+                                                                        onClick={(e) => handleShiftClick(e, shift)}
+                                                                        title={hasConflict
+                                                                            ? `⚠️ KONFLIKT: Mitarbeiter ist im ${getAbsenceTypeLabel(conflict.type)}\n${getShiftLabel(shift)}`
+                                                                            : getShiftLabel(shift)
+                                                                        }
+                                                                    >
+                                                                        {hasConflict && (
+                                                                            <ExclamationTriangleIcon className="h-3 w-3 mr-1 flex-shrink-0 text-red-200" />
+                                                                        )}
+                                                                        <div className="font-semibold truncate mr-1">{start.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-{end.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                                                    </div>
+                                                                );
+                                                            })}
 
-                                                        {/* Absences (Timeline) */}
-                                                        {absenceRequests.filter(req => req.employeeId === employee.id && req.status !== 'rejected' && ((req.startDate <= rowEnd.toLocaleDateString('sv-SE') && req.endDate >= rowStart.toLocaleDateString('sv-SE')))).map(req => {
-                                                            const style = getAbsenceStyle(req.type);
-                                                            const absStart = new Date(req.startDate); absStart.setHours(0, 0, 0, 0);
-                                                            const absEnd = new Date(req.endDate); absEnd.setHours(23, 59, 59, 999);
-                                                            const pos = getPositionStyle(absStart, absEnd);
-                                                            return (
-                                                                <div key={req.id} className="absolute top-0 bottom-0 flex items-center justify-center text-xs font-bold absence-pattern border-l border-r pointer-events-none opacity-60" style={{ ...pos, backgroundColor: style.bg, borderColor: style.border, color: style.text }}>
-                                                                    <span className="bg-white/80 px-1 rounded shadow-sm backdrop-blur-sm truncate max-w-full">{style.label}</span>
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </>
-                                                ) : (
-                                                    // --- GRID RENDERING (Week/Month) ---
-                                                    <div className="flex h-full">
-                                                        {gridDays.map((day, i) => {
-                                                            const dayStr = day.toLocaleDateString('sv-SE');
+                                                            {/* Absences (Timeline) - Only for employees currently */}
+                                                            {!isGroup && absenceRequests.filter(req => req.employeeId === rowIdNum && req.status !== 'rejected' && ((req.startDate <= rowEnd.toLocaleDateString('sv-SE') && req.endDate >= rowStart.toLocaleDateString('sv-SE')))).map(req => {
+                                                                const style = getAbsenceStyle(req.type);
+                                                                const absStart = new Date(req.startDate); absStart.setHours(0, 0, 0, 0);
+                                                                const absEnd = new Date(req.endDate); absEnd.setHours(23, 59, 59, 999);
+                                                                const pos = getPositionStyle(absStart, absEnd);
+                                                                return (
+                                                                    <div key={req.id} className="absolute top-0 bottom-0 flex items-center justify-center text-xs font-bold absence-pattern border-l border-r pointer-events-none opacity-60" style={{ ...pos, backgroundColor: style.bg, borderColor: style.border, color: style.text }}>
+                                                                        <span className="bg-white/80 px-1 rounded shadow-sm backdrop-blur-sm truncate max-w-full">{style.label}</span>
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </>
+                                                    ) : (
+                                                        // --- GRID RENDERING (Week/Month) ---
+                                                        <div className="flex h-full">
+                                                            {gridDays.map((day, i) => {
+                                                                const dayStr = day.toLocaleDateString('sv-SE');
 
-                                                            // Find Shift for this day
-                                                            // Note: Simple logic assuming shifts don't span multiple days visually in grid mode or show them on start day
-                                                            const dayShifts = shifts.filter(s => {
-                                                                if (s.employeeId !== employee.id) return false;
-                                                                const shiftStartStr = new Date(s.start).toLocaleDateString('sv-SE');
-                                                                return shiftStartStr === dayStr;
-                                                            });
+                                                                // Find Shift for this day
+                                                                const dayShifts = row.shifts.filter(s => {
+                                                                    const shiftStartStr = new Date(s.start).toLocaleDateString('sv-SE');
+                                                                    return shiftStartStr === dayStr;
+                                                                });
 
-                                                            // Find Absence
-                                                            const absence = absenceRequests.find(req =>
-                                                                req.employeeId === employee.id &&
-                                                                req.status !== 'rejected' &&
-                                                                dayStr >= req.startDate && dayStr <= req.endDate
-                                                            );
+                                                                // Find Absence (Only for employees)
+                                                                const absence = !isGroup ? absenceRequests.find(req =>
+                                                                    req.employeeId === rowIdNum &&
+                                                                    req.status !== 'rejected' &&
+                                                                    dayStr >= req.startDate && dayStr <= req.endDate
+                                                                ) : null;
 
-                                                            const isToday = day.toDateString() === new Date().toDateString();
-                                                            const isWeekend = day.getDay() === 0 || day.getDay() === 6;
-                                                            const isDropTarget = dropTarget?.employeeId === employee.id && dropTarget?.date === dayStr;
+                                                                const isToday = day.toDateString() === new Date().toDateString();
+                                                                const isWeekend = day.getDay() === 0 || day.getDay() === 6;
+                                                                const isDropTarget = dropTarget?.targetId === row.id && dropTarget?.date === dayStr;
 
-                                                            return (
-                                                                <div
-                                                                    key={i}
-                                                                    className={`flex-1 border-r border-gray-100 last:border-r-0 relative p-1 flex flex-col gap-1 overflow-hidden group/cell
-                                                                            ${draggedTemplate ? 'cursor-copy' : activeTemplate ? 'hover:bg-green-50 cursor-pointer' : 'hover:bg-blue-50/50 cursor-pointer'}
+                                                                return (
+                                                                    <div
+                                                                        key={i}
+                                                                        className={`flex-1 border-r border-gray-100 last:border-r-0 relative p-1 flex flex-col gap-1 overflow-hidden group/cell
+                                                                            ${draggedTemplate ? 'cursor-copy' : (!isGroup && activeTemplate) ? 'hover:bg-green-50 cursor-pointer' : (!isGroup ? 'hover:bg-blue-50/50 cursor-pointer' : '')}
                                                                             ${isToday ? 'bg-blue-50/30' : isWeekend ? 'bg-gray-50/30' : ''}
                                                                             ${isDropTarget ? 'bg-green-100 ring-2 ring-green-500 ring-inset' : ''}
                                                                         `}
-                                                                    onClick={() => handleTrackClick(employee.id, day)}
-                                                                    onDragOver={(e) => handleDragOver(e, employee.id, dayStr)}
-                                                                    onDragLeave={handleDragLeave}
-                                                                    onDrop={(e) => handleDrop(e, employee.id, dayStr)}
-                                                                >
-                                                                    {/* Hover Plus Icon - only show in empty cells */}
-                                                                    {dayShifts.length === 0 && (
-                                                                        <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
-                                                                            <div className="opacity-0 group-hover/cell:opacity-100 transition-opacity duration-150">
-                                                                                <PlusIcon className="h-4 w-4 text-gray-400" />
+                                                                        onClick={() => !isGroup && handleTrackClick(rowIdNum, day)}
+                                                                        onDragOver={(e) => handleDragOver(e, row.id, row.type, dayStr)}
+                                                                        onDragLeave={handleDragLeave}
+                                                                        onDrop={(e) => handleDrop(e, row.id, row.type, dayStr)}
+                                                                    >
+                                                                        {/* Hover Plus Icon - only show in empty cells and for employees */}
+                                                                        {!isGroup && dayShifts.length === 0 && (
+                                                                            <div className="absolute inset-0 flex items-center justify-center pointer-events-none z-20">
+                                                                                <div className="opacity-0 group-hover/cell:opacity-100 transition-opacity duration-150">
+                                                                                    <PlusIcon className="h-4 w-4 text-gray-400" />
+                                                                                </div>
                                                                             </div>
-                                                                        </div>
-                                                                    )}
-                                                                    {/* Absence Layer */}
-                                                                    {absence && (
-                                                                        <div className={`absolute inset-0 opacity-40 z-0 absence-pattern flex items-center justify-center`} style={{ backgroundColor: getAbsenceStyle(absence.type).bg }}>
-                                                                            {viewMode === 'week' && <span className="text-xs font-bold -rotate-12 opacity-80">{getAbsenceStyle(absence.type).label}</span>}
-                                                                        </div>
-                                                                    )}
-
-                                                                    {/* Shifts */}
-                                                                    {dayShifts.map(shift => {
-                                                                        const conflict = hasAbsenceConflict(shift, absenceRequests);
-                                                                        const hasConflict = !!conflict;
-
-                                                                        return (
-                                                                            <div
-                                                                                key={shift.id}
-                                                                                draggable={true}
-                                                                                onDragStart={(e) => handleDragStart(e, shift)}
-                                                                                onDragEnd={handleDragEnd}
-                                                                                className={`relative z-10 text-xs text-white rounded px-1.5 py-0.5 shadow-sm truncate cursor-grab active:cursor-grabbing hover:scale-105 transition-transform ${viewMode === 'month' ? 'h-full flex items-center justify-center' : ''
-                                                                                    } ${hasConflict ? 'ring-2 ring-red-600 ring-inset' : ''
-                                                                                    }`}
-                                                                                style={{ backgroundColor: shift.color || '#3b82f6' }}
-                                                                                onClick={(e) => handleShiftClick(e, shift)}
-                                                                                title={hasConflict
-                                                                                    ? `⚠️ KONFLIKT: Mitarbeiter ist im ${getAbsenceTypeLabel(conflict.type)}\n${getShiftLabel(shift)} (${new Date(shift.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-${new Date(shift.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`
-                                                                                    : `${getShiftLabel(shift)} (${new Date(shift.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-${new Date(shift.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`
-                                                                                }
-                                                                            >
-                                                                                {viewMode === 'week' ? (
-                                                                                    <>
-                                                                                        <div className="flex items-center gap-1">
-                                                                                            {hasConflict && <ExclamationTriangleIcon className="h-3 w-3 flex-shrink-0 text-red-200" />}
-                                                                                            <div className="font-bold">{new Date(shift.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
-                                                                                        </div>
-                                                                                        <div className="truncate opacity-90 text-[10px]">{getShiftLabel(shift)}</div>
-                                                                                    </>
-                                                                                ) : (
-                                                                                    // Compact for Month
-                                                                                    <div className="font-bold text-center">{shift.label ? shift.label.substring(0, 3) : new Date(shift.start).getHours()}</div>
-                                                                                )}
+                                                                        )}
+                                                                        {/* Absence Layer */}
+                                                                        {absence && (
+                                                                            <div className={`absolute inset-0 opacity-40 z-0 absence-pattern flex items-center justify-center`} style={{ backgroundColor: getAbsenceStyle(absence.type).bg }}>
+                                                                                {viewMode === 'week' && <span className="text-xs font-bold -rotate-12 opacity-80">{getAbsenceStyle(absence.type).label}</span>}
                                                                             </div>
-                                                                        );
-                                                                    })}
-                                                                </div>
-                                                            );
-                                                        })}
-                                                    </div>
-                                                )}
+                                                                        )}
+
+                                                                        {/* Shifts */}
+                                                                        {dayShifts.map(shift => {
+                                                                            const conflict = hasAbsenceConflict(shift, absenceRequests);
+                                                                            const hasConflict = !!conflict;
+
+                                                                            return (
+                                                                                <div
+                                                                                    key={shift.id}
+                                                                                    draggable={true}
+                                                                                    onDragStart={(e) => handleDragStart(e, shift)}
+                                                                                    onDragEnd={handleDragEnd}
+                                                                                    className={`relative z-10 text-xs text-white rounded px-1.5 py-0.5 shadow-sm truncate cursor-grab active:cursor-grabbing hover:scale-105 transition-transform ${viewMode === 'month' ? 'h-full flex items-center justify-center' : ''
+                                                                                        } ${hasConflict ? 'ring-2 ring-red-600 ring-inset' : ''
+                                                                                        }`}
+                                                                                    style={{ backgroundColor: shift.color || '#3b82f6' }}
+                                                                                    onClick={(e) => handleShiftClick(e, shift)}
+                                                                                    title={hasConflict
+                                                                                        ? `⚠️ KONFLIKT: Mitarbeiter ist im ${getAbsenceTypeLabel(conflict.type)}\n${getShiftLabel(shift)} (${new Date(shift.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-${new Date(shift.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`
+                                                                                        : `${getShiftLabel(shift)} (${new Date(shift.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}-${new Date(shift.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`
+                                                                                    }
+                                                                                >
+                                                                                    {viewMode === 'week' ? (
+                                                                                        <>
+                                                                                            <div className="flex items-center gap-1">
+                                                                                                {hasConflict && <ExclamationTriangleIcon className="h-3 w-3 flex-shrink-0 text-red-200" />}
+                                                                                                <div className="font-bold">{new Date(shift.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</div>
+                                                                                            </div>
+                                                                                            <div className="truncate opacity-90 text-[10px]">{getShiftLabel(shift)}</div>
+                                                                                        </>
+                                                                                    ) : (
+                                                                                        // Compact for Month
+                                                                                        <div className="font-bold text-center">{shift.label ? shift.label.substring(0, 3) : new Date(shift.start).getHours()}</div>
+                                                                                    )}
+                                                                                </div>
+                                                                            );
+                                                                        })}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        );
+                                    })}
+
+                                    {displayRows.length === 0 && (
+                                        <div className="p-8 text-center text-gray-500 italic">Keine Einträge für die aktuelle Auswahl gefunden.</div>
+                                    )}
+
+                                    {/* SUMMARY ROW */}
+                                    {displayRows.length > 0 && viewMode !== 'timeline' && (
+                                        <div className="flex border-t-2 border-gray-300 bg-gray-50 sticky bottom-0 z-10 shadow-lg">
+                                            {/* Summary Label */}
+                                            <div className="w-48 shrink-0 p-3 border-r border-gray-200 font-bold text-gray-900 bg-gray-100 sticky left-0 z-20 flex items-center">
+                                                <span>GESAMT</span>
+                                            </div>
+
+                                            {/* Daily Summaries */}
+                                            <div className="flex-1 flex">
+                                                {gridDays.map((day, i) => {
+                                                    const stats = calculateDailyStats(day, shifts, employees);
+                                                    const coverage = getCoverageColor(stats.employeeCount);
+
+                                                    return (
+                                                        <div
+                                                            key={i}
+                                                            className={`flex-1 border-r border-gray-200 last:border-r-0 p-2 flex flex-col items-center justify-center ${coverage.bg}`}
+                                                        >
+                                                            <div className={`text-sm font-bold ${coverage.text}`}>
+                                                                {stats.employeeCount} MA
+                                                            </div>
+                                                            <div className="text-xs text-gray-600">
+                                                                {stats.totalHours.toFixed(1)}h
+                                                            </div>
+                                                        </div>
+                                                    );
+                                                })}
                                             </div>
                                         </div>
-                                    );
-                                })}
-
-                                {displayRows.length === 0 && (
-                                    <div className="p-8 text-center text-gray-500 italic">Keine Einträge für die aktuelle Auswahl gefunden.</div>
-                                )}
-
-                                {/* SUMMARY ROW */}
-                                {displayRows.length > 0 && viewMode !== 'timeline' && (
-                                    <div className="flex border-t-2 border-gray-300 bg-gray-50 sticky bottom-0 z-10 shadow-lg">
-                                        {/* Summary Label */}
-                                        <div className="w-48 shrink-0 p-3 border-r border-gray-200 font-bold text-gray-900 bg-gray-100 sticky left-0 z-20 flex items-center">
-                                            <span>GESAMT</span>
-                                        </div>
-
-                                        {/* Daily Summaries */}
-                                        <div className="flex-1 flex">
-                                            {gridDays.map((day, i) => {
-                                                const stats = calculateDailyStats(day, shifts, employees);
-                                                const coverage = getCoverageColor(stats.employeeCount);
-
-                                                return (
-                                                    <div
-                                                        key={i}
-                                                        className={`flex-1 border-r border-gray-200 last:border-r-0 p-2 flex flex-col items-center justify-center ${coverage.bg}`}
-                                                    >
-                                                        <div className={`text-sm font-bold ${coverage.text}`}>
-                                                            {stats.employeeCount} MA
-                                                        </div>
-                                                        <div className="text-xs text-gray-600">
-                                                            {stats.totalHours.toFixed(1)}h
-                                                        </div>
-                                                    </div>
-                                                );
-                                            })}
-                                        </div>
-                                    </div>
-                                )}
-                            </div>
-                        </div>
-                    </div>
-                </Card>
-            </div>
-        )}
-
-        {activeTab === 'management' && (
-            <div className="animate-fade-in">
-                <Card>
-                    <h2 className="text-2xl font-bold mb-6">Verwaltung</h2>
-                    <p className="text-gray-600 mb-6">
-                        Verwalten Sie Schichtvorlagen, Rotationsmuster und Mitarbeitergruppen
-                    </p>
-
-                    <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                        {/* Schichtvorlagen */}
-                        <button
-                            onClick={() => setIsTemplateModalOpen(true)}
-                            className="flex flex-col items-center justify-center p-8 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group"
-                        >
-                            <div className="w-16 h-16 bg-gray-100 group-hover:bg-blue-100 rounded-full flex items-center justify-center mb-4 transition-colors">
-                                <CogIcon className="h-8 w-8 text-gray-600 group-hover:text-blue-600 transition-colors" />
-                            </div>
-                            <h3 className="text-lg font-bold mb-2 group-hover:text-blue-600 transition-colors">Schichtvorlagen</h3>
-                            <p className="text-sm text-gray-500 text-center">
-                                Erstellen und bearbeiten Sie wiederverwendbare Schichtvorlagen
-                            </p>
-                            <div className="mt-4 text-sm font-medium text-blue-600">
-                                {shiftTemplates.length} Vorlagen
-                            </div>
-                        </button>
-
-                        {/* Rotationsmuster */}
-                        <button
-                            onClick={() => setIsRotationPatternManagementOpen(true)}
-                            className="flex flex-col items-center justify-center p-8 border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all group"
-                        >
-                            <div className="w-16 h-16 bg-gray-100 group-hover:bg-purple-100 rounded-full flex items-center justify-center mb-4 transition-colors text-3xl">
-                                🔄
-                            </div>
-                            <h3 className="text-lg font-bold mb-2 group-hover:text-purple-600 transition-colors">Rotationsmuster</h3>
-                            <p className="text-sm text-gray-500 text-center">
-                                Definieren Sie wiederkehrende Schichtmuster für Rotationen
-                            </p>
-                            <div className="mt-4 text-sm font-medium text-purple-600">
-                                {rotationPatterns.length} Muster
-                            </div>
-                        </button>
-
-                        {/* Mitarbeitergruppen */}
-                        <button
-                            onClick={() => setIsEmployeeGroupManagementOpen(true)}
-                            className="flex flex-col items-center justify-center p-8 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all group"
-                        >
-                            <div className="w-16 h-16 bg-gray-100 group-hover:bg-green-100 rounded-full flex items-center justify-center mb-4 transition-colors text-3xl">
-                                👥
-                            </div>
-                            <h3 className="text-lg font-bold mb-2 group-hover:text-green-600 transition-colors">Mitarbeitergruppen</h3>
-                            <p className="text-sm text-gray-500 text-center">
-                                Gruppieren Sie Mitarbeiter für gemeinsame Schichtzuweisungen
-                            </p>
-                            <div className="mt-4 text-sm font-medium text-green-600">
-                                {employeeGroups.length} Gruppen
-                            </div>
-                        </button>
-                    </div>
-                </Card>
-            </div>
-        )}
-
-        {activeTab === 'report' && (
-            <div className="animate-fade-in space-y-4">
-                <Card>
-                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
-                        <div>
-                            <h2 className="text-xl font-bold">Schichtplan Bericht</h2>
-                            <p className="text-sm text-gray-500">Übersicht und Export für den gewählten Zeitraum.</p>
-                        </div>
-                        <Button onClick={handleExportPdf} className="bg-green-600 hover:bg-green-700 flex items-center gap-2">
-                            <DocumentArrowDownIcon className="h-5 w-5" />
-                            <span>Als PDF exportieren</span>
-                        </Button>
-                    </div>
-
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <DateSelectorButton
-                            label="Zeitraum"
-                            value={`${formatDate(reportStartDate)} - ${formatDate(reportEndDate)}`}
-                            onClick={() => setIsReportDateRangeOpen(true)}
-                            placeholder="Zeitraum wählen"
-                        />
-                        <SelectorButton
-                            label="Mitarbeiter"
-                            value={getReportEmployeeSelectorLabel()}
-                            onClick={() => setIsReportEmployeeSelectOpen(true)}
-                            placeholder="Mitarbeiter wählen"
-                        />
-                    </div>
-                </Card>
-
-                <div className="space-y-6">
-                    {reportData.map(({ employee, weeks }) => {
-                        // Flatten weeks to get all shifts for list view
-                        const allShiftsInPeriod = weeks.flatMap(w => w.flatMap(d => d.shifts));
-
-                        if (allShiftsInPeriod.length === 0) return null;
-
-                        return (
-                            <Card key={employee.id} className="overflow-hidden">
-                                <h3 className="text-lg font-bold border-b pb-2 mb-3 bg-gray-50 -mx-6 -mt-6 px-6 pt-6">
-                                    {employee.firstName} {employee.lastName}
-                                </h3>
-                                <div className="overflow-x-auto">
-                                    <table className="min-w-full text-sm text-left">
-                                        <thead className="text-gray-500 bg-gray-50 font-medium border-b">
-                                            <tr>
-                                                <th className="px-4 py-2">Datum</th>
-                                                <th className="px-4 py-2">Zeit</th>
-                                                <th className="px-4 py-2">Ort / Tätigkeit</th>
-                                                <th className="px-4 py-2">Label</th>
-                                            </tr>
-                                        </thead>
-                                        <tbody className="divide-y divide-gray-100">
-                                            {allShiftsInPeriod.map(shift => {
-                                                const sStart = new Date(shift.start);
-                                                const sEnd = new Date(shift.end);
-                                                const customer = customers.find(c => c.id === shift.customerId);
-                                                const activity = activities.find(a => a.id === shift.activityId);
-
-                                                return (
-                                                    <tr key={shift.id} className="hover:bg-gray-50">
-                                                        <td className="px-4 py-2 font-medium">{sStart.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
-                                                        <td className="px-4 py-2">
-                                                            {sStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {sEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
-                                                        </td>
-                                                        <td className="px-4 py-2">
-                                                            {customer?.name} {customer && activity && '/'} {activity?.name}
-                                                        </td>
-                                                        <td className="px-4 py-2">
-                                                            {shift.label && (
-                                                                <span className="inline-block px-2 py-0.5 rounded text-xs text-white" style={{ backgroundColor: shift.color || '#9ca3af' }}>
-                                                                    {shift.label}
-                                                                </span>
-                                                            )}
-                                                        </td>
-                                                    </tr>
-                                                );
-                                            })}
-                                        </tbody>
-                                    </table>
+                                    )}
                                 </div>
-                            </Card>
-                        );
-                    })}
-                    {reportData.every(d => d.weeks.flatMap(w => w.flatMap(day => day.shifts)).length === 0) && (
-                        <div className="text-center py-10 text-gray-500">
-                            Keine Schichten für den gewählten Zeitraum und die gewählten Mitarbeiter gefunden.
+                            </div>
                         </div>
-                    )}
+                    </Card>
                 </div>
-            </div>
-        )}
+            )}
 
-        {/* --- MODALS --- */}
-        {isModalOpen && (
-            <ShiftFormModal
-                isOpen={isModalOpen}
-                onClose={handleCloseModal}
-                onSave={handleSave}
-                onDelete={handleDelete}
-                employees={employees}
-                customers={customers}
-                activities={activities}
-                companySettings={companySettings}
-                initialData={modalInitialData}
-                defaultDate={modalDefaultDate}
-                defaultEmployeeId={modalDefaultEmployeeId}
-                shiftTemplates={shiftTemplates}
-                absenceRequests={absenceRequests}
+            {activeTab === 'management' && (
+                <div className="animate-fade-in">
+                    <Card>
+                        <h2 className="text-2xl font-bold mb-6">Verwaltung</h2>
+                        <p className="text-gray-600 mb-6">
+                            Verwalten Sie Schichtvorlagen, Rotationsmuster und Mitarbeitergruppen
+                        </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* Schichtvorlagen */}
+                            <button
+                                onClick={() => setIsTemplateModalOpen(true)}
+                                className="flex flex-col items-center justify-center p-8 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group"
+                            >
+                                <div className="w-16 h-16 bg-gray-100 group-hover:bg-blue-100 rounded-full flex items-center justify-center mb-4 transition-colors">
+                                    <CogIcon className="h-8 w-8 text-gray-600 group-hover:text-blue-600 transition-colors" />
+                                </div>
+                                <h3 className="text-lg font-bold mb-2 group-hover:text-blue-600 transition-colors">Schichtvorlagen</h3>
+                                <p className="text-sm text-gray-500 text-center">
+                                    Erstellen und bearbeiten Sie wiederverwendbare Schichtvorlagen
+                                </p>
+                                <div className="mt-4 text-sm font-medium text-blue-600">
+                                    {shiftTemplates.length} Vorlagen
+                                </div>
+                            </button>
+
+                            {/* Rotationsmuster */}
+                            <button
+                                onClick={() => setIsRotationPatternManagementOpen(true)}
+                                className="flex flex-col items-center justify-center p-8 border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all group"
+                            >
+                                <div className="w-16 h-16 bg-gray-100 group-hover:bg-purple-100 rounded-full flex items-center justify-center mb-4 transition-colors text-3xl">
+                                    🔄
+                                </div>
+                                <h3 className="text-lg font-bold mb-2 group-hover:text-purple-600 transition-colors">Rotationsmuster</h3>
+                                <p className="text-sm text-gray-500 text-center">
+                                    Definieren Sie wiederkehrende Schichtmuster für Rotationen
+                                </p>
+                                <div className="mt-4 text-sm font-medium text-purple-600">
+                                    {rotationPatterns.length} Muster
+                                </div>
+                            </button>
+
+                            {/* Mitarbeitergruppen */}
+                            <button
+                                onClick={() => setIsEmployeeGroupManagementOpen(true)}
+                                className="flex flex-col items-center justify-center p-8 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all group"
+                            >
+                                <div className="w-16 h-16 bg-gray-100 group-hover:bg-green-100 rounded-full flex items-center justify-center mb-4 transition-colors text-3xl">
+                                    👥
+                                </div>
+                                <h3 className="text-lg font-bold mb-2 group-hover:text-green-600 transition-colors">Mitarbeitergruppen</h3>
+                                <p className="text-sm text-gray-500 text-center">
+                                    Gruppieren Sie Mitarbeiter für gemeinsame Schichtzuweisungen
+                                </p>
+                                <div className="mt-4 text-sm font-medium text-green-600">
+                                    {employeeGroups.length} Gruppen
+                                </div>
+                            </button>
+                        </div>
+                    </Card>
+                </div>
+            )}
+
+            {activeTab === 'report' && (
+                <div className="animate-fade-in space-y-4">
+                    <Card>
+                        <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-4">
+                            <div>
+                                <h2 className="text-xl font-bold">Schichtplan Bericht</h2>
+                                <p className="text-sm text-gray-500">Übersicht und Export für den gewählten Zeitraum.</p>
+                            </div>
+                            <Button onClick={handleExportPdf} className="bg-green-600 hover:bg-green-700 flex items-center gap-2">
+                                <DocumentArrowDownIcon className="h-5 w-5" />
+                                <span>Als PDF exportieren</span>
+                            </Button>
+                        </div>
+
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            <DateSelectorButton
+                                label="Zeitraum"
+                                value={`${formatDate(reportStartDate)} - ${formatDate(reportEndDate)}`}
+                                onClick={() => setIsReportDateRangeOpen(true)}
+                                placeholder="Zeitraum wählen"
+                            />
+                            <SelectorButton
+                                label="Mitarbeiter"
+                                value={getReportEmployeeSelectorLabel()}
+                                onClick={() => setIsReportEmployeeSelectOpen(true)}
+                                placeholder="Mitarbeiter wählen"
+                            />
+                        </div>
+                    </Card>
+
+                    <div className="space-y-6">
+                        {reportData.map(({ employee, weeks }) => {
+                            // Flatten weeks to get all shifts for list view
+                            const allShiftsInPeriod = weeks.flatMap(w => w.flatMap(d => d.shifts));
+
+                            if (allShiftsInPeriod.length === 0) return null;
+
+                            return (
+                                <Card key={employee.id} className="overflow-hidden">
+                                    <h3 className="text-lg font-bold border-b pb-2 mb-3 bg-gray-50 -mx-6 -mt-6 px-6 pt-6">
+                                        {employee.firstName} {employee.lastName}
+                                    </h3>
+                                    <div className="overflow-x-auto">
+                                        <table className="min-w-full text-sm text-left">
+                                            <thead className="text-gray-500 bg-gray-50 font-medium border-b">
+                                                <tr>
+                                                    <th className="px-4 py-2">Datum</th>
+                                                    <th className="px-4 py-2">Zeit</th>
+                                                    <th className="px-4 py-2">Ort / Tätigkeit</th>
+                                                    <th className="px-4 py-2">Label</th>
+                                                </tr>
+                                            </thead>
+                                            <tbody className="divide-y divide-gray-100">
+                                                {allShiftsInPeriod.map(shift => {
+                                                    const sStart = new Date(shift.start);
+                                                    const sEnd = new Date(shift.end);
+                                                    const customer = customers.find(c => c.id === shift.customerId);
+                                                    const activity = activities.find(a => a.id === shift.activityId);
+
+                                                    return (
+                                                        <tr key={shift.id} className="hover:bg-gray-50">
+                                                            <td className="px-4 py-2 font-medium">{sStart.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' })}</td>
+                                                            <td className="px-4 py-2">
+                                                                {sStart.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - {sEnd.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                                            </td>
+                                                            <td className="px-4 py-2">
+                                                                {customer?.name} {customer && activity && '/'} {activity?.name}
+                                                            </td>
+                                                            <td className="px-4 py-2">
+                                                                {shift.label && (
+                                                                    <span className="inline-block px-2 py-0.5 rounded text-xs text-white" style={{ backgroundColor: shift.color || '#9ca3af' }}>
+                                                                        {shift.label}
+                                                                    </span>
+                                                                )}
+                                                            </td>
+                                                        </tr>
+                                                    );
+                                                })}
+                                            </tbody>
+                                        </table>
+                                    </div>
+                                </Card>
+                            );
+                        })}
+                        {reportData.every(d => d.weeks.flatMap(w => w.flatMap(day => day.shifts)).length === 0) && (
+                            <div className="text-center py-10 text-gray-500">
+                                Keine Schichten für den gewählten Zeitraum und die gewählten Mitarbeiter gefunden.
+                            </div>
+                        )}
+                    </div>
+                </div>
+            )}
+
+            {/* --- MODALS --- */}
+            {isModalOpen && (
+                <ShiftFormModal
+                    isOpen={isModalOpen}
+                    onClose={handleCloseModal}
+                    onSave={handleSave}
+                    onDelete={handleDelete}
+                    employees={employees}
+                    customers={customers}
+                    activities={activities}
+                    companySettings={companySettings}
+                    initialData={modalInitialData}
+                    defaultDate={modalDefaultDate}
+                    defaultEmployeeId={modalDefaultEmployeeId}
+                    shiftTemplates={shiftTemplates}
+                    absenceRequests={absenceRequests}
+                />
+            )}
+
+            {isDatePickModalOpen && (
+                <CalendarModal
+                    isOpen={isDatePickModalOpen}
+                    onClose={handleCloseDatePickModal}
+                    onSelectDate={handleJumpToDate}
+                    title="Startdatum wählen"
+                    initialStartDate={viewStartDateTime.toISOString()}
+                    selectionMode="single"
+                />
+            )}
+
+            {isFilterModalOpen && (
+                <EmployeeMultiSelectModal
+                    isOpen={isFilterModalOpen}
+                    onClose={() => setIsFilterModalOpen(false)}
+                    onApply={(ids) => {
+                        setPlannerVisibleEmployeeIds(ids.map(Number));
+                        setIsFilterModalOpen(false);
+                    }}
+                    employees={employees}
+                    selectedEmployeeIds={plannerVisibleEmployeeIds}
+                    title="Mitarbeiter filtern"
+                />
+            )}
+
+            {isTemplateModalOpen && (
+                <ShiftTemplateManagementModal
+                    isOpen={isTemplateModalOpen}
+                    onClose={() => setIsTemplateModalOpen(false)}
+                    templates={shiftTemplates}
+                    onAdd={addShiftTemplate}
+                    onUpdate={updateShiftTemplate}
+                    onDelete={deleteShiftTemplate}
+                />
+            )}
+
+            {isGeneratorModalOpen && (
+                <ShiftPatternGeneratorModal
+                    isOpen={isGeneratorModalOpen}
+                    onClose={() => setIsGeneratorModalOpen(false)}
+                    templates={shiftTemplates}
+                    employees={employees}
+                    employeeGroups={employeeGroups}
+                    rotationPatterns={rotationPatterns}
+                    onGenerate={(generatedShifts) => {
+                        generatedShifts.forEach(s => addShift(s));
+                        setIsGeneratorModalOpen(false);
+                    }}
+                    shifts={shifts}
+                    deleteShift={deleteShift}
+                />
+            )}
+
+            {isRotationPatternManagementOpen && (
+                <RotationPatternManagementModal
+                    isOpen={isRotationPatternManagementOpen}
+                    onClose={() => setIsRotationPatternManagementOpen(false)}
+                    patterns={rotationPatterns}
+                    shiftTemplates={shiftTemplates}
+                    onAdd={addRotationPattern}
+                    onUpdate={updateRotationPattern}
+                    onDelete={deleteRotationPattern}
+                />
+            )}
+
+            {isEmployeeGroupManagementOpen && (
+                <EmployeeGroupManagementModal
+                    isOpen={isEmployeeGroupManagementOpen}
+                    onClose={() => setIsEmployeeGroupManagementOpen(false)}
+                    groups={employeeGroups}
+                    employees={employees}
+                    onAdd={addEmployeeGroup}
+                    onUpdate={updateEmployeeGroup}
+                    onDelete={deleteEmployeeGroup}
+                />
+            )}
+
+            {showGroupAssignModal && (
+                <GroupAssignmentModal
+                    isOpen={showGroupAssignModal}
+                    onClose={() => setShowGroupAssignModal(false)}
+                    group={groupAssignData ? employeeGroups.find(g => g.id === groupAssignData.groupId) || null : null}
+                    employees={employees}
+                    onAssignAll={handleGroupAssignAll}
+                    onAssignOne={handleGroupAssignOne}
+                />
+            )}
+
+            {/* Report Tab Modals */}
+            <PlannerDateRangeModal
+                isOpen={isReportDateRangeOpen}
+                onClose={() => setIsReportDateRangeOpen(false)}
+                onApply={(start, end) => {
+                    setReportStartDate(start);
+                    setReportEndDate(end);
+                }}
+                currentStartDate={reportStartDate}
+                currentEndDate={reportEndDate}
             />
-        )}
 
-        {isDatePickModalOpen && (
-            <CalendarModal
-                isOpen={isDatePickModalOpen}
-                onClose={handleCloseDatePickModal}
-                onSelectDate={handleJumpToDate}
-                title="Startdatum wählen"
-                initialStartDate={viewStartDateTime.toISOString()}
-                selectionMode="single"
-            />
-        )}
-
-        {isFilterModalOpen && (
             <EmployeeMultiSelectModal
-                isOpen={isFilterModalOpen}
-                onClose={() => setIsFilterModalOpen(false)}
+                isOpen={isReportEmployeeSelectOpen}
+                onClose={() => setIsReportEmployeeSelectOpen(false)}
                 onApply={(ids) => {
-                    setPlannerVisibleEmployeeIds(ids.map(Number));
-                    setIsFilterModalOpen(false);
+                    setReportEmployeeIds(ids.map(Number));
+                    setIsReportEmployeeSelectOpen(false);
                 }}
                 employees={employees}
-                selectedEmployeeIds={plannerVisibleEmployeeIds}
-                title="Mitarbeiter filtern"
+                selectedEmployeeIds={reportEmployeeIds}
+                title="Mitarbeiter auswählen"
             />
-        )}
 
-        {isTemplateModalOpen && (
-            <ShiftTemplateManagementModal
-                isOpen={isTemplateModalOpen}
-                onClose={() => setIsTemplateModalOpen(false)}
-                templates={shiftTemplates}
-                onAdd={addShiftTemplate}
-                onUpdate={updateShiftTemplate}
-                onDelete={deleteShiftTemplate}
-            />
-        )}
-
-        {isGeneratorModalOpen && (
-            <ShiftPatternGeneratorModal
-                isOpen={isGeneratorModalOpen}
-                onClose={() => setIsGeneratorModalOpen(false)}
-                templates={shiftTemplates}
-                employees={employees}
-                employeeGroups={employeeGroups}
-                rotationPatterns={rotationPatterns}
-                onGenerate={(generatedShifts) => {
-                    generatedShifts.forEach(s => addShift(s));
-                    setIsGeneratorModalOpen(false);
+            {/* Delete Confirmation Modal */}
+            <ConfirmModal
+                isOpen={employeeToDelete !== null}
+                onClose={() => setEmployeeToDelete(null)}
+                onConfirm={() => {
+                    if (employeeToDelete) {
+                        const shiftsToDelete = shifts.filter(s => Number(s.employeeId) === employeeToDelete.id);
+                        deleteShiftsByEmployee(employeeToDelete.id);
+                        shiftsToDelete.forEach(shift => deleteShift(shift.id));
+                        setEmployeeToDelete(null);
+                    }
                 }}
-                shifts={shifts}
-                deleteShift={deleteShift}
-            />
-        )}
-
-        {isRotationPatternManagementOpen && (
-            <RotationPatternManagementModal
-                isOpen={isRotationPatternManagementOpen}
-                onClose={() => setIsRotationPatternManagementOpen(false)}
-                patterns={rotationPatterns}
-                shiftTemplates={shiftTemplates}
-                onAdd={addRotationPattern}
-                onUpdate={updateRotationPattern}
-                onDelete={deleteRotationPattern}
-            />
-        )}
-
-        {isEmployeeGroupManagementOpen && (
-            <EmployeeGroupManagementModal
-                isOpen={isEmployeeGroupManagementOpen}
-                onClose={() => setIsEmployeeGroupManagementOpen(false)}
-                groups={employeeGroups}
-                employees={employees}
-                onAdd={addEmployeeGroup}
-                onUpdate={updateEmployeeGroup}
-                onDelete={deleteEmployeeGroup}
-            />
-        )}
-
-        {showGroupAssignModal && (
-            <GroupAssignmentModal
-                isOpen={showGroupAssignModal}
-                onClose={() => setShowGroupAssignModal(false)}
-                group={groupAssignData ? employeeGroups.find(g => g.id === groupAssignData.groupId) || null : null}
-                employees={employees}
-                onAssignAll={handleGroupAssignAll}
-                onAssignOne={handleGroupAssignOne}
-            />
-        )}
-
-        {/* Report Tab Modals */}
-        <PlannerDateRangeModal
-            isOpen={isReportDateRangeOpen}
-            onClose={() => setIsReportDateRangeOpen(false)}
-            onApply={(start, end) => {
-                setReportStartDate(start);
-                setReportEndDate(end);
-            }}
-            currentStartDate={reportStartDate}
-            currentEndDate={reportEndDate}
-        />
-
-        <EmployeeMultiSelectModal
-            isOpen={isReportEmployeeSelectOpen}
-            onClose={() => setIsReportEmployeeSelectOpen(false)}
-            onApply={(ids) => {
-                setReportEmployeeIds(ids.map(Number));
-                setIsReportEmployeeSelectOpen(false);
-            }}
-            employees={employees}
-            selectedEmployeeIds={reportEmployeeIds}
-            title="Mitarbeiter auswählen"
-        />
-
-        {/* Delete Confirmation Modal */}
-        <ConfirmModal
-            isOpen={employeeToDelete !== null}
-            onClose={() => setEmployeeToDelete(null)}
-            onConfirm={() => {
-                if (employeeToDelete) {
-                    const shiftsToDelete = shifts.filter(s => Number(s.employeeId) === employeeToDelete.id);
-                    deleteShiftsByEmployee(employeeToDelete.id);
-                    shiftsToDelete.forEach(shift => deleteShift(shift.id));
-                    setEmployeeToDelete(null);
+                title="Schichten löschen"
+                message={employeeToDelete
+                    ? `Möchten Sie wirklich alle ${employeeToDelete.shiftCount} Schichten für ${employeeToDelete.name} löschen?`
+                    : ''
                 }
-            }}
-            title="Schichten löschen"
-            message={employeeToDelete
-                ? `Möchten Sie wirklich alle ${employeeToDelete.shiftCount} Schichten für ${employeeToDelete.name} löschen?`
-                : ''
-            }
-            confirmText="Löschen"
-            cancelText="Abbrechen"
-        />
+                confirmText="Löschen"
+                cancelText="Abbrechen"
+            />
 
-        <WeekCopyModal
-            isOpen={isWeekCopyModalOpen}
-            onClose={() => setIsWeekCopyModalOpen(false)}
-            onCopy={handleWeekCopy}
-            sourceWeekStart={getStartOfWeek(viewStartDateTime)}
-            shiftCount={shifts.filter(s => {
-                const shiftDate = new Date(s.start);
-                const weekStart = getStartOfWeek(viewStartDateTime);
-                const weekEnd = new Date(weekStart);
-                weekEnd.setDate(weekEnd.getDate() + 7);
-                return shiftDate >= weekStart && shiftDate < weekEnd;
-            }).length}
-        />
-    </div>
-);
+            <WeekCopyModal
+                isOpen={isWeekCopyModalOpen}
+                onClose={() => setIsWeekCopyModalOpen(false)}
+                onCopy={handleWeekCopy}
+                sourceWeekStart={getStartOfWeek(viewStartDateTime)}
+                shiftCount={shifts.filter(s => {
+                    const shiftDate = new Date(s.start);
+                    const weekStart = getStartOfWeek(viewStartDateTime);
+                    const weekEnd = new Date(weekStart);
+                    weekEnd.setDate(weekEnd.getDate() + 7);
+                    return shiftDate >= weekStart && shiftDate < weekEnd;
+                }).length}
+            />
+        </div>
+    );
 };
