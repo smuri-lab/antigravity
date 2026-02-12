@@ -1323,6 +1323,8 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                     onClose={() => setIsGeneratorModalOpen(false)}
                     templates={shiftTemplates}
                     employees={employees}
+                    employeeGroups={employeeGroups}
+                    rotationPatterns={rotationPatterns}
                     onGenerate={(generatedShifts) => {
                         generatedShifts.forEach(s => addShift(s));
                         setIsGeneratorModalOpen(false);
