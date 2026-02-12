@@ -1173,6 +1173,70 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                 </div>
             )}
 
+            {activeTab === 'management' && (
+                <div className="animate-fade-in">
+                    <Card>
+                        <h2 className="text-2xl font-bold mb-6">Verwaltung</h2>
+                        <p className="text-gray-600 mb-6">
+                            Verwalten Sie Schichtvorlagen, Rotationsmuster und Mitarbeitergruppen
+                        </p>
+
+                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                            {/* Schichtvorlagen */}
+                            <button
+                                onClick={() => setIsTemplateModalOpen(true)}
+                                className="flex flex-col items-center justify-center p-8 border-2 border-gray-200 rounded-xl hover:border-blue-500 hover:bg-blue-50 transition-all group"
+                            >
+                                <div className="w-16 h-16 bg-gray-100 group-hover:bg-blue-100 rounded-full flex items-center justify-center mb-4 transition-colors">
+                                    <CogIcon className="h-8 w-8 text-gray-600 group-hover:text-blue-600 transition-colors" />
+                                </div>
+                                <h3 className="text-lg font-bold mb-2 group-hover:text-blue-600 transition-colors">Schichtvorlagen</h3>
+                                <p className="text-sm text-gray-500 text-center">
+                                    Erstellen und bearbeiten Sie wiederverwendbare Schichtvorlagen
+                                </p>
+                                <div className="mt-4 text-sm font-medium text-blue-600">
+                                    {shiftTemplates.length} Vorlagen
+                                </div>
+                            </button>
+
+                            {/* Rotationsmuster */}
+                            <button
+                                onClick={() => setIsRotationPatternManagementOpen(true)}
+                                className="flex flex-col items-center justify-center p-8 border-2 border-gray-200 rounded-xl hover:border-purple-500 hover:bg-purple-50 transition-all group"
+                            >
+                                <div className="w-16 h-16 bg-gray-100 group-hover:bg-purple-100 rounded-full flex items-center justify-center mb-4 transition-colors text-3xl">
+                                    🔄
+                                </div>
+                                <h3 className="text-lg font-bold mb-2 group-hover:text-purple-600 transition-colors">Rotationsmuster</h3>
+                                <p className="text-sm text-gray-500 text-center">
+                                    Definieren Sie wiederkehrende Schichtmuster für Rotationen
+                                </p>
+                                <div className="mt-4 text-sm font-medium text-purple-600">
+                                    {rotationPatterns.length} Muster
+                                </div>
+                            </button>
+
+                            {/* Mitarbeitergruppen */}
+                            <button
+                                onClick={() => setIsEmployeeGroupManagementOpen(true)}
+                                className="flex flex-col items-center justify-center p-8 border-2 border-gray-200 rounded-xl hover:border-green-500 hover:bg-green-50 transition-all group"
+                            >
+                                <div className="w-16 h-16 bg-gray-100 group-hover:bg-green-100 rounded-full flex items-center justify-center mb-4 transition-colors text-3xl">
+                                    👥
+                                </div>
+                                <h3 className="text-lg font-bold mb-2 group-hover:text-green-600 transition-colors">Mitarbeitergruppen</h3>
+                                <p className="text-sm text-gray-500 text-center">
+                                    Gruppieren Sie Mitarbeiter für gemeinsame Schichtzuweisungen
+                                </p>
+                                <div className="mt-4 text-sm font-medium text-green-600">
+                                    {employeeGroups.length} Gruppen
+                                </div>
+                            </button>
+                        </div>
+                    </Card>
+                </div>
+            )}
+
             {activeTab === 'report' && (
                 <div className="animate-fade-in space-y-4">
                     <Card>
