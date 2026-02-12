@@ -1548,6 +1548,30 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                 />
             )}
 
+            {isRotationPatternManagementOpen && (
+                <RotationPatternManagementModal
+                    isOpen={isRotationPatternManagementOpen}
+                    onClose={() => setIsRotationPatternManagementOpen(false)}
+                    patterns={rotationPatterns}
+                    shiftTemplates={shiftTemplates}
+                    onAdd={addRotationPattern}
+                    onUpdate={updateRotationPattern}
+                    onDelete={deleteRotationPattern}
+                />
+            )}
+
+            {isEmployeeGroupManagementOpen && (
+                <EmployeeGroupManagementModal
+                    isOpen={isEmployeeGroupManagementOpen}
+                    onClose={() => setIsEmployeeGroupManagementOpen(false)}
+                    groups={employeeGroups}
+                    employees={employees}
+                    onAdd={addEmployeeGroup}
+                    onUpdate={updateEmployeeGroup}
+                    onDelete={deleteEmployeeGroup}
+                />
+            )}
+
             {isGeneratorModalOpen && (
                 <ShiftPatternGeneratorModal
                     isOpen={isGeneratorModalOpen}
