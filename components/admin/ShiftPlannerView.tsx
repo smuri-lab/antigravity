@@ -1322,6 +1322,18 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                 />
             )}
 
+            {isRotationPatternManagementOpen && (
+                <RotationPatternManagementModal
+                    isOpen={isRotationPatternManagementOpen}
+                    onClose={() => setIsRotationPatternManagementOpen(false)}
+                    patterns={rotationPatterns}
+                    shiftTemplates={shiftTemplates}
+                    onAdd={addRotationPattern}
+                    onUpdate={updateRotationPattern}
+                    onDelete={deleteRotationPattern}
+                />
+            )}
+
             {/* Report Tab Modals */}
             <PlannerDateRangeModal
                 isOpen={isReportDateRangeOpen}
