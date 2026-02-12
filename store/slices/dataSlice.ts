@@ -1,5 +1,5 @@
 import { StateCreator } from 'zustand';
-import { TimeEntry, AbsenceRequest, Shift, Employee, Customer, Activity, CompanySettings, ShiftTemplate, TimeBalanceAdjustment, HolidaysByYear, AbsenceType } from '../../types';
+import { TimeEntry, AbsenceRequest, Shift, Employee, Customer, Activity, CompanySettings, ShiftTemplate, TimeBalanceAdjustment, HolidaysByYear, AbsenceType, RotationTemplate, EmployeeGroup } from '../../types';
 import { INITIAL_CUSTOMERS, INITIAL_ACTIVITIES, INITIAL_EMPLOYEES, INITIAL_SHIFT_TEMPLATES, INITIAL_USER_ACCOUNT, GermanState } from '../../constants';
 import { applyAutomaticBreaks } from '../../components/utils/calculations';
 
@@ -15,6 +15,8 @@ export interface DataSlice {
     timeBalanceAdjustments: TimeBalanceAdjustment[];
     holidaysByYear: HolidaysByYear;
     selectedState: GermanState;
+    rotationPatterns: RotationTemplate[];
+    employeeGroups: EmployeeGroup[];
 
     // Actions
     setTimeEntries: (entries: TimeEntry[] | ((prev: TimeEntry[]) => TimeEntry[])) => void;
@@ -28,6 +30,8 @@ export interface DataSlice {
     setTimeBalanceAdjustments: (adjustments: TimeBalanceAdjustment[] | ((prev: TimeBalanceAdjustment[]) => TimeBalanceAdjustment[])) => void;
     setHolidaysByYear: (holidays: HolidaysByYear | ((prev: HolidaysByYear) => HolidaysByYear)) => void;
     setSelectedState: (state: GermanState) => void;
+    setRotationPatterns: (patterns: RotationTemplate[] | ((prev: RotationTemplate[]) => RotationTemplate[])) => void;
+    setEmployeeGroups: (groups: EmployeeGroup[] | ((prev: EmployeeGroup[]) => EmployeeGroup[])) => void;
 
     // Advanced Actions
     addTimeEntry: (entry: Omit<TimeEntry, 'id' | 'employeeId'>, employeeId: number) => void;
@@ -47,6 +51,12 @@ export interface DataSlice {
     updateShiftTemplate: (updatedTemplate: ShiftTemplate) => void;
     deleteShiftTemplate: (id: string) => void;
     deleteShiftsByEmployee: (employeeId: number) => void;
+    addRotationPattern: (pattern: Omit<RotationTemplate, 'id' | 'createdAt'>) => void;
+    updateRotationPattern: (updatedPattern: RotationTemplate) => void;
+    deleteRotationPattern: (id: string) => void;
+    addEmployeeGroup: (group: Omit<EmployeeGroup, 'id' | 'createdAt'>) => void;
+    updateEmployeeGroup: (updatedGroup: EmployeeGroup) => void;
+    deleteEmployeeGroup: (id: string) => void;
 }
 
 export const createDataSlice: StateCreator<DataSlice> = (set) => ({
@@ -77,6 +87,8 @@ export const createDataSlice: StateCreator<DataSlice> = (set) => ({
     timeBalanceAdjustments: [],
     holidaysByYear: {},
     selectedState: 'BW',
+    rotationPatterns: [],
+    employeeGroups: [],
 
     setTimeEntries: (entries) => set((state) => ({
         timeEntries: typeof entries === 'function' ? entries(state.timeEntries) : entries
@@ -109,6 +121,8 @@ export const createDataSlice: StateCreator<DataSlice> = (set) => ({
         holidaysByYear: typeof holidays === 'function' ? holidays(state.holidaysByYear) : holidays
     })),
     setSelectedState: (state) => set({ selectedState: state }),
+    setRotationPatterns: (patterns) => set((state) => ({ rotationPatterns: typeof patterns === 'function' ? patterns(state.rotationPatterns) : patterns })),
+    setEmployeeGroups: (groups) => set((state) => ({ employeeGroups: typeof groups === 'function' ? groups(state.employeeGroups) : groups })),
 
     addTimeEntry: (entry, employeeId) => set((state) => {
         const employee = state.employees.find(e => e.id === employeeId);
@@ -180,4 +194,34 @@ export const createDataSlice: StateCreator<DataSlice> = (set) => ({
         console.log('Store: Shifts removed:', state.shifts.length - newShifts.length);
         return { shifts: newShifts };
     }),
+
+    // Rotation Pattern CRUD
+    addRotationPattern: (pattern) => set((state) => ({
+        rotationPatterns: [...state.rotationPatterns, {
+            ...pattern,
+            id: crypto.randomUUID(),
+            createdAt: new Date().toISOString()
+        }]
+    })),
+    updateRotationPattern: (updatedPattern) => set((state) => ({
+        rotationPatterns: state.rotationPatterns.map(p => p.id === updatedPattern.id ? updatedPattern : p)
+    })),
+    deleteRotationPattern: (id) => set((state) => ({
+        rotationPatterns: state.rotationPatterns.filter(p => p.id !== id)
+    })),
+
+    // Employee Group CRUD
+    addEmployeeGroup: (group) => set((state) => ({
+        employeeGroups: [...state.employeeGroups, {
+            ...group,
+            id: crypto.randomUUID(),
+            createdAt: new Date().toISOString()
+        }]
+    })),
+    updateEmployeeGroup: (updatedGroup) => set((state) => ({
+        employeeGroups: state.employeeGroups.map(g => g.id === updatedGroup.id ? updatedGroup : g)
+    })),
+    deleteEmployeeGroup: (id) => set((state) => ({
+        employeeGroups: state.employeeGroups.filter(g => g.id !== id)
+    })),
 });

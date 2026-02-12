@@ -61,6 +61,15 @@ export interface RotationTemplate {
   createdAt: string;
 }
 
+export interface EmployeeGroup {
+  id: string;
+  name: string;
+  description?: string;
+  employeeIds: number[];
+  color?: string;
+  createdAt: string;
+}
+
 export interface Shift {
   id: string;
   employeeId: number;

@@ -33,6 +33,8 @@ export const useStore = create<StoreState>()(
                 shiftTemplates: state.shiftTemplates,
                 timeBalanceAdjustments: state.timeBalanceAdjustments,
                 selectedState: state.selectedState,
+                rotationPatterns: state.rotationPatterns,
+                employeeGroups: state.employeeGroups,
                 // Stopwatch
                 isRunning: state.isRunning,
                 startTime: state.startTime,
