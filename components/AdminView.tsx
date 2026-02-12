@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import type { AbsenceRequest, TimeEntry, Employee, Customer, Activity, Holiday, CompanySettings, TimeBalanceAdjustment, HolidaysByYear, Shift, ShiftTemplate } from '../types';
+import type { AbsenceRequest, TimeEntry, Employee, Customer, Activity, Holiday, CompanySettings, TimeBalanceAdjustment, HolidaysByYear, Shift, ShiftTemplate, RotationTemplate, EmployeeGroup } from '../types';
 import { AdminViewType } from '../types';
 import { AdminNav } from './admin/AdminNav';
 import { SettingsView } from './admin/SettingsView';
@@ -60,6 +60,16 @@ interface AdminViewProps {
   addShiftTemplate: (template: Omit<ShiftTemplate, 'id'>) => void;
   updateShiftTemplate: (template: ShiftTemplate) => void;
   deleteShiftTemplate: (id: string) => void;
+  // Rotation Patterns
+  rotationPatterns: any[]; // Using any temporarily to avoid import cycle if type not exported, but should be RotationTemplate[]
+  addRotationPattern: (pattern: any) => void;
+  updateRotationPattern: (pattern: any) => void;
+  deleteRotationPattern: (id: string) => void;
+  // Employee Groups
+  employeeGroups: any[]; // Should be EmployeeGroup[]
+  addEmployeeGroup: (group: any) => void;
+  updateEmployeeGroup: (group: any) => void;
+  deleteEmployeeGroup: (id: string) => void;
 }
 
 export const AdminView: React.FC<AdminViewProps> = (props) => {
@@ -99,6 +109,14 @@ export const AdminView: React.FC<AdminViewProps> = (props) => {
           addShiftTemplate={props.addShiftTemplate}
           updateShiftTemplate={props.updateShiftTemplate}
           deleteShiftTemplate={props.deleteShiftTemplate}
+          rotationPatterns={props.rotationPatterns}
+          addRotationPattern={props.addRotationPattern}
+          updateRotationPattern={props.updateRotationPattern}
+          deleteRotationPattern={props.deleteRotationPattern}
+          employeeGroups={props.employeeGroups}
+          addEmployeeGroup={props.addEmployeeGroup}
+          updateEmployeeGroup={props.updateEmployeeGroup}
+          deleteEmployeeGroup={props.deleteEmployeeGroup}
         />;
       case AdminViewType.TimeTracking:
         return <TimeTrackingManagement {...props} />;

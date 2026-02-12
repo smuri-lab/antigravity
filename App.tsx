@@ -850,6 +850,16 @@ const App: React.FC = () => {
                   updateShiftTemplate={updateShiftTemplate}
                   deleteShiftTemplate={deleteShiftTemplate}
                   deleteShiftsByEmployee={deleteShiftsByEmployee}
+                  // Rotation Patterns
+                  rotationPatterns={rotationPatterns}
+                  addRotationPattern={addRotationPattern}
+                  updateRotationPattern={updateRotationPattern}
+                  deleteRotationPattern={deleteRotationPattern}
+                  // Employee Groups
+                  employeeGroups={employeeGroups}
+                  addEmployeeGroup={addEmployeeGroup}
+                  updateEmployeeGroup={updateEmployeeGroup}
+                  deleteEmployeeGroup={deleteEmployeeGroup}
                 />
               ) : (
                 renderEmployeeView()
