@@ -1069,7 +1069,10 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                                             return (
                                                                                 <div
                                                                                     key={shift.id}
-                                                                                    className={`relative z-10 text-xs text-white rounded px-1.5 py-0.5 shadow-sm truncate cursor-pointer hover:scale-105 transition-transform ${viewMode === 'month' ? 'h-full flex items-center justify-center' : ''
+                                                                                    draggable={true}
+                                                                                    onDragStart={(e) => handleDragStart(e, shift)}
+                                                                                    onDragEnd={handleDragEnd}
+                                                                                    className={`relative z-10 text-xs text-white rounded px-1.5 py-0.5 shadow-sm truncate cursor-grab active:cursor-grabbing hover:scale-105 transition-transform ${viewMode === 'month' ? 'h-full flex items-center justify-center' : ''
                                                                                         } ${hasConflict ? 'ring-2 ring-red-600 ring-inset' : ''
                                                                                         }`}
                                                                                     style={{ backgroundColor: shift.color || '#3b82f6' }}
