@@ -48,6 +48,19 @@ export interface ShiftTemplate {
   label?: string;
 }
 
+export interface PatternBlock {
+  templateId: string | null; // Reference to ShiftTemplate.id, null for free day
+  days: number;
+}
+
+export interface RotationTemplate {
+  id: string;
+  name: string;
+  description?: string;
+  blocks: PatternBlock[];
+  createdAt: string;
+}
+
 export interface Shift {
   id: string;
   employeeId: number;

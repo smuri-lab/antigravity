@@ -1,6 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
+import { RotationTemplate, PatternBlock as StoredPatternBlock } from '../../types';
+import { SaveRotationTemplateModal } from './SaveRotationTemplateModal';
+import { LoadRotationTemplateModal } from './LoadRotationTemplateModal';
+import { BookmarkIcon } from '../icons/BookmarkIcon';
+import { FolderOpenIcon } from '../icons/FolderOpenIcon';
 import type { Employee, ShiftTemplate, Shift } from '../../types';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
@@ -55,11 +60,28 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
     const [endDate, setEndDate] = useState('');
     const [clearExisting, setClearExisting] = useState(false);
 
+    // Rotation template state
+    const [rotationTemplates, setRotationTemplates] = useState<RotationTemplate[]>([]);
+    const [showSaveTemplateModal, setShowSaveTemplateModal] = useState(false);
+    const [showLoadTemplateModal, setShowLoadTemplateModal] = useState(false);
+
     // Modals
     const [isEmployeeSelectOpen, setIsEmployeeSelectOpen] = useState(false);
     const [isDateRangeOpen, setIsDateRangeOpen] = useState(false);
     const [isTemplateSelectOpen, setIsTemplateSelectOpen] = useState<{ index: number, isOpen: boolean }>({ index: -1, isOpen: false });
     const [isClosing, setIsClosing] = useState(false);
+
+    // Load rotation templates from LocalStorage
+    useEffect(() => {
+        const saved = localStorage.getItem('rotationTemplates');
+        if (saved) {
+            try {
+                setRotationTemplates(JSON.parse(saved));
+            } catch (error) {
+                console.error('Failed to load rotation templates:', error);
+            }
+        }
+    }, []);
 
     useEffect(() => {
         if (isOpen) {
@@ -150,6 +172,43 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
         }
         return 0;
     }, [generationMode, rotationInputMode, patternBlocks, pattern]);
+
+    // Rotation Template Functions
+    const saveRotationTemplate = (name: string, description?: string) => {
+        const newTemplate: RotationTemplate = {
+            id: crypto.randomUUID(),
+            name,
+            description,
+            blocks: patternBlocks.map(block => ({
+                templateId: block.template?.id || null,
+                days: block.days
+            })),
+            createdAt: new Date().toISOString()
+        };
+
+        const updated = [...rotationTemplates, newTemplate];
+        setRotationTemplates(updated);
+        localStorage.setItem('rotationTemplates', JSON.stringify(updated));
+        setShowSaveTemplateModal(false);
+    };
+
+    const loadRotationTemplate = (template: RotationTemplate) => {
+        // Convert stored blocks back to internal format with full template objects
+        const loadedBlocks = template.blocks.map(block => ({
+            template: block.templateId ? templates.find(t => t.id === block.templateId) || null : null,
+            days: block.days
+        }));
+
+        setPatternBlocks(loadedBlocks);
+        setRotationInputMode('blocks');
+        setShowLoadTemplateModal(false);
+    };
+
+    const deleteRotationTemplate = (id: string) => {
+        const updated = rotationTemplates.filter(t => t.id !== id);
+        setRotationTemplates(updated);
+        localStorage.setItem('rotationTemplates', JSON.stringify(updated));
+    };
 
     const handleGenerate = () => {
         if (!startDate || !endDate) {
@@ -416,6 +475,32 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                                                 📊 Rotationszyklus: <strong>{totalDays} Tage</strong>
                                             </div>
                                         )}
+
+                                        {/* Save/Load Template Buttons */}
+                                        {totalDays > 0 && (
+                                            <div className="mt-4 flex gap-2">
+                                                <button
+                                                    onClick={() => setShowSaveTemplateModal(true)}
+                                                    className="flex-1 py-2.5 px-4 bg-green-600 text-white rounded-lg hover:bg-green-700 font-medium text-sm flex items-center justify-center gap-2 transition-colors shadow-sm"
+                                                >
+                                                    <BookmarkIcon className="h-4 w-4" />
+                                                    Als Vorlage speichern
+                                                </button>
+
+                                                {rotationTemplates.length > 0 && (
+                                                    <button
+                                                        onClick={() => setShowLoadTemplateModal(true)}
+                                                        className="flex-1 py-2.5 px-4 bg-blue-600 text-white rounded-lg hover:bg-blue-700 font-medium text-sm flex items-center justify-center gap-2 transition-colors shadow-sm relative"
+                                                    >
+                                                        <FolderOpenIcon className="h-4 w-4" />
+                                                        Vorlage laden
+                                                        <span className="absolute -top-1 -right-1 bg-white text-blue-600 text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center shadow">
+                                                            {rotationTemplates.length}
+                                                        </span>
+                                                    </button>
+                                                )}
+                                            </div>
+                                        )}
                                     </>
                                 ) : (
                                     /* Individual Day Mode UI (existing) */
@@ -610,6 +695,24 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                 initialStartDate={startDate}
                 initialEndDate={endDate}
             />
+
+            {/* Rotation Template Modals */}
+            <SaveRotationTemplateModal
+                isOpen={showSaveTemplateModal}
+                onClose={() => setShowSaveTemplateModal(false)}
+                onSave={saveRotationTemplate}
+                totalDays={totalDays}
+            />
+
+            <LoadRotationTemplateModal
+                isOpen={showLoadTemplateModal}
+                onClose={() => setShowLoadTemplateModal(false)}
+                templates={rotationTemplates}
+                shiftTemplates={templates}
+                onLoad={loadRotationTemplate}
+                onDelete={deleteRotationTemplate}
+            />
+
 
         </div>,
         document.body
