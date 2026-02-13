@@ -145,12 +145,7 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
                 </button>
             </div>
 
-            <Button onClick={handleCreate} className="mb-6" variant="primary">
-                <PlusIcon className="h-5 w-5" />
-                Neue Gruppe
-            </Button>
-
-            <div className="flex-grow overflow-y-auto">
+            <div className="flex-grow overflow-y-auto pr-2">
                 {groups.length === 0 ? (
                     <div className="text-center py-12 text-gray-500">
                         <p>Noch keine Gruppen erstellt.</p>
@@ -207,6 +202,13 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
                         ))}
                     </div>
                 )}
+            </div>
+
+            <div className="flex justify-center mt-6 pt-6 border-t">
+                <Button onClick={handleCreate} variant="primary">
+                    <PlusIcon className="h-5 w-5" />
+                    Neue Gruppe
+                </Button>
             </div>
         </Card>
     );
