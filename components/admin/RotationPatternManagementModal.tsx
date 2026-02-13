@@ -193,7 +193,7 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
                                             <p className="text-sm text-gray-600 mt-1">{pattern.description}</p>
                                         )}
                                     </div>
-                                    <div className="flex gap-2 ml-4">
+                                    <div className="flex gap-2 ml-4 self-center">
                                         <button
                                             onClick={() => handleEdit(pattern)}
                                             className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
@@ -209,32 +209,6 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
                                             <TrashIcon className="h-5 w-5" />
                                         </button>
                                     </div>
-                                </div>
-
-                                {/* Preview Grid */}
-                                <div className="grid grid-cols-7 gap-1 max-w-md">
-                                    {days.slice(0, 14).map((template, idx) => (
-                                        <div
-                                            key={idx}
-                                            className="aspect-square rounded flex items-center justify-center text-xs font-bold border"
-                                            style={{
-                                                backgroundColor: template?.color ? `${template.color}20` : '#f3f4f6',
-                                                color: template?.color || '#9ca3af',
-                                                borderColor: template?.color || '#e5e7eb'
-                                            }}
-                                            title={template?.name || 'Frei'}
-                                        >
-                                            {idx + 1}
-                                        </div>
-                                    ))}
-                                    {days.length > 14 && (
-                                        <div className="aspect-square rounded flex items-center justify-center text-xs font-bold bg-gray-100 text-gray-500 border border-gray-200">
-                                            +{days.length - 14}
-                                        </div>
-                                    )}
-                                </div>
-                                <div className="mt-2 text-xs text-gray-500 text-right">
-                                    {days.length} Tage Gesamt
                                 </div>
                             </div>
                         );
