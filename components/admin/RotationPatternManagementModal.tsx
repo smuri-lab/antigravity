@@ -136,6 +136,14 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
         handleCloseEdit();
     };
 
+    // Handle modal close with animation
+    const handleClose = () => {
+        setIsClosing(true);
+        setTimeout(onClose, 300); // Match animation duration
+    };
+
+    if (!isOpen && !isClosing) return null; // Only render if open or closing
+
     // Cell Interaction
     const handleDayClick = (index: number) => {
         if (!activeTemplate) return; // Do nothing if no tool selected based on user request "paint"
@@ -160,15 +168,13 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
 
     // Render list view
     const renderListView = () => (
-        <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <Card className={`w-full max-w-2xl flex flex-col ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`} onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-6 border-b pb-4">
                 <h2 className="text-2xl font-bold">Rotationsmuster verwalten</h2>
-                <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
                     <XIcon className="h-6 w-6" />
                 </button>
             </div>
-
-
 
             {patterns.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
@@ -176,7 +182,7 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
                     <p className="text-sm mt-2">Klicken Sie auf "Neues Rotationsmuster" um zu beginnen.</p>
                 </div>
             ) : (
-                <div className="space-y-3">
+                <div className="space-y-3 overflow-y-auto pr-2">
                     {patterns.map(pattern => {
                         const days = blocksToDays(pattern.blocks);
                         return (
@@ -222,17 +228,17 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
 
     // Render edit/create modal
     const renderEditView = () => (
-        <Card className="w-full max-w-3xl max-h-[90vh] overflow-y-auto">
+        <Card className={`w-full max-w-2xl flex flex-col ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`} onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-6 border-b pb-4">
                 <h2 className="text-2xl font-bold">
                     {isCreating ? 'Neues Rotationsmuster' : 'Rotationsmuster bearbeiten'}
                 </h2>
-                <button onClick={handleCloseEdit} className="text-gray-400 hover:text-gray-600">
+                <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
                     <XIcon className="h-6 w-6" />
                 </button>
             </div>
 
-            <div className="space-y-6">
+            <div className="flex-grow overflow-y-auto pr-2 space-y-6">
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     {/* Name */}
                     <div>
@@ -372,7 +378,7 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
     );
 
     return ReactDOM.createPortal(
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[300] p-4">
+        <div className={`fixed inset-0 bg-black flex items-center justify-center z-[300] p-4 transition-colors duration-300 ${isClosing ? 'bg-opacity-0' : 'bg-opacity-50'}`} onClick={handleClose}>
             {(isCreating || editingPattern) ? renderEditView() : renderListView()}
 
             {/* Delete Confirmation */}

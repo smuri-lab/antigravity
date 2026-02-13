@@ -40,11 +40,17 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
     const [description, setDescription] = useState('');
     const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<number[]>([]);
     const [color, setColor] = useState(GROUP_COLORS[0].value);
+    const [isClosing, setIsClosing] = useState(false);
 
     // Delete confirmation
     const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
     if (!isOpen) return null;
+
+    const handleClose = () => {
+        setIsClosing(true);
+        setTimeout(onClose, 300);
+    };
 
     // Open create modal
     const handleCreate = () => {
@@ -120,10 +126,10 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
 
     // Render list view
     const renderListView = () => (
-        <Card className="w-full max-w-4xl max-h-[90vh] overflow-y-auto">
+        <Card className={`w-full max-w-2xl max-h-[90vh] flex flex-col ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`} onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-6 border-b pb-4">
                 <h2 className="text-2xl font-bold">Mitarbeitergruppen verwalten</h2>
-                <button onClick={onClose} className="text-gray-400 hover:text-gray-600">
+                <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
                     <XIcon className="h-6 w-6" />
                 </button>
             </div>
@@ -133,68 +139,70 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
                 Neue Gruppe
             </Button>
 
-            {groups.length === 0 ? (
-                <div className="text-center py-12 text-gray-500">
-                    <p>Noch keine Gruppen erstellt.</p>
-                    <p className="text-sm mt-2">Klicken Sie auf "Neue Gruppe" um zu beginnen.</p>
-                </div>
-            ) : (
-                <div className="space-y-3">
-                    {groups.map(group => (
-                        <div
-                            key={group.id}
-                            className="border rounded-lg p-4 hover:shadow-md transition-shadow"
-                            style={{ borderLeftWidth: '4px', borderLeftColor: group.color || '#6b7280' }}
-                        >
-                            <div className="flex justify-between items-start mb-2">
-                                <div className="flex-1">
-                                    <div className="flex items-center gap-2">
-                                        <div
-                                            className="w-4 h-4 rounded-full"
-                                            style={{ backgroundColor: group.color || '#6b7280' }}
-                                        />
-                                        <h3 className="font-bold text-lg">{group.name}</h3>
+            <div className="flex-grow overflow-y-auto">
+                {groups.length === 0 ? (
+                    <div className="text-center py-12 text-gray-500">
+                        <p>Noch keine Gruppen erstellt.</p>
+                        <p className="text-sm mt-2">Klicken Sie auf "Neue Gruppe" um zu beginnen.</p>
+                    </div>
+                ) : (
+                    <div className="space-y-3">
+                        {groups.map(group => (
+                            <div
+                                key={group.id}
+                                className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                                style={{ borderLeftWidth: '4px', borderLeftColor: group.color || '#6b7280' }}
+                            >
+                                <div className="flex justify-between items-start mb-2">
+                                    <div className="flex-1">
+                                        <div className="flex items-center gap-2">
+                                            <div
+                                                className="w-4 h-4 rounded-full"
+                                                style={{ backgroundColor: group.color || '#6b7280' }}
+                                            />
+                                            <h3 className="font-bold text-lg">{group.name}</h3>
+                                        </div>
+                                        {group.description && (
+                                            <p className="text-sm text-gray-600 mt-1">{group.description}</p>
+                                        )}
                                     </div>
-                                    {group.description && (
-                                        <p className="text-sm text-gray-600 mt-1">{group.description}</p>
-                                    )}
+                                    <div className="flex gap-2 ml-4">
+                                        <button
+                                            onClick={() => handleEdit(group)}
+                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                            title="Bearbeiten"
+                                        >
+                                            <PencilIcon className="h-5 w-5" />
+                                        </button>
+                                        <button
+                                            onClick={() => setDeleteConfirmId(group.id)}
+                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                            title="Löschen"
+                                        >
+                                            <TrashIcon className="h-5 w-5" />
+                                        </button>
+                                    </div>
                                 </div>
-                                <div className="flex gap-2 ml-4">
-                                    <button
-                                        onClick={() => handleEdit(group)}
-                                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                        title="Bearbeiten"
-                                    >
-                                        <PencilIcon className="h-5 w-5" />
-                                    </button>
-                                    <button
-                                        onClick={() => setDeleteConfirmId(group.id)}
-                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                        title="Löschen"
-                                    >
-                                        <TrashIcon className="h-5 w-5" />
-                                    </button>
+
+                                <div className="text-sm text-gray-600 mb-2">
+                                    👥 {group.employeeIds.length} {group.employeeIds.length === 1 ? 'Mitarbeiter' : 'Mitarbeiter'}
+                                </div>
+
+                                <div className="text-sm text-gray-700">
+                                    {group.employeeIds.slice(0, 3).map(id => getEmployeeName(id)).join(', ')}
+                                    {group.employeeIds.length > 3 && ` +${group.employeeIds.length - 3} weitere`}
                                 </div>
                             </div>
-
-                            <div className="text-sm text-gray-600 mb-2">
-                                👥 {group.employeeIds.length} {group.employeeIds.length === 1 ? 'Mitarbeiter' : 'Mitarbeiter'}
-                            </div>
-
-                            <div className="text-sm text-gray-700">
-                                {group.employeeIds.slice(0, 3).map(id => getEmployeeName(id)).join(', ')}
-                                {group.employeeIds.length > 3 && ` +${group.employeeIds.length - 3} weitere`}
-                            </div>
-                        </div>
-                    ))}
-                </div>
-            )}
+                        ))}
+                    </div>
+                )}
+            </div>
         </Card>
     );
 
     // Render edit/create modal
     const renderEditView = () => (
-        <Card className="w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+        <Card className={`w-full max-w-2xl max-h-[90vh] flex flex-col ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`} onClick={e => e.stopPropagation()}>
             <div className="flex justify-between items-center mb-6 border-b pb-4">
                 <h2 className="text-2xl font-bold">
                     {isCreating ? 'Neue Gruppe' : 'Gruppe bearbeiten'}
@@ -204,7 +212,7 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
                 </button>
             </div>
 
-            <div className="space-y-6">
+            <div className="flex-grow overflow-y-auto space-y-6 pr-2">
                 {/* Name */}
                 <div>
                     <label className="block text-sm font-semibold mb-2">Name*</label>
@@ -297,7 +305,7 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
     );
 
     return ReactDOM.createPortal(
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[300] p-4">
+        <div className={`fixed inset-0 bg-black flex items-center justify-center z-[300] p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : 'animate-modal-fade-in'}`} onClick={handleClose}>
             {(isCreating || editingGroup) ? renderEditView() : renderListView()}
 
             {/* Delete Confirmation */}
