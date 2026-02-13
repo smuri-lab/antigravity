@@ -11,12 +11,12 @@ import { PlusIcon } from '../icons/PlusIcon';
 import { PencilIcon } from '../icons/PencilIcon';
 
 interface ShiftTemplateManagementModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-  templates: ShiftTemplate[];
-  onAdd: (template: Omit<ShiftTemplate, 'id'>) => void;
-  onUpdate: (template: ShiftTemplate) => void;
-  onDelete: (id: string) => void;
+    isOpen: boolean;
+    onClose: () => void;
+    templates: ShiftTemplate[];
+    onAdd: (template: Omit<ShiftTemplate, 'id'>) => void;
+    onUpdate: (template: ShiftTemplate) => void;
+    onDelete: (id: string) => void;
 }
 
 const colors = [
@@ -30,8 +30,8 @@ const colors = [
     { hex: '#ec4899', name: 'Pink' },
 ];
 
-export const ShiftTemplateManagementModal: React.FC<ShiftTemplateManagementModalProps> = ({ 
-    isOpen, onClose, templates = [], onAdd, onUpdate, onDelete 
+export const ShiftTemplateManagementModal: React.FC<ShiftTemplateManagementModalProps> = ({
+    isOpen, onClose, templates = [], onAdd, onUpdate, onDelete
 }) => {
     const [editingId, setEditingId] = useState<string | null>(null);
     const [formData, setFormData] = useState<Partial<ShiftTemplate>>({});
@@ -91,9 +91,9 @@ export const ShiftTemplateManagementModal: React.FC<ShiftTemplateManagementModal
                 <button onClick={handleClose} className="absolute top-4 right-4 text-gray-400 hover:text-gray-600 z-10">
                     <XIcon className="h-6 w-6" />
                 </button>
-                
+
                 <h2 className="text-xl font-bold mb-4">Schicht-Vorlagen verwalten</h2>
-                
+
                 <div className="flex-grow overflow-y-auto pr-2">
                     {/* List */}
                     <div className="space-y-3 mb-6">
@@ -126,10 +126,12 @@ export const ShiftTemplateManagementModal: React.FC<ShiftTemplateManagementModal
 
                     {/* Add Button */}
                     {!editingId && (
-                        <Button onClick={handleCreate} className="w-full border-2 border-dashed border-gray-300 text-gray-500 hover:border-blue-500 hover:text-blue-600 bg-transparent hover:bg-blue-50 flex items-center justify-center gap-2 py-3">
-                            <PlusIcon className="h-5 w-5" />
-                            Neue Vorlage erstellen
-                        </Button>
+                        <div className="flex justify-center mt-6 pt-6 border-t">
+                            <Button onClick={handleCreate} variant="primary">
+                                <PlusIcon className="h-5 w-5" />
+                                Neue Vorlage erstellen
+                            </Button>
+                        </div>
                     )}
 
                     {/* Edit Form */}
@@ -137,32 +139,32 @@ export const ShiftTemplateManagementModal: React.FC<ShiftTemplateManagementModal
                         <div className="mt-4 p-4 bg-gray-50 rounded-lg border border-gray-200 animate-fade-in">
                             <h3 className="font-bold text-gray-800 mb-4">{editingId === 'new' ? 'Neue Vorlage' : 'Vorlage bearbeiten'}</h3>
                             <div className="space-y-4">
-                                <Input 
-                                    label="Name der Schicht" 
-                                    placeholder="z.B. Frühschicht" 
-                                    value={formData.name || ''} 
+                                <Input
+                                    label="Name der Schicht"
+                                    placeholder="z.B. Frühschicht"
+                                    value={formData.name || ''}
                                     onChange={e => setFormData(prev => ({ ...prev, name: e.target.value }))}
                                     autoFocus
                                 />
                                 <div className="grid grid-cols-2 gap-4">
-                                    <Input 
-                                        label="Startzeit" 
-                                        type="time" 
-                                        value={formData.startTime || ''} 
-                                        onChange={e => setFormData(prev => ({ ...prev, startTime: e.target.value }))} 
+                                    <Input
+                                        label="Startzeit"
+                                        type="time"
+                                        value={formData.startTime || ''}
+                                        onChange={e => setFormData(prev => ({ ...prev, startTime: e.target.value }))}
                                     />
-                                    <Input 
-                                        label="Endzeit" 
-                                        type="time" 
-                                        value={formData.endTime || ''} 
-                                        onChange={e => setFormData(prev => ({ ...prev, endTime: e.target.value }))} 
+                                    <Input
+                                        label="Endzeit"
+                                        type="time"
+                                        value={formData.endTime || ''}
+                                        onChange={e => setFormData(prev => ({ ...prev, endTime: e.target.value }))}
                                     />
                                 </div>
-                                <Input 
-                                    label="Kürzel / Label im Plan (Optional)" 
-                                    placeholder="z.B. Früh" 
-                                    value={formData.label || ''} 
-                                    onChange={e => setFormData(prev => ({ ...prev, label: e.target.value }))} 
+                                <Input
+                                    label="Kürzel / Label im Plan (Optional)"
+                                    placeholder="z.B. Früh"
+                                    value={formData.label || ''}
+                                    onChange={e => setFormData(prev => ({ ...prev, label: e.target.value }))}
                                     maxLength={10}
                                 />
                                 <div>
@@ -172,7 +174,7 @@ export const ShiftTemplateManagementModal: React.FC<ShiftTemplateManagementModal
                                             <button
                                                 key={c.hex}
                                                 type="button"
-                                                onClick={() => setFormData(prev => ({...prev, color: c.hex}))}
+                                                onClick={() => setFormData(prev => ({ ...prev, color: c.hex }))}
                                                 className={`w-8 h-8 rounded-full border-2 transition-all ${formData.color === c.hex ? 'border-gray-600 scale-110 shadow-md' : 'border-transparent hover:scale-105'}`}
                                                 style={{ backgroundColor: c.hex }}
                                                 title={c.name}
