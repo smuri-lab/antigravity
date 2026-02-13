@@ -538,7 +538,7 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
     );
 
     return (
-        <div className="space-y-4">
+        <div className="space-y-4 pt-4">
             <div className="border-b border-gray-200">
                 <nav className="-mb-px flex space-x-6" aria-label="Tabs">
                     {tabs.map((tab) => (
