@@ -337,15 +337,7 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
                                     )}
 
                                     {/* Hover overlay hint */}
-                                    {activeTemplate && (
-                                        <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 rounded-lg transition-opacity flex items-center justify-center">
-                                            {activeTemplate === 'empty' ? (
-                                                <div className="w-2 h-2 bg-gray-400 rounded-full"></div>
-                                            ) : (
-                                                <div className="w-2 h-2 rounded-full" style={{ backgroundColor: activeTemplate.color }}></div>
-                                            )}
-                                        </div>
-                                    )}
+
                                 </button>
                             ))}
 
