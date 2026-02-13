@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
 import type { EmployeeGroup, Employee } from '../../types';
 import { Card } from '../ui/Card';
@@ -20,13 +20,17 @@ interface EmployeeGroupManagementModalProps {
 }
 
 const GROUP_COLORS = [
-    { value: '#3b82f6', label: 'Blau' },
-    { value: '#8b5cf6', label: 'Lila' },
-    { value: '#10b981', label: 'Grün' },
-    { value: '#f59e0b', label: 'Orange' },
     { value: '#ef4444', label: 'Rot' },
+    { value: '#f97316', label: 'Orange' },
+    { value: '#f59e0b', label: 'Gelb' },
+    { value: '#84cc16', label: 'Hellgrün' },
+    { value: '#10b981', label: 'Grün' },
     { value: '#06b6d4', label: 'Cyan' },
-    { value: '#ec4899', label: 'Pink' },
+    { value: '#3b82f6', label: 'Blau' },
+    { value: '#6366f1', label: 'Indigo' },
+    { value: '#8b5cf6', label: 'Violett' },
+    { value: '#d946ef', label: 'Pink' },
+    { value: '#f43f5e', label: 'Rose' },
     { value: '#6b7280', label: 'Grau' },
 ];
 
@@ -45,12 +49,19 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
     // Delete confirmation
     const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
-    if (!isOpen) return null;
-
+    // Handle modal close with animation
     const handleClose = () => {
         setIsClosing(true);
         setTimeout(onClose, 300);
     };
+
+    useEffect(() => {
+        if (isOpen) {
+            setIsClosing(false);
+        }
+    }, [isOpen]);
+
+    if (!isOpen && !isClosing) return null;
 
     // Open create modal
     const handleCreate = () => {

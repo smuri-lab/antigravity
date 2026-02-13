@@ -33,6 +33,9 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
     const [patternDays, setPatternDays] = useState<(ShiftTemplate | null)[]>([]);
     const [activeTemplate, setActiveTemplate] = useState<ShiftTemplate | 'empty' | null>(null);
 
+    // Animation State
+    const [isClosing, setIsClosing] = useState(false);
+
     // Delete confirmation
     const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
 
@@ -41,7 +44,8 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
     // Helper: Convert blocks to flat days array
     const blocksToDays = (blocks: PatternBlock[]): (ShiftTemplate | null)[] => {
         const days: (ShiftTemplate | null)[] = [];
-        blocks.forEach(block => {
+        // Safety check for undefined blocks
+        (blocks || []).forEach(block => {
             const template = block.templateId ? shiftTemplates.find(t => t.id === block.templateId) || null : null;
             for (let i = 0; i < block.days; i++) {
                 days.push(template);
@@ -141,6 +145,12 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
         setIsClosing(true);
         setTimeout(onClose, 300); // Match animation duration
     };
+
+    useEffect(() => {
+        if (isOpen) {
+            setIsClosing(false);
+        }
+    }, [isOpen]);
 
     if (!isOpen && !isClosing) return null; // Only render if open or closing
 
