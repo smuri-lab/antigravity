@@ -168,10 +168,12 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
                 </button>
             </div>
 
-            <Button onClick={handleCreate} className="mb-6" variant="primary">
-                <PlusIcon className="h-5 w-5" />
-                Neues Rotationsmuster
-            </Button>
+            <div className="flex justify-center mb-6">
+                <Button onClick={handleCreate} variant="primary">
+                    <PlusIcon className="h-5 w-5" />
+                    Neues Rotationsmuster
+                </Button>
+            </div>
 
             {patterns.length === 0 ? (
                 <div className="text-center py-12 text-gray-500">
@@ -305,8 +307,8 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
                         <button
                             onClick={() => setActiveTemplate('empty')}
                             className={`px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-2 transition-all whitespace-nowrap ${activeTemplate === 'empty'
-                                    ? 'bg-gray-800 text-white border-gray-800 ring-2 ring-offset-1 ring-gray-300'
-                                    : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
+                                ? 'bg-gray-800 text-white border-gray-800 ring-2 ring-offset-1 ring-gray-300'
+                                : 'bg-white text-gray-600 border-gray-300 hover:bg-gray-100'
                                 }`}
                         >
                             <span className="w-3 h-3 rounded-full border border-gray-400 bg-white"></span>
@@ -320,8 +322,8 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
                                     key={t.id}
                                     onClick={() => setActiveTemplate(t)}
                                     className={`px-3 py-1.5 rounded-full text-xs font-bold border flex items-center gap-2 transition-all whitespace-nowrap ${isActive
-                                            ? 'ring-2 ring-offset-1 scale-105'
-                                            : 'hover:bg-white hover:shadow-sm opacity-90'
+                                        ? 'ring-2 ring-offset-1 scale-105'
+                                        : 'hover:bg-white hover:shadow-sm opacity-90'
                                         }`}
                                     style={{
                                         backgroundColor: isActive ? t.color : `${t.color}20`,
