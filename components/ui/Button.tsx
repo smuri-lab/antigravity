@@ -10,7 +10,7 @@ export const Button: React.FC<ButtonProps> = ({ children, className = '', varian
   const hasTextColor = className.includes('text-');
 
   // Base classes always applied
-  const baseClasses = "px-4 py-2 text-sm font-bold rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors";
+  const baseClasses = "inline-flex items-center justify-center gap-2 px-4 py-2 text-sm font-bold rounded-lg shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 transition-colors";
 
   // Variant styles
   const variants = {

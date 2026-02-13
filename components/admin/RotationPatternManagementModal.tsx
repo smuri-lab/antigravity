@@ -144,8 +144,8 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
                 </button>
             </div>
 
-            <Button onClick={handleCreate} className="mb-6 w-full" variant="primary">
-                <PlusIcon className="h-5 w-5 mr-2" />
+            <Button onClick={handleCreate} className="mb-6" variant="primary">
+                <PlusIcon className="h-5 w-5" />
                 Neues Rotationsmuster
             </Button>
 
