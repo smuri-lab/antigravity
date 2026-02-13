@@ -25,6 +25,8 @@ import { PlannerDateRangeModal, type Preset } from './PlannerDateRangeModal';
 import { ArrowsPointingOutIcon } from '../icons/ArrowsPointingOutIcon';
 import { ArrowsPointingInIcon } from '../icons/ArrowsPointingInIcon';
 import { DevicePhoneMobileIcon } from '../icons/DevicePhoneMobileIcon';
+import { ClipboardDocumentListIcon } from '../icons/ClipboardDocumentListIcon';
+import { DocumentTextIcon } from '../icons/DocumentTextIcon';
 
 interface PlannerViewProps {
     employees: Employee[];
@@ -357,8 +359,8 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
     }, [visibleDays]);
 
     const tabs = [
-        { id: 'planner', label: 'Planer' },
-        { id: 'list', label: 'Antragsliste', badge: pendingRequests.length },
+        { id: 'planner', label: 'Planer', icon: CalendarDaysIcon },
+        { id: 'list', label: 'Antragsliste', badge: pendingRequests.length, icon: ClipboardDocumentListIcon },
     ];
 
     const renderRequestListForYear = (requests: AbsenceRequest[]) => (
@@ -536,7 +538,7 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
     );
 
     return (
-        <div className="space-y-6">
+        <div className="space-y-4">
             <div className="border-b border-gray-200">
                 <nav className="-mb-px flex space-x-6" aria-label="Tabs">
                     {tabs.map((tab) => (
@@ -546,9 +548,10 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
                             className={`${activeTab === tab.id
                                 ? 'border-blue-500 text-blue-600'
                                 : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center`}
+                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
                             aria-current={activeTab === tab.id ? 'page' : undefined}
                         >
+                            {tab.icon && <tab.icon className="h-5 w-5" />}
                             {tab.label}
                             {tab.badge !== undefined && tab.badge > 0 && (
                                 <span className="ml-2 bg-red-500 text-white text-xs font-bold rounded-full h-5 w-5 flex items-center justify-center">
