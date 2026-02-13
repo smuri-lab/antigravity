@@ -232,7 +232,7 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder="z.B. Team A, Nachtschicht, Wochenend-Team"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                         autoFocus
                     />
                 </div>
@@ -244,7 +244,7 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
                         placeholder="z.B. Hauptschicht-Rotation"
-                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+                        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20 resize-none"
                         rows={2}
                     />
                 </div>

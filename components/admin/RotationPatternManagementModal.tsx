@@ -258,7 +258,7 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
                             value={name}
                             onChange={(e) => setName(e.target.value)}
                             placeholder="z.B. 3-Schicht System"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                             autoFocus
                         />
                     </div>
@@ -270,7 +270,7 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
                             value={description}
                             onChange={(e) => setDescription(e.target.value)}
                             placeholder="Optional"
-                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                            className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 focus:ring-2 focus:ring-blue-500/20"
                         />
                     </div>
                 </div>
