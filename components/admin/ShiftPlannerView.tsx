@@ -307,7 +307,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                     id: e.id.toString(),
                     data: e,
                     label: `${e.firstName} ${e.lastName}`,
-                    subLabel: e.role || '',
+                    subLabel: '',
                     avatarDetails: { firstName: e.firstName, lastName: e.lastName },
                     shifts: shifts.filter(s => s.employeeId === e.id),
                     color: undefined,
