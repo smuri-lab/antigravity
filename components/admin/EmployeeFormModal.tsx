@@ -445,15 +445,27 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
 
                                         <div>
                                             <label className="block text-sm font-medium text-gray-700 mb-2">Passwort-Optionen</label>
-                                            <div className="grid grid-cols-1 md:grid-cols-2 gap-2 mb-4">
-                                                <label className={`flex items-center p-3 border rounded-md cursor-pointer transition-colors ${passwordMode === 'manual' ? 'bg-blue-50 border-blue-300 ring-1 ring-blue-300' : 'hover:bg-gray-50'}`}>
-                                                    <input type="radio" name="passwordMode" className="h-4 w-4 text-blue-600" checked={passwordMode === 'manual'} onChange={() => setPasswordMode('manual')} />
-                                                    <span className="ml-2 text-sm">Manuell festlegen</span>
-                                                </label>
-                                                <label className={`flex items-center p-3 border rounded-md cursor-pointer transition-colors ${passwordMode === 'email' ? 'bg-blue-50 border-blue-300 ring-1 ring-blue-300' : 'hover:bg-gray-50'}`}>
-                                                    <input type="radio" name="passwordMode" className="h-4 w-4 text-blue-600" checked={passwordMode === 'email'} onChange={() => setPasswordMode('email')} />
-                                                    <span className="ml-2 text-sm">Einladung per E-Mail</span>
-                                                </label>
+                                            <div className="grid grid-cols-2 gap-2 mb-4">
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPasswordMode('manual')}
+                                                    className={`py-2 px-3 text-sm font-medium rounded-md border transition-all duration-200 ${passwordMode === 'manual'
+                                                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                                        }`}
+                                                >
+                                                    Manuell festlegen
+                                                </button>
+                                                <button
+                                                    type="button"
+                                                    onClick={() => setPasswordMode('email')}
+                                                    className={`py-2 px-3 text-sm font-medium rounded-md border transition-all duration-200 ${passwordMode === 'email'
+                                                        ? 'bg-blue-600 text-white border-blue-600 shadow-sm'
+                                                        : 'bg-white text-gray-700 border-gray-300 hover:bg-gray-50'
+                                                        }`}
+                                                >
+                                                    Einladung per E-Mail
+                                                </button>
                                             </div>
 
                                             {passwordMode === 'manual' && (
