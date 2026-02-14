@@ -110,7 +110,7 @@ export const ShiftTemplateManagementModal: React.FC<ShiftTemplateManagementModal
                                     </div>
                                 </div>
                                 <div className="flex items-center gap-2">
-                                    <button onClick={() => handleEdit(template)} className="p-2 text-gray-500 hover:text-blue-600 transition-colors">
+                                    <button onClick={() => handleEdit(template)} className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors">
                                         <PencilIcon className="h-5 w-5" />
                                     </button>
                                     <button onClick={() => handleDelete(template.id)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors">
