@@ -134,7 +134,7 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
     // Get employee name by ID
     const getEmployeeName = (id: number) => {
         const emp = employees.find(e => e.id === id);
-        return emp ? `${emp.name} ${emp.surname}` : `ID ${id}`;
+        return emp ? `${emp.firstName} ${emp.lastName}` : `ID ${id}`;
     };
 
     // Render list view
@@ -294,7 +294,7 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
                                             className="w-4 h-4 text-blue-600 rounded focus:ring-2 focus:ring-blue-500"
                                         />
                                         <span className="flex-1">
-                                            {emp.name} {emp.surname}
+                                            {emp.firstName} {emp.lastName}
                                         </span>
                                         <span className="text-xs text-gray-500">
                                             {emp.role === 'admin' ? '👑 Admin' : ''}

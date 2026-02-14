@@ -259,7 +259,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                                 <option value="">-- Mitarbeiter wählen --</option>
                                 {employees.map(emp => (
                                     <option key={emp.id} value={emp.id}>
-                                        {emp.name} {emp.surname}
+                                        {emp.firstName} {emp.lastName}
                                     </option>
                                 ))}
                             </select>
@@ -303,7 +303,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                                             {getGroupEmployees().map((emp, index) => (
                                                 <div key={emp.id} className="flex items-center gap-3">
                                                     <span className="flex-1 text-sm">
-                                                        {emp.name} {emp.surname}
+                                                        {emp.firstName} {emp.lastName}
                                                     </span>
                                                     <input
                                                         type="number"

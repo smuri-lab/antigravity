@@ -113,7 +113,7 @@ export const GroupAssignmentModal: React.FC<GroupAssignmentModalProps> = ({
                                             onChange={() => setSelectedEmployeeId(emp.id)}
                                             className="text-blue-600 focus:ring-blue-500"
                                         />
-                                        <span>{emp.name} {emp.surname}</span>
+                                        <span>{emp.firstName} {emp.lastName}</span>
                                     </label>
                                 ))}
                             </div>
