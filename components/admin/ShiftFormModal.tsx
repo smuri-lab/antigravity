@@ -14,6 +14,7 @@ import { ConfirmModal } from '../ui/ConfirmModal';
 import { DateSelectorButton } from '../ui/DateSelectorButton';
 import { CalendarModal } from '../ui/CalendarModal';
 import { TimePicker } from '../ui/TimePicker';
+import { AlertModal } from '../ui/AlertModal';
 
 interface ShiftFormModalProps {
     isOpen: boolean;
@@ -82,6 +83,7 @@ export const ShiftFormModal: React.FC<ShiftFormModalProps> = ({
     const [isCalendarOpen, setIsCalendarOpen] = useState(false);
 
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [alertConfig, setAlertConfig] = useState<{ title: string; message: string } | null>(null);
     const [isClosing, setIsClosing] = useState(false);
 
     // Conflict warning state
@@ -147,7 +149,7 @@ export const ShiftFormModal: React.FC<ShiftFormModalProps> = ({
     const handleSubmit = (e: React.FormEvent) => {
         e.preventDefault();
         if ((!formData.employeeId && formData.employeeId !== 0) || !date || !startTime || !endTime) {
-            alert('Bitte füllen Sie alle Pflichtfelder aus.');
+            setAlertConfig({ title: 'Eingabe unvollständig', message: 'Bitte füllen Sie alle Pflichtfelder aus (Mitarbeiter, Datum und Zeiten).' });
             return;
         }
 
@@ -160,7 +162,7 @@ export const ShiftFormModal: React.FC<ShiftFormModalProps> = ({
             const nextDayEnd = new Date(end);
             nextDayEnd.setDate(nextDayEnd.getDate() + 1);
             if (start >= nextDayEnd) {
-                alert('Die Endzeit muss nach der Startzeit liegen.');
+                setAlertConfig({ title: 'Ungültige Zeit', message: 'Die Endzeit muss nach der Startzeit liegen.' });
                 return;
             }
             // If user enters 22:00 to 06:00, the date logic above makes end 06:00 SAME DAY.
@@ -382,6 +384,13 @@ export const ShiftFormModal: React.FC<ShiftFormModalProps> = ({
                 title="Schicht löschen"
                 message="Möchten Sie diese Schicht wirklich entfernen?"
                 confirmText="Löschen"
+            />
+
+            <AlertModal
+                isOpen={!!alertConfig}
+                onClose={() => setAlertConfig(null)}
+                title={alertConfig?.title || ''}
+                message={alertConfig?.message || ''}
             />
         </>,
         document.body

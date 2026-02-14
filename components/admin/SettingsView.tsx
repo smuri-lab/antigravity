@@ -10,18 +10,19 @@ import { Button } from '../ui/Button';
 import { ProfileSettings } from './ProfileSettings';
 import { UserCircleIcon } from '../icons/UserCircleIcon';
 import { CogIcon } from '../icons/CogIcon';
+import { AlertModal } from '../ui/AlertModal';
 
 interface SettingsViewProps {
-  selectedState: string;
-  onStateChange: (state: string) => void;
-  timeTrackingMethod: 'all' | 'manual';
-  onTimeTrackingMethodChange: (method: 'all' | 'manual') => void;
-  companySettings: CompanySettings;
-  onUpdateCompanySettings: (settings: CompanySettings) => void;
-  // Added props for Profile integration
-  currentUser: Employee;
-  onUpdateEmployee: (employee: Employee) => void;
-  initialTab?: 'profile' | 'system';
+    selectedState: string;
+    onStateChange: (state: string) => void;
+    timeTrackingMethod: 'all' | 'manual';
+    onTimeTrackingMethodChange: (method: 'all' | 'manual') => void;
+    companySettings: CompanySettings;
+    onUpdateCompanySettings: (settings: CompanySettings) => void;
+    // Added props for Profile integration
+    currentUser: Employee;
+    onUpdateEmployee: (employee: Employee) => void;
+    initialTab?: 'profile' | 'system';
 }
 
 const germanStates = [
@@ -65,6 +66,7 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
     const [localTimeTrackingMethod, setLocalTimeTrackingMethod] = useState(timeTrackingMethod);
     const [localSettings, setLocalSettings] = useState(companySettings);
     const [successMessage, setSuccessMessage] = useState<string | null>(null);
+    const [alertConfig, setAlertConfig] = useState<{ title: string; message: string } | null>(null);
     const [activeTab, setActiveTab] = useState<'general' | 'timeTracking' | 'employeeSettings'>('general');
 
     useEffect(() => {
@@ -80,12 +82,12 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
     const handleExportToggle = (checked: boolean) => {
         setLocalSettings(prev => ({ ...prev, employeeCanExport: checked }));
     };
-    
+
     const handleLabelInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         const { name, value } = e.target;
-        setLocalSettings(prev => ({...prev, [name]: value}));
+        setLocalSettings(prev => ({ ...prev, [name]: value }));
     };
-    
+
     const handleTimeFormatChange = (key: 'adminTimeFormat' | 'employeeTimeFormat', value: string) => {
         setLocalSettings(prev => ({ ...prev, [key]: value as 'decimal' | 'hoursMinutes' }));
     };
@@ -93,19 +95,19 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
     const handleAllowHalfDayVacationsToggle = (checked: boolean) => {
         setLocalSettings(prev => ({ ...prev, allowHalfDayVacations: checked }));
     };
-    
+
     const handleShiftPlannerHourChange = (key: 'shiftPlannerStartHour' | 'shiftPlannerEndHour', value: string) => {
         const numValue = parseInt(value, 10);
         setLocalSettings(prev => ({ ...prev, [key]: numValue }));
     };
-    
+
     const handleTimeCategoryModeChange = (value: string) => {
         setLocalSettings(prev => ({ ...prev, timeCategoryMode: value as 'both' | 'customer' | 'activity' }));
     };
 
     const handleSave = () => {
         if ((localSettings.shiftPlannerStartHour ?? 0) >= (localSettings.shiftPlannerEndHour ?? 24)) {
-            alert('Die Startzeit des Schichtplaners muss vor der Endzeit liegen.');
+            setAlertConfig({ title: 'Zeitraum ungültig', message: 'Die Startzeit des Schichtplaners muss vor der Endzeit liegen.' });
             return;
         }
 
@@ -120,13 +122,13 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
         window.scrollTo(0, 0);
         setTimeout(() => setSuccessMessage(null), 3000);
     };
-    
+
     const tabs = [
         { id: 'general', label: 'Allgemein' },
         { id: 'timeTracking', label: 'Zeiterfassung' },
         { id: 'employeeSettings', label: 'Mitarbeiter' },
     ];
-    
+
     const customerLabel = localSettings.customerLabel || 'Zeitkategorie 1';
     const activityLabel = localSettings.activityLabel || 'Zeitkategorie 2';
 
@@ -138,24 +140,23 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                     <p className="text-sm text-gray-500">Technische Einstellungen und Regeln für das Zeiterfassungssystem.</p>
                 </div>
             </div>
-            
+
             {successMessage && (
                 <div className="mb-6 p-3 bg-green-100 text-green-800 border border-green-200 rounded-lg animate-fade-in" role="alert">
                     {successMessage}
                 </div>
             )}
-            
+
             <div className="border-b border-gray-200">
                 <nav className="-mb-px flex space-x-6" aria-label="Tabs">
                     {tabs.map((tab) => (
                         <button
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
-                            className={`${
-                                activeTab === tab.id
+                            className={`${activeTab === tab.id
                                     ? 'border-blue-500 text-blue-600'
                                     : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base`}
+                                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base`}
                             aria-current={activeTab === tab.id ? 'page' : undefined}
                         >
                             {tab.label}
@@ -180,7 +181,7 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                                 ))}
                             </Select>
                         </div>
-                        
+
                         <div className="pt-8 border-t">
                             <h3 className="text-lg font-semibold text-gray-800 mb-1">Zeitformat für Anzeige & Eingabe</h3>
                             <p className="text-sm text-gray-500 mb-4">Legen Sie fest, ob Zeitdauern in Dezimalstunden (z.B. 8,50h) oder in Stunden und Minuten (z.B. 8h 30min) angezeigt werden.</p>
@@ -199,7 +200,7 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                                 </div>
                                 <div>
                                     <h4 className="font-semibold text-gray-700 mb-2">Mitarbeiter-Ansicht</h4>
-                                     <RadioGroup
+                                    <RadioGroup
                                         name="employeeTimeFormat"
                                         options={[
                                             { value: 'hoursMinutes', label: 'Stunden & Minuten (z.B. 8h 30min)' },
@@ -238,15 +239,15 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                         </div>
                     </div>
                 )}
-                
+
                 {activeTab === 'timeTracking' && (
                     <div className="space-y-8 animate-fade-in">
                         <div>
                             <h3 className="text-lg font-semibold text-gray-800 mb-1">Zeitkategorien Benennung</h3>
                             <p className="text-sm text-gray-500 mb-4">Benennen Sie die Zeitkategorien, um sie an die Terminologie Ihres Unternehmens anzupassen (z.B. 'Kunde' in 'Projekt' ändern).</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                 <Input name="customerLabel" label="Bezeichnung für Zeitkategorie 1" value={localSettings.customerLabel || ''} onChange={handleLabelInputChange} placeholder="z.B. Kunde, Projekt..." />
-                                 <Input name="activityLabel" label="Bezeichnung für Zeitkategorie 2" value={localSettings.activityLabel || ''} onChange={handleLabelInputChange} placeholder="z.B. Tätigkeit, Aufgabe..." />
+                                <Input name="customerLabel" label="Bezeichnung für Zeitkategorie 1" value={localSettings.customerLabel || ''} onChange={handleLabelInputChange} placeholder="z.B. Kunde, Projekt..." />
+                                <Input name="activityLabel" label="Bezeichnung für Zeitkategorie 2" value={localSettings.activityLabel || ''} onChange={handleLabelInputChange} placeholder="z.B. Tätigkeit, Aufgabe..." />
                             </div>
                         </div>
 
@@ -288,7 +289,7 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                         </div>
                     </div>
                 )}
-                
+
                 {activeTab === 'employeeSettings' && (
                     <div className="space-y-8 animate-fade-in">
                         <div>
@@ -323,6 +324,13 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                     Einstellungen Speichern
                 </Button>
             </div>
+
+            <AlertModal
+                isOpen={!!alertConfig}
+                onClose={() => setAlertConfig(null)}
+                title={alertConfig?.title || ''}
+                message={alertConfig?.message || ''}
+            />
         </Card>
     );
 };
@@ -344,22 +352,20 @@ export const SettingsView: React.FC<SettingsViewProps> = (props) => {
                 <div className="bg-white p-1 rounded-xl shadow-sm border border-gray-200 inline-flex">
                     <button
                         onClick={() => setMainTab('profile')}
-                        className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                            mainTab === 'profile'
+                        className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${mainTab === 'profile'
                                 ? 'bg-blue-600 text-white shadow-md'
                                 : 'text-gray-600 hover:bg-gray-50'
-                        }`}
+                            }`}
                     >
                         <UserCircleIcon className="h-5 w-5" />
                         Profil & Account
                     </button>
                     <button
                         onClick={() => setMainTab('system')}
-                        className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${
-                            mainTab === 'system'
+                        className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${mainTab === 'system'
                                 ? 'bg-blue-600 text-white shadow-md'
                                 : 'text-gray-600 hover:bg-gray-50'
-                        }`}
+                            }`}
                     >
                         <CogIcon className="h-5 w-5" />
                         Technisches

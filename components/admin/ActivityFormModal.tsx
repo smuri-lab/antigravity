@@ -5,6 +5,7 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { Input } from '../ui/Input';
 import { XIcon } from '../icons/XIcon';
+import { AlertModal } from '../ui/AlertModal';
 
 interface ActivityFormModalProps {
   isOpen: boolean;
@@ -18,6 +19,7 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({ isOpen, on
   const [name, setName] = useState('');
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<{ title: string; message: string } | null>(null);
 
   const activityLabel = companySettings.activityLabel || 'Tätigkeit';
 
@@ -45,7 +47,7 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({ isOpen, on
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name.trim()) {
-      alert(`Der Name für ${activityLabel} darf nicht leer sein.`);
+      setAlertConfig({ title: 'Leeres Feld', message: `Der Name für ${activityLabel} darf nicht leer sein.` });
       return;
     }
     setIsClosing(true);
@@ -89,6 +91,12 @@ export const ActivityFormModal: React.FC<ActivityFormModalProps> = ({ isOpen, on
           </div>
         </form>
       </Card>
+      <AlertModal
+        isOpen={!!alertConfig}
+        onClose={() => setAlertConfig(null)}
+        title={alertConfig?.title || ''}
+        message={alertConfig?.message || ''}
+      />
     </div>,
     document.body
   );

@@ -9,6 +9,7 @@ import { XIcon } from '../icons/XIcon';
 import { SelectorButton } from '../ui/SelectorButton';
 import { EmployeeMultiSelectModal } from './EmployeeMultiSelectModal';
 import { Input } from '../ui/Input';
+import { AlertModal } from '../ui/AlertModal';
 
 interface ShiftPlanExportModalProps {
   isOpen: boolean;
@@ -19,22 +20,22 @@ interface ShiftPlanExportModalProps {
 
 const months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
 const getYears = () => {
-    const currentYear = new Date().getFullYear();
-    const years = [];
-    for (let i = -1; i < 3; i++) {
-        years.push(currentYear + i);
-    }
-    return years;
+  const currentYear = new Date().getFullYear();
+  const years = [];
+  for (let i = -1; i < 3; i++) {
+    years.push(currentYear + i);
+  }
+  return years;
 };
 
 // Helper to get start of week (Monday)
 const getStartOfWeek = (date: Date): Date => {
-    const d = new Date(date);
-    const day = d.getDay();
-    const diff = d.getDate() - day + (day === 0 ? -6 : 1);
-    const monday = new Date(d.setDate(diff));
-    monday.setHours(0,0,0,0);
-    return monday;
+  const d = new Date(date);
+  const day = d.getDay();
+  const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+  const monday = new Date(d.setDate(diff));
+  monday.setHours(0, 0, 0, 0);
+  return monday;
 };
 
 export const ShiftPlanExportModal: React.FC<ShiftPlanExportModalProps> = ({ isOpen, onClose, onConfirm, employees }) => {
@@ -42,11 +43,12 @@ export const ShiftPlanExportModal: React.FC<ShiftPlanExportModalProps> = ({ isOp
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
   const [selectedWeekDate, setSelectedWeekDate] = useState(new Date().toLocaleDateString('sv-SE')); // Used to pick any day in the week
-  
+
   const [selectedEmployeeIds, setSelectedEmployeeIds] = useState<string[]>([]);
   const [isEmployeeSelectOpen, setIsEmployeeSelectOpen] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<{ title: string; message: string } | null>(null);
   const [isClosing, setIsClosing] = useState(false);
-  
+
   useEffect(() => {
     if (isOpen) {
       setSelectedEmployeeIds(employees.map(e => String(e.id))); // Default all
@@ -62,46 +64,46 @@ export const ShiftPlanExportModal: React.FC<ShiftPlanExportModalProps> = ({ isOp
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     const employeesToExport = employees.filter(e => selectedEmployeeIds.includes(String(e.id)));
-    
+
     if (employeesToExport.length === 0) {
-        alert("Bitte wählen Sie mindestens einen Mitarbeiter aus.");
-        return;
+      setAlertConfig({ title: 'Auswahl unvollständig', message: 'Bitte wählen Sie mindestens einen Mitarbeiter aus.' });
+      return;
     }
 
     let startDate: Date;
     let endDate: Date;
 
     if (mode === 'monthly') {
-        startDate = new Date(selectedYear, selectedMonth, 1);
-        endDate = new Date(selectedYear, selectedMonth + 1, 0);
-        endDate.setHours(23, 59, 59, 999);
+      startDate = new Date(selectedYear, selectedMonth, 1);
+      endDate = new Date(selectedYear, selectedMonth + 1, 0);
+      endDate.setHours(23, 59, 59, 999);
     } else {
-        if (!selectedWeekDate) {
-            alert("Bitte wählen Sie ein Datum für die Woche aus.");
-            return;
-        }
-        startDate = getStartOfWeek(new Date(selectedWeekDate));
-        endDate = new Date(startDate);
-        endDate.setDate(startDate.getDate() + 6);
-        endDate.setHours(23, 59, 59, 999);
+      if (!selectedWeekDate) {
+        setAlertConfig({ title: 'Datum fehlt', message: 'Bitte wählen Sie ein Datum für die Woche aus.' });
+        return;
+      }
+      startDate = getStartOfWeek(new Date(selectedWeekDate));
+      endDate = new Date(startDate);
+      endDate.setDate(startDate.getDate() + 6);
+      endDate.setHours(23, 59, 59, 999);
     }
-    
+
     setIsClosing(true);
     setTimeout(() => {
-        onConfirm(employeesToExport, startDate, endDate, 'pdf');
+      onConfirm(employeesToExport, startDate, endDate, 'pdf');
     }, 300);
   };
 
   if (!isOpen) return null;
 
   const getEmployeeSelectorLabel = () => {
-      if (selectedEmployeeIds.length === 0) return 'Keine Mitarbeiter ausgewählt';
-      if (selectedEmployeeIds.length === employees.length) return 'Alle Mitarbeiter';
-      if (selectedEmployeeIds.length === 1) {
-          const emp = employees.find(e => String(e.id) === selectedEmployeeIds[0]);
-          return emp ? `${emp.firstName} ${emp.lastName}` : '1 Mitarbeiter';
-      }
-      return `${selectedEmployeeIds.length} Mitarbeiter ausgewählt`;
+    if (selectedEmployeeIds.length === 0) return 'Keine Mitarbeiter ausgewählt';
+    if (selectedEmployeeIds.length === employees.length) return 'Alle Mitarbeiter';
+    if (selectedEmployeeIds.length === 1) {
+      const emp = employees.find(e => String(e.id) === selectedEmployeeIds[0]);
+      return emp ? `${emp.firstName} ${emp.lastName}` : '1 Mitarbeiter';
+    }
+    return `${selectedEmployeeIds.length} Mitarbeiter ausgewählt`;
   };
 
   return ReactDOM.createPortal(
@@ -113,59 +115,59 @@ export const ShiftPlanExportModal: React.FC<ShiftPlanExportModalProps> = ({ isOp
 
         <form onSubmit={handleSubmit} className="space-y-6">
           <h2 className="text-xl font-bold text-center">Schichtplan exportieren</h2>
-          
+
           <div className="space-y-4">
-            
+
             {/* Mode Selection */}
             <div className="flex gap-4 p-1 bg-gray-100 rounded-lg">
-                <button
-                    type="button"
-                    onClick={() => setMode('weekly')}
-                    className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${mode === 'weekly' ? 'bg-white shadow text-blue-600' : 'text-gray-600 hover:bg-gray-200'}`}
-                >
-                    Wochenplan
-                </button>
-                <button
-                    type="button"
-                    onClick={() => setMode('monthly')}
-                    className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${mode === 'monthly' ? 'bg-white shadow text-blue-600' : 'text-gray-600 hover:bg-gray-200'}`}
-                >
-                    Monatsplan
-                </button>
+              <button
+                type="button"
+                onClick={() => setMode('weekly')}
+                className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${mode === 'weekly' ? 'bg-white shadow text-blue-600' : 'text-gray-600 hover:bg-gray-200'}`}
+              >
+                Wochenplan
+              </button>
+              <button
+                type="button"
+                onClick={() => setMode('monthly')}
+                className={`flex-1 py-2 text-sm font-semibold rounded-md transition-all ${mode === 'monthly' ? 'bg-white shadow text-blue-600' : 'text-gray-600 hover:bg-gray-200'}`}
+              >
+                Monatsplan
+              </button>
             </div>
 
             {/* Time Selection */}
             {mode === 'weekly' ? (
-                <Input 
-                    label="Datum in der Woche auswählen" 
-                    type="date" 
-                    value={selectedWeekDate} 
-                    onChange={(e) => setSelectedWeekDate(e.target.value)} 
-                    required 
-                />
+              <Input
+                label="Datum in der Woche auswählen"
+                type="date"
+                value={selectedWeekDate}
+                onChange={(e) => setSelectedWeekDate(e.target.value)}
+                required
+              />
             ) : (
-                <div className="grid grid-cols-2 gap-4">
-                    <Select label="Monat" value={selectedMonth} onChange={(e) => setSelectedMonth(Number(e.target.value))}>
-                        {months.map((m, i) => <option key={i} value={i}>{m}</option>)}
-                    </Select>
-                    <Select label="Jahr" value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))}>
-                        {getYears().map(y => <option key={y} value={y}>{y}</option>)}
-                    </Select>
-                </div>
+              <div className="grid grid-cols-2 gap-4">
+                <Select label="Monat" value={selectedMonth} onChange={(e) => setSelectedMonth(Number(e.target.value))}>
+                  {months.map((m, i) => <option key={i} value={i}>{m}</option>)}
+                </Select>
+                <Select label="Jahr" value={selectedYear} onChange={(e) => setSelectedYear(Number(e.target.value))}>
+                  {getYears().map(y => <option key={y} value={y}>{y}</option>)}
+                </Select>
+              </div>
             )}
 
             {/* Employee Selection */}
             <div>
-              <SelectorButton 
-                  label="Mitarbeiter" 
-                  value={getEmployeeSelectorLabel()} 
-                  onClick={() => setIsEmployeeSelectOpen(true)} 
-                  placeholder="Mitarbeiter auswählen..."
+              <SelectorButton
+                label="Mitarbeiter"
+                value={getEmployeeSelectorLabel()}
+                onClick={() => setIsEmployeeSelectOpen(true)}
+                placeholder="Mitarbeiter auswählen..."
               />
             </div>
-            
+
             <p className="text-xs text-gray-500">
-                Es wird für jeden ausgewählten Mitarbeiter eine individuelle Übersicht erstellt (PDF, gruppiert nach Seiten).
+              Es wird für jeden ausgewählten Mitarbeiter eine individuelle Übersicht erstellt (PDF, gruppiert nach Seiten).
             </p>
 
           </div>
@@ -176,16 +178,23 @@ export const ShiftPlanExportModal: React.FC<ShiftPlanExportModalProps> = ({ isOp
           </div>
         </form>
       </Card>
-      
+
       <EmployeeMultiSelectModal
         isOpen={isEmployeeSelectOpen}
         onClose={() => setIsEmployeeSelectOpen(false)}
         onApply={(ids) => {
-            setSelectedEmployeeIds(ids.map(String));
-            setIsEmployeeSelectOpen(false);
+          setSelectedEmployeeIds(ids.map(String));
+          setIsEmployeeSelectOpen(false);
         }}
         employees={employees}
         selectedEmployeeIds={selectedEmployeeIds.map(Number)}
+      />
+
+      <AlertModal
+        isOpen={!!alertConfig}
+        onClose={() => setAlertConfig(null)}
+        title={alertConfig?.title || ''}
+        message={alertConfig?.message || ''}
       />
     </div>,
     document.body

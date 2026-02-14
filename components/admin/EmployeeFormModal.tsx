@@ -17,6 +17,7 @@ import { FlexibleTimeInputCompact } from '../ui/FlexibleTimeInputCompact';
 import { RadioGroup } from '../ui/RadioGroup';
 import { TrashIcon } from '../icons/TrashIcon';
 import { ConfirmModal } from '../ui/ConfirmModal';
+import { AlertModal } from '../ui/AlertModal';
 
 interface EmployeeFormModalProps {
     isOpen: boolean;
@@ -92,6 +93,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
     const [isClosing, setIsClosing] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [alertConfig, setAlertConfig] = useState<{ title: string; message: string } | null>(null);
     const timeFormat = companySettings.adminTimeFormat || 'hoursMinutes';
 
     // Determine the reference year for vacation display
@@ -209,17 +211,21 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
         setTimeout(onClose, 300);
     };
 
+    const showAlert = (title: string, message: string) => {
+        setAlertConfig({ title, message });
+    };
+
     const validateStep1 = () => {
         if (!formData.firstName || !formData.lastName || !formData.username) {
-            alert("Bitte füllen Sie alle Pflichtfelder aus (Vorname, Nachname, Benutzername).");
+            showAlert("Pflichtfelder fehlen", "Bitte füllen Sie alle Pflichtfelder aus (Vorname, Nachname, Benutzername).");
             return false;
         }
         if (passwordMode === 'manual' && !initialData && !formData.password) {
-            alert("Bitte geben Sie ein Passwort ein.");
+            showAlert("Passwort erforderlich", "Bitte geben Sie ein Passwort ein.");
             return false;
         }
         if (passwordMode === 'email' && !formData.email) {
-            alert("Bitte geben Sie eine E-Mail-Adresse ein.");
+            showAlert("E-Mail erforderlich", "Bitte geben Sie eine E-Mail-Adresse ein.");
             return false;
         }
         return true;
@@ -282,7 +288,7 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
 
         // Validate required fields (mainly Step 1) regardless of current step/tab
         if (!formData.firstName || !formData.lastName || !formData.username) {
-            alert("Bitte füllen Sie die Pflichtfelder (Vorname, Nachname, Benutzername) aus.");
+            showAlert("Pflichtfelder fehlen", "Bitte füllen Sie die Pflichtfelder (Vorname, Nachname, Benutzername) aus.");
             setStep(1); // Jump to first tab
             return;
         }
@@ -703,6 +709,13 @@ export const EmployeeFormModal: React.FC<EmployeeFormModalProps> = ({ isOpen, on
                 title="Mitarbeiter löschen"
                 message={`Möchten Sie den Mitarbeiter ${initialData?.firstName} ${initialData?.lastName} wirklich endgültig löschen?`}
                 confirmText="Ja, löschen"
+            />
+
+            <AlertModal
+                isOpen={!!alertConfig}
+                onClose={() => setAlertConfig(null)}
+                title={alertConfig?.title || ''}
+                message={alertConfig?.message || ''}
             />
         </>,
         document.body

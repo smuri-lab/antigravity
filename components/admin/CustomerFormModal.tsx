@@ -10,6 +10,7 @@ import { ConfirmModal } from '../ui/ConfirmModal';
 import { TrashIcon } from '../icons/TrashIcon';
 import { MapPinIcon } from '../icons/MapPinIcon';
 import { ToggleSwitch } from '../ui/ToggleSwitch';
+import { AlertModal } from '../ui/AlertModal';
 
 interface CustomerFormModalProps {
   isOpen: boolean;
@@ -42,6 +43,7 @@ export const CustomerFormModal: React.FC<CustomerFormModalProps> = ({ isOpen, on
   const [isClosing, setIsClosing] = useState(false);
   const [isVisible, setIsVisible] = useState(false);
   const [isLocating, setIsLocating] = useState(false);
+  const [alertConfig, setAlertConfig] = useState<{ title: string; message: string } | null>(null);
 
   const customerLabel = companySettings.customerLabel || 'Kunde';
 
@@ -102,7 +104,7 @@ export const CustomerFormModal: React.FC<CustomerFormModalProps> = ({ isOpen, on
 
   const handleGetCurrentPosition = () => {
     if (!navigator.geolocation) {
-      alert('Geolokalisierung wird von diesem Browser nicht unterstützt.');
+      setAlertConfig({ title: 'Nicht unterstützt', message: 'Geolokalisierung wird von diesem Browser nicht unterstützt.' });
       return;
     }
     setIsLocating(true);
@@ -117,7 +119,7 @@ export const CustomerFormModal: React.FC<CustomerFormModalProps> = ({ isOpen, on
       },
       (error) => {
         console.error(error);
-        alert('Fehler beim Abrufen des Standorts. Bitte prüfen Sie die Berechtigungen.');
+        setAlertConfig({ title: 'Standortfehler', message: 'Fehler beim Abrufen des Standorts. Bitte prüfen Sie die Berechtigungen (GPS).' });
         setIsLocating(false);
       },
       { enableHighAccuracy: true }
@@ -219,6 +221,12 @@ export const CustomerFormModal: React.FC<CustomerFormModalProps> = ({ isOpen, on
           confirmText="Ja, löschen"
         />
       )}
+      <AlertModal
+        isOpen={!!alertConfig}
+        onClose={() => setAlertConfig(null)}
+        title={alertConfig?.title || ''}
+        message={alertConfig?.message || ''}
+      />
     </>,
     document.body
   );

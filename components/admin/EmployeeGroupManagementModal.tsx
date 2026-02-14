@@ -8,6 +8,7 @@ import { PlusIcon } from '../icons/PlusIcon';
 import { TrashIcon } from '../icons/TrashIcon';
 import { PencilIcon } from '../icons/PencilIcon';
 import { ConfirmModal } from '../ui/ConfirmModal';
+import { AlertModal } from '../ui/AlertModal';
 
 interface EmployeeGroupManagementModalProps {
     isOpen: boolean;
@@ -48,6 +49,7 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
 
     // Delete confirmation
     const [deleteConfirmId, setDeleteConfirmId] = useState<string | null>(null);
+    const [alertConfig, setAlertConfig] = useState<{ title: string; message: string } | null>(null);
 
     // Handle modal close with animation
     const handleClose = () => {
@@ -92,12 +94,12 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
     // Save (create or update)
     const handleSave = () => {
         if (!name.trim()) {
-            alert('Bitte geben Sie einen Namen ein.');
+            setAlertConfig({ title: 'Name fehlt', message: 'Bitte geben Sie einen Namen für die Gruppe ein.' });
             return;
         }
 
         if (selectedEmployeeIds.length === 0) {
-            alert('Bitte wählen Sie mindestens einen Mitarbeiter.');
+            setAlertConfig({ title: 'Keine Mitarbeiter', message: 'Bitte wählen Sie mindestens einen Mitarbeiter für diese Gruppe aus.' });
             return;
         }
 
@@ -335,6 +337,13 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
                 message="Möchten Sie diese Gruppe wirklich löschen? Diese Aktion kann nicht rückgängig gemacht werden."
                 confirmText="Löschen"
                 cancelText="Abbrechen"
+            />
+
+            <AlertModal
+                isOpen={!!alertConfig}
+                onClose={() => setAlertConfig(null)}
+                title={alertConfig?.title || ''}
+                message={alertConfig?.message || ''}
             />
         </div>,
         document.body

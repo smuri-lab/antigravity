@@ -5,6 +5,7 @@ import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { XIcon } from '../icons/XIcon';
 import { ChevronDownIcon } from '../icons/ChevronDownIcon';
+import { AlertModal } from '../ui/AlertModal';
 
 interface ShiftPatternGeneratorModalProps {
     isOpen: boolean;
@@ -41,6 +42,9 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
 
     // Offset visibility
     const [showOffsets, setShowOffsets] = useState(false);
+
+    // Alert state
+    const [alertConfig, setAlertConfig] = useState<{ title: string; message: string } | null>(null);
 
     // Reset on open
     useEffect(() => {
@@ -88,18 +92,23 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
     // Generate shifts
     const handleGenerate = () => {
         if (!selectedPattern) {
-            alert('Bitte wählen Sie ein Rotationsmuster aus.');
+            setAlertConfig({ title: 'Muster fehlt', message: 'Bitte wählen Sie ein Rotationsmuster aus.' });
             return;
         }
 
         const targetEmployees = getTargetEmployees();
         if (targetEmployees.length === 0) {
-            alert('Bitte wählen Sie einen Mitarbeiter oder eine Gruppe aus.');
+            setAlertConfig({
+                title: 'Ziel fehlt',
+                message: assignmentMode === 'individual'
+                    ? 'Bitte wählen Sie einen Mitarbeiter aus.'
+                    : 'Bitte wählen Sie eine Mitarbeitergruppe aus.'
+            });
             return;
         }
 
         if (!startDate || !endDate) {
-            alert('Bitte wählen Sie einen Zeitraum aus.');
+            setAlertConfig({ title: 'Zeitraum fehlt', message: 'Bitte wählen Sie ein Start- und Enddatum aus.' });
             return;
         }
 
@@ -107,7 +116,7 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
         const end = new Date(endDate);
 
         if (start >= end) {
-            alert('Das Startdatum muss vor dem Enddatum liegen.');
+            setAlertConfig({ title: 'Ungültiger Zeitraum', message: 'Das Startdatum muss vor dem Enddatum liegen.' });
             return;
         }
 
@@ -391,6 +400,13 @@ export const ShiftPatternGeneratorModal: React.FC<ShiftPatternGeneratorModalProp
                     </div>
                 </div>
             </Card>
+
+            <AlertModal
+                isOpen={!!alertConfig}
+                onClose={() => setAlertConfig(null)}
+                title={alertConfig?.title || ''}
+                message={alertConfig?.message || ''}
+            />
         </div>,
         document.body
     );
