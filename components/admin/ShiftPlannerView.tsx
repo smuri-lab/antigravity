@@ -1298,37 +1298,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                         <div className="p-8 text-center text-gray-500 italic">Keine Einträge für die aktuelle Auswahl gefunden.</div>
                                     )}
 
-                                    {/* SUMMARY ROW */}
-                                    {displayRows.length > 0 && viewMode !== 'timeline' && (
-                                        <div className="flex border-t-2 border-gray-300 bg-gray-50 sticky bottom-0 z-10 shadow-lg">
-                                            {/* Summary Label */}
-                                            <div className="w-48 shrink-0 p-3 border-r border-gray-200 font-bold text-gray-900 bg-gray-100 sticky left-0 z-20 flex items-center">
-                                                <span>GESAMT</span>
-                                            </div>
 
-                                            {/* Daily Summaries */}
-                                            <div className="flex-1 flex">
-                                                {gridDays.map((day, i) => {
-                                                    const stats = calculateDailyStats(day, shifts, employees);
-                                                    const coverage = getCoverageColor(stats.employeeCount);
-
-                                                    return (
-                                                        <div
-                                                            key={i}
-                                                            className={`flex-1 border-r border-gray-200 last:border-r-0 p-2 flex flex-col items-center justify-center ${coverage.bg}`}
-                                                        >
-                                                            <div className={`text-sm font-bold ${coverage.text}`}>
-                                                                {stats.employeeCount} MA
-                                                            </div>
-                                                            <div className="text-xs text-gray-600">
-                                                                {stats.totalHours.toFixed(1)}h
-                                                            </div>
-                                                        </div>
-                                                    );
-                                                })}
-                                            </div>
-                                        </div>
-                                    )}
                                 </div>
                             </div>
                         </div>
