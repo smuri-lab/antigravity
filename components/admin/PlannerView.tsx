@@ -379,7 +379,7 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
                                 <p className="text-sm text-gray-600">{dateText}</p>
                             </div>
                             <div className="flex items-center gap-2">
-                                <button onClick={() => setRequestToDelete(req)} className="p-2 text-gray-400 hover:text-red-600 opacity-50 hover:opacity-100 transition-opacity"><TrashIcon className="h-5 w-5" /></button>
+                                <button onClick={() => setRequestToDelete(req)} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors opacity-80 hover:opacity-100"><TrashIcon className="h-5 w-5" /></button>
                             </div>
                         </div>
                         {req.adminComment && <p className="mt-2 pt-2 border-t text-sm italic">"{req.adminComment}"</p>}

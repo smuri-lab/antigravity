@@ -63,7 +63,7 @@ export const ActivityManagement: React.FC<ActivityManagementProps> = ({ activiti
             Anlegen
           </Button>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white">
             <thead className="bg-gray-50">
@@ -76,7 +76,7 @@ export const ActivityManagement: React.FC<ActivityManagementProps> = ({ activiti
               {activities.length > 0 ? (
                 activities.map(a => (
                   <tr key={a.id} onClick={() => handleOpenModal(a)} className="cursor-pointer hover:bg-gray-50 transition-colors">
-                    <td 
+                    <td
                       className="py-4 px-4 whitespace-nowrap font-normal"
                       title={`Bearbeiten: ${a.name}`}
                     >
@@ -84,7 +84,7 @@ export const ActivityManagement: React.FC<ActivityManagementProps> = ({ activiti
                     </td>
                     <td className="py-4 px-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex gap-2 justify-end">
-                        <button onClick={(e) => { e.stopPropagation(); handleDeleteClick(a); }} className="p-2 text-gray-500 hover:text-red-600"><TrashIcon className="h-5 w-5"/></button>
+                        <button onClick={(e) => { e.stopPropagation(); handleDeleteClick(a); }} className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"><TrashIcon className="h-5 w-5" /></button>
                       </div>
                     </td>
                   </tr>
@@ -100,7 +100,7 @@ export const ActivityManagement: React.FC<ActivityManagementProps> = ({ activiti
           </table>
         </div>
       </Card>
-      
+
       {isModalOpen && (
         <ActivityFormModal
           isOpen={isModalOpen}
@@ -110,7 +110,7 @@ export const ActivityManagement: React.FC<ActivityManagementProps> = ({ activiti
           companySettings={companySettings}
         />
       )}
-      
+
       <ConfirmModal
         isOpen={!!activityToDelete}
         onClose={() => setActivityToDelete(null)}
