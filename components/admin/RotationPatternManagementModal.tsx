@@ -181,8 +181,8 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
     // Render list view
     const renderListView = () => (
         <Card className={`w-full max-w-2xl flex flex-col ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`} onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 className="text-2xl font-bold">Rotationsmuster verwalten</h2>
+            <div className="flex justify-between items-center mb-4 border-b pb-4">
+                <h2 className="text-xl font-bold">Rotationsmuster verwalten</h2>
                 <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
                     <XIcon className="h-6 w-6" />
                 </button>
@@ -198,30 +198,30 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
                     {patterns.map(pattern => {
                         const days = blocksToDays(pattern.blocks);
                         return (
-                            <div key={pattern.id} className="border rounded-lg p-4 hover:shadow-md transition-shadow">
-                                <div className="flex justify-between items-start mb-4">
+                            <div key={pattern.id} className="p-3 border rounded-lg flex items-center justify-between hover:bg-gray-50 bg-white shadow-sm transition-shadow">
+                                <div className="flex items-center gap-3">
                                     <div className="flex-1">
-                                        <h3 className="font-bold text-lg">{pattern.name}</h3>
+                                        <h3 className="font-semibold text-gray-800">{pattern.name}</h3>
                                         {pattern.description && (
-                                            <p className="text-sm text-gray-600 mt-1">{pattern.description}</p>
+                                            <p className="text-xs text-gray-500 mt-1">{pattern.description}</p>
                                         )}
                                     </div>
-                                    <div className="flex gap-2 ml-4 self-center">
-                                        <button
-                                            onClick={() => handleEdit(pattern)}
-                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                            title="Bearbeiten"
-                                        >
-                                            <PencilIcon className="h-5 w-5" />
-                                        </button>
-                                        <button
-                                            onClick={() => setDeleteConfirmId(pattern.id)}
-                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                            title="Löschen"
-                                        >
-                                            <TrashIcon className="h-5 w-5" />
-                                        </button>
-                                    </div>
+                                </div>
+                                <div className="flex gap-2 ml-4 self-center">
+                                    <button
+                                        onClick={() => handleEdit(pattern)}
+                                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="Bearbeiten"
+                                    >
+                                        <PencilIcon className="h-5 w-5" />
+                                    </button>
+                                    <button
+                                        onClick={() => setDeleteConfirmId(pattern.id)}
+                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                        title="Löschen"
+                                    >
+                                        <TrashIcon className="h-5 w-5" />
+                                    </button>
                                 </div>
                             </div>
                         );
@@ -241,8 +241,8 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
     // Render edit/create modal
     const renderEditView = () => (
         <Card className={`w-full max-w-2xl flex flex-col ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`} onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 className="text-2xl font-bold">
+            <div className="flex justify-between items-center mb-4 border-b pb-4">
+                <h2 className="text-xl font-bold">
                     {isCreating ? 'Neues Rotationsmuster' : 'Rotationsmuster bearbeiten'}
                 </h2>
                 <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
@@ -390,7 +390,7 @@ export const RotationPatternManagementModal: React.FC<RotationPatternManagementM
     );
 
     return ReactDOM.createPortal(
-        <div className={`fixed inset-0 bg-black flex items-center justify-center z-[300] p-4 transition-colors duration-300 ${isClosing ? 'bg-opacity-0' : 'bg-opacity-50'}`} onClick={handleClose}>
+        <div className={`fixed inset-0 bg-black flex items-center justify-center z-[250] p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : 'animate-modal-fade-in'}`} onClick={handleClose}>
             {(isCreating || editingPattern) ? renderEditView() : renderListView()}
 
             {/* Delete Confirmation */}

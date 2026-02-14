@@ -140,8 +140,8 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
     // Render list view
     const renderListView = () => (
         <Card className={`w-full max-w-2xl max-h-[90vh] flex flex-col ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`} onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 className="text-2xl font-bold">Mitarbeitergruppen verwalten</h2>
+            <div className="flex justify-between items-center mb-4 border-b pb-4">
+                <h2 className="text-xl font-bold">Mitarbeitergruppen verwalten</h2>
                 <button onClick={handleClose} className="text-gray-400 hover:text-gray-600">
                     <XIcon className="h-6 w-6" />
                 </button>
@@ -158,47 +158,47 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
                         {groups.map(group => (
                             <div
                                 key={group.id}
-                                className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                                className="p-3 border rounded-lg flex items-center justify-between hover:bg-gray-50 bg-white shadow-sm transition-shadow"
                                 style={{ borderLeftWidth: '4px', borderLeftColor: group.color || '#6b7280' }}
                             >
-                                <div className="flex justify-between items-start mb-2">
+                                <div className="flex items-center gap-3">
                                     <div className="flex-1">
                                         <div className="flex items-center gap-2">
                                             <div
                                                 className="w-4 h-4 rounded-full"
                                                 style={{ backgroundColor: group.color || '#6b7280' }}
                                             />
-                                            <h3 className="font-bold text-lg">{group.name}</h3>
+                                            <h3 className="font-semibold text-gray-800">{group.name}</h3>
                                         </div>
                                         {group.description && (
-                                            <p className="text-sm text-gray-600 mt-1">{group.description}</p>
+                                            <p className="text-xs text-gray-500 mt-1">{group.description}</p>
                                         )}
-                                    </div>
-                                    <div className="flex gap-2 ml-4">
-                                        <button
-                                            onClick={() => handleEdit(group)}
-                                            className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
-                                            title="Bearbeiten"
-                                        >
-                                            <PencilIcon className="h-5 w-5" />
-                                        </button>
-                                        <button
-                                            onClick={() => setDeleteConfirmId(group.id)}
-                                            className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                                            title="Löschen"
-                                        >
-                                            <TrashIcon className="h-5 w-5" />
-                                        </button>
+                                        <div className="mt-2 flex flex-col gap-0.5">
+                                            <div className="text-[10px] text-gray-500 flex items-center gap-1">
+                                                <span>👥 {group.employeeIds.length} {group.employeeIds.length === 1 ? 'Mitarbeiter' : 'Mitarbeiter'}</span>
+                                            </div>
+                                            <div className="text-[11px] text-gray-600 line-clamp-1">
+                                                {group.employeeIds.slice(0, 3).map(id => getEmployeeName(id)).join(', ')}
+                                                {group.employeeIds.length > 3 && ` +${group.employeeIds.length - 3} weitere`}
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-
-                                <div className="text-sm text-gray-600 mb-2">
-                                    👥 {group.employeeIds.length} {group.employeeIds.length === 1 ? 'Mitarbeiter' : 'Mitarbeiter'}
-                                </div>
-
-                                <div className="text-sm text-gray-700">
-                                    {group.employeeIds.slice(0, 3).map(id => getEmployeeName(id)).join(', ')}
-                                    {group.employeeIds.length > 3 && ` +${group.employeeIds.length - 3} weitere`}
+                                <div className="flex gap-2 ml-4 self-center">
+                                    <button
+                                        onClick={() => handleEdit(group)}
+                                        className="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors"
+                                        title="Bearbeiten"
+                                    >
+                                        <PencilIcon className="h-5 w-5" />
+                                    </button>
+                                    <button
+                                        onClick={() => setDeleteConfirmId(group.id)}
+                                        className="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                                        title="Löschen"
+                                    >
+                                        <TrashIcon className="h-5 w-5" />
+                                    </button>
                                 </div>
                             </div>
                         ))}
@@ -212,14 +212,14 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
                     Neue Gruppe
                 </Button>
             </div>
-        </Card>
+        </Card >
     );
 
     // Render edit/create modal
     const renderEditView = () => (
         <Card className={`w-full max-w-2xl max-h-[90vh] flex flex-col ${isClosing ? 'animate-modal-slide-down' : 'animate-modal-slide-up'}`} onClick={e => e.stopPropagation()}>
-            <div className="flex justify-between items-center mb-6 border-b pb-4">
-                <h2 className="text-2xl font-bold">
+            <div className="flex justify-between items-center mb-4 border-b pb-4">
+                <h2 className="text-xl font-bold">
                     {isCreating ? 'Neue Gruppe' : 'Gruppe bearbeiten'}
                 </h2>
                 <button onClick={handleCloseEdit} className="text-gray-400 hover:text-gray-600">
@@ -320,7 +320,7 @@ export const EmployeeGroupManagementModal: React.FC<EmployeeGroupManagementModal
     );
 
     return ReactDOM.createPortal(
-        <div className={`fixed inset-0 bg-black flex items-center justify-center z-[300] p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : 'animate-modal-fade-in'}`} onClick={handleClose}>
+        <div className={`fixed inset-0 bg-black flex items-center justify-center z-[250] p-4 transition-colors duration-300 ${isClosing ? 'animate-modal-fade-out' : 'animate-modal-fade-in'}`} onClick={handleClose}>
             {(isCreating || editingGroup) ? renderEditView() : renderListView()}
 
             {/* Delete Confirmation */}
