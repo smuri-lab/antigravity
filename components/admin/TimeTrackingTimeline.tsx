@@ -225,12 +225,15 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                     <div ref={scrollContainerRef} className="flex-1 w-full h-full flex flex-col">
                         {/* Header Row */}
                         <div className="h-12 border-b border-gray-200 bg-white flex w-full sticky top-0 z-20">
-                            {timelineSlots.slice(0, -1).map((time, index) => (
-                                <div key={index} className="flex-1 border-r border-gray-200 text-xs text-gray-500 flex items-center justify-center font-medium min-w-0">
-
-                                    <span className="truncate px-1">{time.getHours().toString().padStart(2, '0')}</span>
-                                </div>
-                            ))}
+                            {timelineSlots.slice(0, -1).map((time, index) => {
+                                const displayHour = time.getHours().toString().padStart(2, '0');
+                                return (
+                                    <div key={index} className="flex-1 border-r border-gray-200 text-xs text-gray-500 flex flex-col items-center justify-center font-medium min-w-0 bg-white relative">
+                                        <span className="truncate px-1 mb-1">{displayHour}:00</span>
+                                        <div className="absolute bottom-0 h-1.5 w-px bg-gray-300 left-1/2"></div>
+                                    </div>
+                                );
+                            })}
                         </div>
 
                         {/* Employee Rows - Wrapper for scrolling content if needed, but width is 100% */}
