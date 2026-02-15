@@ -228,59 +228,79 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                             ))}
                         </div>
 
-                        {/* Employee Rows */}
-                        <div className="relative">
+                        {/* Employee Rows - Wrapper for scrolling content if needed, but width is 100% */}
+                        <div className="relative flex-1 w-full overflow-y-auto">
                             {/* Vertical Grid Lines */}
-                            <div className="absolute inset-0 flex pointer-events-none">
+                            <div className="absolute inset-0 flex pointer-events-none w-full min-h-full">
                                 {timelineSlots.slice(0, -1).map((_, index) => (
-                                    <div key={index} className="flex-1 border-r border-gray-100"></div>
+                                    <div key={index} className="flex-1 border-r border-gray-100 h-full"></div>
                                 ))}
                             </div>
 
-                            {filteredEmployees.map(emp => {
-                                // Filter entries for this employee and day
-                                const empEntries = timeEntries.filter(entry => {
-                                    const entryStart = new Date(entry.start);
-                                    const sameDay = entryStart.toDateString() === currentDate.toDateString();
-                                    return entry.employeeId === emp.id && sameDay;
-                                });
+                            <div className="relative z-10">
+                                {filteredEmployees.map(emp => {
+                                    // Filter entries for this employee and day
+                                    const empEntries = timeEntries.filter(entry => {
+                                        const entryStart = new Date(entry.start);
+                                        const sameDay = entryStart.toDateString() === currentDate.toDateString();
+                                        return entry.employeeId === emp.id && sameDay;
+                                    });
 
-                                return (
-                                    <div key={emp.id} className="h-14 border-b relative group hover:bg-gray-50/30 transition-colors">
-                                        {empEntries.map(entry => {
-                                            const style = getPositionStyle(entry.start, entry.end);
-                                            if (style.display === 'none') return null;
+                                    return (
+                                        <div key={emp.id} className="h-14 border-b relative group hover:bg-gray-50/30 transition-colors w-full">
+                                            {empEntries.map(entry => {
+                                                const style = getPositionStyle(entry.start, entry.end);
+                                                if (style.display === 'none') return null;
 
-                                            // Color Handling (Activity or Customer based)
-                                            const activity = activities.find(a => a.id === entry.activityId);
-                                            // const customer = customers.find(c => c.id === entry.customerId);
-                                            // Minimalistic color logic - could be expanded
-                                            const barColor = '#3b82f6'; // blue-500 default
+                                                // Color Handling (Activity or Customer based)
+                                                const activity = activities.find(a => a.id === entry.activityId);
+                                                // const customer = customers.find(c => c.id === entry.customerId);
+                                                // Minimalistic color logic - could be expanded
+                                                const barColor = '#3b82f6'; // blue-500 default
 
-                                            return (
-                                                <div
-                                                    key={entry.id}
-                                                    className="absolute top-2 bottom-2 bg-blue-500 rounded-md border border-blue-600 opacity-90 hover:opacity-100 cursor-pointer shadow-sm overflow-hidden"
-                                                    style={{ ...style, backgroundColor: barColor }}
-                                                    title={`${new Date(entry.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(entry.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} (${activity?.name || 'Aktivität'})`}
-                                                >
-                                                    <div className="text-[10px] text-white px-1 font-medium truncate leading-4">
-                                                        {activity?.name || '???'}
+                                                return (
+                                                    <div
+                                                        key={entry.id}
+                                                        className="absolute top-2 bottom-2 bg-blue-500 rounded-md border border-blue-600 opacity-90 hover:opacity-100 cursor-pointer shadow-sm overflow-hidden z-20"
+                                                        style={{ ...style, backgroundColor: barColor }}
+                                                        title={`${new Date(entry.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(entry.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} (${activity?.name || 'Aktivität'})`}
+                                                    >
+                                                        <div className="text-[10px] text-white px-1 font-medium truncate leading-4">
+                                                            {activity?.name || '???'}
+                                                        </div>
+                                                        <div className="text-[9px] text-blue-100 px-1 truncate leading-3 hidden sm:block">
+                                                            {formatHoursAndMinutes(((new Date(entry.end).getTime() - new Date(entry.start).getTime()) / 3600000))}h
+                                                        </div>
                                                     </div>
-                                                    <div className="text-[9px] text-blue-100 px-1 truncate leading-3">
-                                                        {formatHoursAndMinutes(((new Date(entry.end).getTime() - new Date(entry.start).getTime()) / 3600000))}h
-                                                    </div>
-                                                </div>
-                                            );
-                                        })}
+                                                );
+                                            })}
+                                        </div>
+                                    );
+                                })}
+                                {filteredEmployees.length === 0 && (
+                                    <div className="p-8 text-center text-gray-500">
+                                        Keine Mitarbeiter gefunden.
                                     </div>
-                                );
-                            })}
+                                )}
+                            </div>
                         </div>
                     </div>
                 </div>
             </div>
+
+            {isFilterModalOpen && (
+                <EmployeeMultiSelectModal
+                    isOpen={isFilterModalOpen}
+                    onClose={() => setIsFilterModalOpen(false)}
+                    employees={employees}
+                    selectedEmployeeIds={visibleEmployeeIds}
+                    onApply={(ids) => {
+                        setVisibleEmployeeIds(ids.map(Number));
+                        setIsFilterModalOpen(false);
+                    }}
+                    title="Mitarbeiter filtern"
+                />
+            )}
         </div>
-        </div >
     );
 };
