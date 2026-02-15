@@ -643,7 +643,7 @@ export const TimeTrackingManagement: React.FC<TimeTrackingManagementProps> = ({
 
     return (
         <div className="space-y-6">
-            <div className="border-b border-gray-200">
+            <div className="border-b border-gray-200 mt-4">
                 <nav className="-mb-px flex space-x-6" aria-label="Tabs">
                     <button
                         onClick={() => setViewMode('timeline')}
