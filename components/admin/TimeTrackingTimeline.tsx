@@ -251,7 +251,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                                     });
 
                                     return (
-                                        <div key={emp.id} className="h-16 border-b relative group hover:bg-gray-50/30 transition-colors w-full">
+                                        <div key={emp.id} className="h-16 border-b relative group hover:bg-blue-50/30 transition-colors w-full">
                                             {empEntries.map(entry => {
                                                 const style = getPositionStyle(entry.start, entry.end);
                                                 if (style.display === 'none') return null;
