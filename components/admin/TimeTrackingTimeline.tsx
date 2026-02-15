@@ -196,21 +196,21 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
             {/* Timeline Content */}
             <div className="flex flex-1 overflow-hidden">
                 {/* Sidebar - Employees */}
-                <div className="w-64 flex-shrink-0 border-r overflow-y-auto bg-gray-50/50">
+                <div className="w-48 flex-shrink-0 border-r border-gray-200 overflow-y-auto bg-gray-50/50">
                     <div
-                        className="h-10 border-b bg-gray-50 sticky top-0 z-10 flex items-center justify-between px-4 font-medium text-xs text-gray-500 uppercase tracking-wider cursor-pointer hover:bg-gray-100 transition-colors group"
+                        className="h-12 border-b border-gray-200 bg-white sticky top-0 z-30 flex items-center justify-between p-3 font-semibold text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors group"
                         onClick={() => setIsFilterModalOpen(true)}
                     >
                         <span>Mitarbeiter</span>
-                        <AdjustmentsHorizontalIcon className={`h-4 w-4 ${visibleEmployeeIds.length !== employees.length ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600'}`} />
+                        <AdjustmentsHorizontalIcon className={`h-5 w-5 ${visibleEmployeeIds.length !== employees.length ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600'}`} />
                     </div>
                     {filteredEmployees.map(emp => (
-                        <div key={emp.id} className="h-14 border-b flex items-center px-4 hover:bg-white transition-colors">
+                        <div key={emp.id} className="h-16 border-b flex items-center px-3 hover:bg-white transition-colors">
                             <div className="flex-1 min-w-0">
-                                <div className="text-sm font-medium text-gray-900 truncate">
+                                <div className="text-base font-normal text-gray-900 truncate leading-tight">
                                     {emp.firstName} {emp.lastName}
                                 </div>
-                                <div className="text-xs text-gray-500 truncate">
+                                <div className="text-xs text-gray-400 truncate">
                                     {/* Optional summary info could go here, e.g. "8:00h" */}
                                 </div>
                             </div>
