@@ -311,7 +311,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
                             <table className="min-w-full text-sm">
                                 <thead className="text-left bg-gray-50 border-b">
                                     <tr>
-                                        <th className="py-2 px-3 font-semibold text-gray-600 w-48 min-w-[12rem] max-w-[12rem]">Mitarbeiter</th>
+                                        <th className="py-2 px-3 font-semibold text-gray-600 w-40 min-w-[10rem] max-w-[10rem]">Mitarbeiter</th>
                                         <th className="py-2 px-3 font-semibold text-gray-600">Tag, Datum</th>
 
                                         {/* Dynamic Headers based on Mode & Grouping */}
@@ -342,7 +342,7 @@ export const ReportsView: React.FC<ReportsViewProps> = ({ timeEntries, customers
                                 <tbody className="divide-y divide-gray-200">
                                     {filteredEntries.map((entry, index) => (
                                         <tr key={index} className="hover:bg-gray-50">
-                                            <td className="py-2 px-3 whitespace-nowrap align-top font-medium w-48 min-w-[12rem] max-w-[12rem] truncate">{entry.employeeName}</td>
+                                            <td className="py-2 px-3 whitespace-nowrap align-top font-medium w-40 min-w-[10rem] max-w-[10rem] truncate">{entry.employeeName}</td>
                                             <td className="py-2 px-3 whitespace-nowrap align-top"><div>{entry.dayOfWeek},</div><div>{entry.date}</div></td>
 
                                             {/* Dynamic Cells */}
