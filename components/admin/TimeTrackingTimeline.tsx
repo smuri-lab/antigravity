@@ -199,7 +199,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                 {/* Sidebar - Employees */}
                 <div className="w-40 min-w-[10rem] max-w-[10rem] flex-shrink-0 border-r border-gray-200 overflow-y-auto bg-white shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
                     <div
-                        className="h-12 border-b border-gray-200 bg-white sticky top-0 z-30 flex items-center justify-between p-3 font-semibold text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors group shadow-sm"
+                        className="h-12 border-b border-gray-200 bg-white sticky top-0 z-30 flex items-center justify-between p-3 text-base font-semibold text-gray-900 cursor-pointer hover:bg-gray-50 transition-colors group shadow-sm"
                         onClick={() => setIsFilterModalOpen(true)}
                     >
                         <span>Mitarbeiter</span>

@@ -1028,7 +1028,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                 <div className="flex bg-white border-b border-gray-200 sticky top-0 z-20 h-12 shadow-sm">
                                     {/* Employee Header with Filter */}
                                     <div
-                                        className="w-40 min-w-[10rem] max-w-[10rem] shrink-0 p-3 border-r border-gray-200 font-semibold text-gray-800 bg-white sticky left-0 z-30 flex items-center justify-between group cursor-pointer hover:bg-gray-50 transition-colors shadow-[2px_1px_5px_rgba(0,0,0,0.02)]"
+                                        className="w-40 min-w-[10rem] max-w-[10rem] shrink-0 p-3 border-r border-gray-200 font-semibold text-base text-gray-900 bg-white sticky left-0 z-30 flex items-center justify-between group cursor-pointer hover:bg-gray-50 transition-colors shadow-[2px_1px_5px_rgba(0,0,0,0.02)]"
                                         onClick={() => setIsFilterModalOpen(true)}
                                     >
                                         <span>Mitarbeiter</span>

@@ -472,7 +472,7 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
 
                             return (
                                 <tr key={employee.id} className="border-b border-gray-200 last:border-b-0">
-                                    <td className="sticky left-0 bg-white py-2 px-3 border-r border-gray-200 text-sm font-normal whitespace-nowrap w-40 min-w-[10rem] max-w-[10rem] z-10 truncate shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
+                                    <td className="sticky left-0 bg-white py-2 px-3 border-r border-gray-200 text-base font-normal text-gray-900 leading-tight whitespace-nowrap w-40 min-w-[10rem] max-w-[10rem] z-10 truncate shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
                                         {employee.firstName} {employee.lastName}
                                     </td>
                                     {visibleDays.map(day => {

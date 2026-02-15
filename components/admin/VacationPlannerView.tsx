@@ -192,7 +192,7 @@ export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({
                     <table className="min-w-full border-collapse border border-gray-200">
                         <thead className="sticky top-0 bg-white z-10 shadow-sm">
                             <tr>
-                                <th className="sticky left-0 bg-white p-2 border-b border-r text-left text-sm font-semibold text-gray-700 w-40 min-w-[10rem] max-w-[10rem] z-20 shadow-[2px_1px_5px_rgba(0,0,0,0.02)]">Mitarbeiter</th>
+                                <th className="sticky left-0 bg-white p-2 border-b border-r text-left text-base font-semibold text-gray-900 w-40 min-w-[10rem] max-w-[10rem] z-20 shadow-[2px_1px_5px_rgba(0,0,0,0.02)]">Mitarbeiter</th>
                                 {visibleDays.map(day => {
                                     const year = day.getFullYear();
                                     const holidaysForYear = holidaysByYear[year] || [];
@@ -228,7 +228,7 @@ export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({
                         <tbody>
                             {employees.map(employee => (
                                 <tr key={employee.id}>
-                                    <td className="sticky left-0 bg-white p-2 border-b border-r text-sm font-medium whitespace-nowrap w-40 min-w-[10rem] max-w-[10rem] z-10 truncate shadow-[2px_0_5px_rgba(0,0,0,0.02)]">{employee.firstName} {employee.lastName}</td>
+                                    <td className="sticky left-0 bg-white p-2 border-b border-r text-base font-normal text-gray-900 whitespace-nowrap w-40 min-w-[10rem] max-w-[10rem] z-10 truncate shadow-[2px_0_5px_rgba(0,0,0,0.02)]">{employee.firstName} {employee.lastName}</td>
                                     {visibleDays.map(day => {
                                         const year = day.getFullYear();
                                         const holidaysForYear = holidaysByYear[year] || [];
