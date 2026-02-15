@@ -9,6 +9,8 @@ import { CogIcon } from '../icons/CogIcon';
 import { XIcon } from '../icons/XIcon';
 import { Select } from '../ui/Select';
 import { CalendarIcon } from '../icons/CalendarIcon';
+import { EmployeeMultiSelectModal } from './EmployeeMultiSelectModal';
+import { AdjustmentsHorizontalIcon } from '../icons/AdjustmentsHorizontalIcon';
 
 interface TimeTrackingTimelineProps {
     employees: Employee[];
@@ -32,6 +34,8 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
     onUpdateSettings
 }) => {
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+    const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
+    const [visibleEmployeeIds, setVisibleEmployeeIds] = useState<number[]>(() => employees.filter(e => e.isActive).map(e => e.id));
     const scrollContainerRef = useRef<HTMLDivElement>(null);
 
     // Settings for view range
@@ -107,8 +111,12 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
         const effectiveStartMs = Math.max(startMs, viewStartMs);
         const effectiveEndMs = Math.min(endMs, viewEndMs);
 
-        const leftPercent = ((effectiveStartMs - viewStartMs) / totalDurationMs) * 100;
-        const widthPercent = ((effectiveEndMs - effectiveStartMs) / totalDurationMs) * 100;
+        // Limit to 100% to avoid overflow
+        let leftPercent = ((effectiveStartMs - viewStartMs) / totalDurationMs) * 100;
+        let widthPercent = ((effectiveEndMs - effectiveStartMs) / totalDurationMs) * 100;
+
+        if (leftPercent < 0) leftPercent = 0;
+        if (leftPercent + widthPercent > 100) widthPercent = 100 - leftPercent;
 
         return {
             left: `${leftPercent}%`,
@@ -117,9 +125,11 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
     };
 
     const filteredEmployees = useMemo(() => {
-        // Show active employees, sorted by last name
-        return employees.filter(e => e.isActive).sort((a, b) => a.lastName.localeCompare(b.lastName));
-    }, [employees]);
+        // Show active employees, sorted by last name, filtered by selection
+        return employees
+            .filter(e => e.isActive && visibleEmployeeIds.includes(e.id))
+            .sort((a, b) => a.lastName.localeCompare(b.lastName));
+    }, [employees, visibleEmployeeIds]);
 
     return (
         <div className="flex flex-col h-full bg-white rounded-lg shadow overflow-hidden">
@@ -145,6 +155,10 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                 </div>
 
                 <div className="flex items-center space-x-2 relative">
+                    <Button variant="ghost" onClick={() => setIsFilterModalOpen(true)} className="text-gray-500 hover:text-gray-700">
+                        <AdjustmentsHorizontalIcon className="w-5 h-5" />
+                    </Button>
+                    <div className="h-4 w-px bg-gray-300 mx-1"></div>
                     <Button variant="ghost" onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="text-gray-500 hover:text-gray-700">
                         <CogIcon className="w-5 h-5" />
                     </Button>
@@ -204,69 +218,69 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                 {/* Timeline Grid */}
                 <div className="flex-1 flex flex-col min-w-0 relative overflow-hidden">
                     {/* Time Scale Header */}
-                    <div ref={scrollContainerRef} className="overflow-x-auto flex-1 custom-scrollbar">
-                        <div className="relative min-w-[800px]" style={{ width: '150%' }}> {/* Ensure enough width for scrolling */}
-                            <div className="h-10 border-b bg-gray-50 flex sticky top-0 z-20">
-                                {timelineSlots.slice(0, -1).map((time, index) => (
-                                    <div key={index} className="flex-1 border-r border-gray-200 text-xs text-gray-500 flex items-center justify-center font-medium">
-                                        {time.getHours().toString().padStart(2, '0')}:00
-                                    </div>
+                    <div ref={scrollContainerRef} className="flex-1 w-full h-full flex flex-col">
+                        {/* Header Row */}
+                        <div className="h-10 border-b bg-gray-50 flex w-full sticky top-0 z-20">
+                            {timelineSlots.slice(0, -1).map((time, index) => (
+                                <div key={index} className="flex-1 border-r border-gray-200 text-xs text-gray-500 flex items-center justify-center font-medium min-w-0">
+                                    <span className="truncate px-1">{time.getHours().toString().padStart(2, '0')}</span>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* Employee Rows */}
+                        <div className="relative">
+                            {/* Vertical Grid Lines */}
+                            <div className="absolute inset-0 flex pointer-events-none">
+                                {timelineSlots.slice(0, -1).map((_, index) => (
+                                    <div key={index} className="flex-1 border-r border-gray-100"></div>
                                 ))}
                             </div>
 
-                            {/* Employee Rows */}
-                            <div className="relative">
-                                {/* Vertical Grid Lines */}
-                                <div className="absolute inset-0 flex pointer-events-none">
-                                    {timelineSlots.slice(0, -1).map((_, index) => (
-                                        <div key={index} className="flex-1 border-r border-gray-100"></div>
-                                    ))}
-                                </div>
+                            {filteredEmployees.map(emp => {
+                                // Filter entries for this employee and day
+                                const empEntries = timeEntries.filter(entry => {
+                                    const entryStart = new Date(entry.start);
+                                    const sameDay = entryStart.toDateString() === currentDate.toDateString();
+                                    return entry.employeeId === emp.id && sameDay;
+                                });
 
-                                {filteredEmployees.map(emp => {
-                                    // Filter entries for this employee and day
-                                    const empEntries = timeEntries.filter(entry => {
-                                        const entryStart = new Date(entry.start);
-                                        const sameDay = entryStart.toDateString() === currentDate.toDateString();
-                                        return entry.employeeId === emp.id && sameDay;
-                                    });
+                                return (
+                                    <div key={emp.id} className="h-14 border-b relative group hover:bg-gray-50/30 transition-colors">
+                                        {empEntries.map(entry => {
+                                            const style = getPositionStyle(entry.start, entry.end);
+                                            if (style.display === 'none') return null;
 
-                                    return (
-                                        <div key={emp.id} className="h-14 border-b relative group hover:bg-gray-50/30 transition-colors">
-                                            {empEntries.map(entry => {
-                                                const style = getPositionStyle(entry.start, entry.end);
-                                                if (style.display === 'none') return null;
+                                            // Color Handling (Activity or Customer based)
+                                            const activity = activities.find(a => a.id === entry.activityId);
+                                            // const customer = customers.find(c => c.id === entry.customerId);
+                                            // Minimalistic color logic - could be expanded
+                                            const barColor = '#3b82f6'; // blue-500 default
 
-                                                // Color Handling (Activity or Customer based)
-                                                const activity = activities.find(a => a.id === entry.activityId);
-                                                // const customer = customers.find(c => c.id === entry.customerId);
-                                                // Minimalistic color logic - could be expanded
-                                                const barColor = '#3b82f6'; // blue-500 default
-
-                                                return (
-                                                    <div
-                                                        key={entry.id}
-                                                        className="absolute top-2 bottom-2 bg-blue-500 rounded-md border border-blue-600 opacity-90 hover:opacity-100 cursor-pointer shadow-sm overflow-hidden"
-                                                        style={{ ...style, backgroundColor: barColor }}
-                                                        title={`${new Date(entry.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(entry.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} (${activity?.name || 'Aktivität'})`}
-                                                    >
-                                                        <div className="text-[10px] text-white px-1 font-medium truncate leading-4">
-                                                            {activity?.name || '???'}
-                                                        </div>
-                                                        <div className="text-[9px] text-blue-100 px-1 truncate leading-3">
-                                                            {formatHoursAndMinutes(((new Date(entry.end).getTime() - new Date(entry.start).getTime()) / 3600000))}h
-                                                        </div>
+                                            return (
+                                                <div
+                                                    key={entry.id}
+                                                    className="absolute top-2 bottom-2 bg-blue-500 rounded-md border border-blue-600 opacity-90 hover:opacity-100 cursor-pointer shadow-sm overflow-hidden"
+                                                    style={{ ...style, backgroundColor: barColor }}
+                                                    title={`${new Date(entry.start).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} - ${new Date(entry.end).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} (${activity?.name || 'Aktivität'})`}
+                                                >
+                                                    <div className="text-[10px] text-white px-1 font-medium truncate leading-4">
+                                                        {activity?.name || '???'}
                                                     </div>
-                                                );
-                                            })}
-                                        </div>
-                                    );
-                                })}
-                            </div>
+                                                    <div className="text-[9px] text-blue-100 px-1 truncate leading-3">
+                                                        {formatHoursAndMinutes(((new Date(entry.end).getTime() - new Date(entry.start).getTime()) / 3600000))}h
+                                                    </div>
+                                                </div>
+                                            );
+                                        })}
+                                    </div>
+                                );
+                            })}
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+        </div >
     );
 };
