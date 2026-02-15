@@ -412,8 +412,8 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
                 <table className="min-w-full border-collapse table-fixed">
                     <thead className="sticky top-0 bg-white z-10 shadow-sm">
                         <tr>
-                            <th rowSpan={2} className="sticky left-0 bg-white border-b border-r border-gray-200 w-48 z-20 align-bottom pb-2">
-                                <button onClick={() => setIsDisplayOptionsModalOpen(true)} className="w-full flex items-center justify-between text-left text-base font-semibold group py-1 px-2 hover:bg-gray-50 transition-colors">
+                            <th rowSpan={2} className="sticky left-0 bg-white border-b border-r border-gray-200 w-48 min-w-[12rem] max-w-[12rem] z-20 align-bottom pb-2 shadow-[2px_1px_5px_rgba(0,0,0,0.02)]">
+                                <button onClick={() => setIsDisplayOptionsModalOpen(true)} className="w-full flex items-center justify-between text-left text-base font-semibold group py-1 px-3 hover:bg-gray-50 transition-colors">
                                     <span>Mitarbeiter</span>
                                     <AdjustmentsHorizontalIcon className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
                                 </button>
@@ -472,7 +472,9 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
 
                             return (
                                 <tr key={employee.id} className="border-b border-gray-200 last:border-b-0">
-                                    <td className="sticky left-0 bg-white py-2 px-2 border-r border-gray-200 text-base font-normal whitespace-nowrap w-48 z-10">{employee.firstName} {employee.lastName}</td>
+                                    <td className="sticky left-0 bg-white py-2 px-3 border-r border-gray-200 text-base font-normal whitespace-nowrap w-48 min-w-[12rem] max-w-[12rem] z-10 truncate shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
+                                        {employee.firstName} {employee.lastName}
+                                    </td>
                                     {visibleDays.map(day => {
                                         const absenceSpan = absenceSpans.find(s => formatDateForComparison(s.day) === formatDateForComparison(day));
                                         const absence = getAbsenceForDay(employee.id, day);

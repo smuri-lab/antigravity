@@ -10,39 +10,39 @@ import { PlusIcon } from '../icons/PlusIcon';
 import { AbsenceFormModal, type AbsenceFormData } from './AbsenceFormModal';
 
 interface VacationPlannerViewProps {
-  employees: Employee[];
-  absenceRequests: AbsenceRequest[];
-  holidaysByYear: HolidaysByYear;
-  timeEntries: TimeEntry[];
-  addAbsenceRequest: (request: Omit<AbsenceRequest, 'id' | 'status'>, status: AbsenceRequest['status']) => void;
-  onUpdateAbsenceRequest: (request: AbsenceRequest) => void;
-  onDeleteAbsenceRequest: (id: number) => void;
-  onEnsureHolidaysForYear: (year: number) => void;
-  companySettings: CompanySettings;
+    employees: Employee[];
+    absenceRequests: AbsenceRequest[];
+    holidaysByYear: HolidaysByYear;
+    timeEntries: TimeEntry[];
+    addAbsenceRequest: (request: Omit<AbsenceRequest, 'id' | 'status'>, status: AbsenceRequest['status']) => void;
+    onUpdateAbsenceRequest: (request: AbsenceRequest) => void;
+    onDeleteAbsenceRequest: (id: number) => void;
+    onEnsureHolidaysForYear: (year: number) => void;
+    companySettings: CompanySettings;
 }
 
 const getAbsenceTypeUI = (type: AbsenceType) => {
     const details = {
-        [AbsenceType.Vacation]: { 
+        [AbsenceType.Vacation]: {
             short: 'U',
-            solidClass: 'bg-blue-500 text-white', 
+            solidClass: 'bg-blue-500 text-white',
             pendingClass: 'bg-blue-100 text-blue-700',
             pendingBorderClass: 'border-blue-400',
-            title: 'Urlaub' 
+            title: 'Urlaub'
         },
-        [AbsenceType.SickLeave]: { 
+        [AbsenceType.SickLeave]: {
             short: 'K',
             solidClass: 'bg-orange-500 text-white',
             pendingClass: 'bg-orange-100 text-orange-700',
             pendingBorderClass: 'border-orange-400',
-            title: 'Krank' 
+            title: 'Krank'
         },
-        [AbsenceType.TimeOff]: { 
+        [AbsenceType.TimeOff]: {
             short: 'F',
             solidClass: 'bg-green-500 text-white',
             pendingClass: 'bg-green-100 text-green-700',
             pendingBorderClass: 'border-green-400',
-            title: 'Freizeitausgleich' 
+            title: 'Freizeitausgleich'
         },
     };
     return details[type];
@@ -64,11 +64,11 @@ const formatDateForComparison = (date: Date): string => {
     return `${yyyy}-${mm}-${dd}`;
 };
 
-export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({ 
-    employees, 
-    absenceRequests, 
-    holidaysByYear, 
-    addAbsenceRequest, 
+export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({
+    employees,
+    absenceRequests,
+    holidaysByYear,
+    addAbsenceRequest,
     onUpdateAbsenceRequest,
     onDeleteAbsenceRequest,
     onEnsureHolidaysForYear,
@@ -85,7 +85,7 @@ export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({
         const endDay = new Date(viewStartDate);
         endDay.setDate(endDay.getDate() + 20); // Last visible day (3 weeks total)
         const endYear = endDay.getFullYear();
-        
+
         onEnsureHolidaysForYear(startYear);
         if (startYear !== endYear) {
             onEnsureHolidaysForYear(endYear);
@@ -107,12 +107,12 @@ export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({
             return day;
         });
     }, [viewStartDate]);
-    
+
     const getAbsenceForDay = (employeeId: number, day: Date): AbsenceRequest | undefined => {
         const dayString = formatDateForComparison(day);
         const requestsForDay = absenceRequests.filter(req =>
-            req.employeeId === employeeId && 
-            dayString >= req.startDate && 
+            req.employeeId === employeeId &&
+            dayString >= req.startDate &&
             dayString <= req.endDate &&
             req.status !== 'rejected'
         );
@@ -128,18 +128,18 @@ export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({
         const endYear = end.getFullYear();
 
         const options: Intl.DateTimeFormatOptions = { day: '2-digit', month: 'short' };
-        
+
         const startStr = start.toLocaleDateString('de-DE', { ...options, year: startYear !== endYear ? 'numeric' : undefined });
         const endStr = end.toLocaleDateString('de-DE', { ...options, year: 'numeric' });
-        
+
         return `${startStr} - ${endStr}`;
     };
-    
+
     const handleOpenModal = (data: Partial<AbsenceFormData> | null = null) => {
         setInitialModalData(data);
         setIsModalOpen(true);
     };
-    
+
     const handleCellClick = (employeeId: number, day: Date) => {
         const existingAbsence = getAbsenceForDay(employeeId, day);
         if (existingAbsence) {
@@ -153,7 +153,7 @@ export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({
             });
         }
     };
-    
+
     const handleSaveAbsence = (data: AbsenceFormData) => {
         if (data.id) {
             onUpdateAbsenceRequest(data as AbsenceRequest);
@@ -176,10 +176,10 @@ export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({
                         <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
                     </button>
                     <h2 className="text-lg sm:text-xl font-bold text-gray-800 text-center">
-                       {formatHeaderDate()}
+                        {formatHeaderDate()}
                     </h2>
                     <div className="flex items-center gap-2">
-                         <Button onClick={() => handleOpenModal()} className="bg-blue-600 hover:bg-blue-700 hidden sm:flex items-center gap-2 text-sm px-3 py-2">
+                        <Button onClick={() => handleOpenModal()} className="bg-blue-600 hover:bg-blue-700 hidden sm:flex items-center gap-2 text-sm px-3 py-2">
                             <PlusIcon className="h-4 w-4" />
                             <span>Abwesenheit eintragen</span>
                         </Button>
@@ -192,7 +192,7 @@ export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({
                     <table className="min-w-full border-collapse border border-gray-200">
                         <thead className="sticky top-0 bg-white z-10 shadow-sm">
                             <tr>
-                                <th className="sticky left-0 bg-white p-2 border-b border-r text-left text-sm font-semibold text-gray-700 w-40 z-20">Mitarbeiter</th>
+                                <th className="sticky left-0 bg-white p-2 border-b border-r text-left text-sm font-semibold text-gray-700 w-48 min-w-[12rem] max-w-[12rem] z-20 shadow-[2px_1px_5px_rgba(0,0,0,0.02)]">Mitarbeiter</th>
                                 {visibleDays.map(day => {
                                     const year = day.getFullYear();
                                     const holidaysForYear = holidaysByYear[year] || [];
@@ -228,7 +228,7 @@ export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({
                         <tbody>
                             {employees.map(employee => (
                                 <tr key={employee.id}>
-                                    <td className="sticky left-0 bg-white p-2 border-b border-r text-sm font-medium whitespace-nowrap w-40 z-10">{employee.firstName} {employee.lastName}</td>
+                                    <td className="sticky left-0 bg-white p-2 border-b border-r text-sm font-medium whitespace-nowrap w-48 min-w-[12rem] max-w-[12rem] z-10 truncate shadow-[2px_0_5px_rgba(0,0,0,0.02)]">{employee.firstName} {employee.lastName}</td>
                                     {visibleDays.map(day => {
                                         const year = day.getFullYear();
                                         const holidaysForYear = holidaysByYear[year] || [];
@@ -243,7 +243,7 @@ export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({
                                         let cellTitle = holiday?.name || 'Abwesenheit eintragen';
 
                                         if (!absence) {
-                                           if (holiday) {
+                                            if (holiday) {
                                                 cellClassName += ' bg-red-50/30';
                                             } else if (isWeekend) {
                                                 cellClassName += ' bg-gray-50/50';
@@ -265,7 +265,7 @@ export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({
                                                     const isPending = absence.status === 'pending';
 
                                                     let pillClasses = 'absolute inset-y-1 left-0 right-0 flex items-center justify-start text-sm font-bold transition-all px-3 ';
-                                                    
+
                                                     if (isPending) {
                                                         pillClasses += `${ui.pendingClass} border-2 border-dashed ${ui.pendingBorderClass}`;
                                                     } else {
@@ -281,10 +281,10 @@ export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({
                                                     } else {
                                                         // Middle part
                                                     }
-                                                    
+
                                                     return (
                                                         <div className={pillClasses} title={isPending ? `${ui.title} (ausstehend)` : ui.title}>
-                                                           {(isStart || isSingleDay) && <span>{ui.short}</span>}
+                                                            {(isStart || isSingleDay) && <span>{ui.short}</span>}
                                                         </div>
                                                     );
                                                 })()}
@@ -295,7 +295,7 @@ export const VacationPlannerView: React.FC<VacationPlannerViewProps> = ({
                             ))}
                         </tbody>
                     </table>
-                     {employees.length === 0 && (
+                    {employees.length === 0 && (
                         <div className="text-center py-10 text-gray-500">
                             Keine Mitarbeiter angelegt. Bitte fügen Sie zuerst Mitarbeiter hinzu.
                         </div>

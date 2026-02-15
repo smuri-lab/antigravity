@@ -196,9 +196,9 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
             {/* Timeline Content */}
             <div className="flex flex-1 overflow-hidden">
                 {/* Sidebar - Employees */}
-                <div className="w-48 flex-shrink-0 border-r border-gray-200 overflow-y-auto bg-gray-50/50">
+                <div className="w-48 min-w-[12rem] max-w-[12rem] flex-shrink-0 border-r border-gray-200 overflow-y-auto bg-gray-50/50 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
                     <div
-                        className="h-12 border-b border-gray-200 bg-white sticky top-0 z-30 flex items-center justify-between p-3 font-semibold text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors group"
+                        className="h-12 border-b border-gray-200 bg-white sticky top-0 z-30 flex items-center justify-between p-3 font-semibold text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors group shadow-sm"
                         onClick={() => setIsFilterModalOpen(true)}
                     >
                         <span>Mitarbeiter</span>

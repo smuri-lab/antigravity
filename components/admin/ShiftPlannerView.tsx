@@ -1028,7 +1028,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                 <div className="flex bg-white border-b border-gray-200 sticky top-0 z-20 h-12 shadow-sm">
                                     {/* Employee Header with Filter */}
                                     <div
-                                        className="w-48 shrink-0 p-3 border-r border-gray-200 font-semibold text-gray-800 bg-white sticky left-0 z-30 flex items-center justify-between group cursor-pointer hover:bg-gray-50 transition-colors"
+                                        className="w-48 min-w-[12rem] max-w-[12rem] shrink-0 p-3 border-r border-gray-200 font-semibold text-gray-800 bg-white sticky left-0 z-30 flex items-center justify-between group cursor-pointer hover:bg-gray-50 transition-colors shadow-[2px_1px_5px_rgba(0,0,0,0.02)]"
                                         onClick={() => setIsFilterModalOpen(true)}
                                     >
                                         <span>Mitarbeiter</span>
@@ -1093,7 +1093,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                             <div key={`${row.type}-${row.id}`} className={`flex h-16 group hover:bg-gray-50/50 transition-colors ${isGroup ? 'bg-gray-50/30' : ''}`}>
                                                 {/* Label Column */}
                                                 <div
-                                                    className={`w-48 shrink-0 p-3 border-r border-gray-200 sticky left-0 z-20 bg-white group-hover:bg-gray-50 flex flex-col justify-center shadow-[2px_0_5px_rgba(0,0,0,0.02)] ${isGroup ? 'bg-gray-50' : ''}`}
+                                                    className={`w-48 min-w-[12rem] max-w-[12rem] shrink-0 p-3 border-r border-gray-200 sticky left-0 z-20 bg-white group-hover:bg-gray-50 flex flex-col justify-center shadow-[2px_0_5px_rgba(0,0,0,0.02)] transition-colors ${isGroup ? 'bg-gray-50' : ''}`}
                                                     style={isGroup && row.color ? { borderLeft: `4px solid ${row.color}` } : {}}
                                                 >
                                                     <div className="flex items-center w-full gap-2">
