@@ -391,19 +391,37 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
 
     const renderPlannerTable = (isFullscreenContext = false) => (
         <>
-            <div className={`flex justify-center items-center gap-2 sm:gap-4 mb-4 sticky left-0 right-0 ${isFullscreenContext ? 'pt-4' : ''}`}>
-                <button onClick={() => changePeriod(-1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Vorheriger Zeitraum">
-                    <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
-                </button>
-                <button onClick={() => setIsDateRangeModalOpen(true)} className="group flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-100 transition-colors" title="Zeitraum anpassen">
-                    <h2 className="text-lg font-bold text-gray-800 text-center font-display tracking-tight">{formatHeaderDate()}</h2>
-                    <CalendarDaysIcon className="h-5 w-5 text-gray-600 group-hover:text-blue-600 transition-colors" />
-                </button>
-                <button onClick={() => changePeriod(1)} className="p-2 rounded-full hover:bg-gray-100 transition-colors" aria-label="Nächster Zeitraum">
-                    <ChevronRightIcon className="h-5 w-5 text-gray-600" />
-                </button>
+            <div className={`flex justify-center items-center mb-4 sticky left-0 right-0 ${isFullscreenContext ? 'pt-4' : ''}`}>
+                <div className="flex items-center bg-gray-100/80 rounded-xl p-1 shadow-sm border border-gray-200/50">
+                    <button
+                        onClick={() => changePeriod(-1)}
+                        className="p-1.5 hover:bg-white rounded-lg hover:shadow-sm text-gray-600 transition-all active:scale-95"
+                        aria-label="Vorheriger Zeitraum"
+                    >
+                        <ChevronLeftIcon className="h-5 w-5" />
+                    </button>
+
+                    <button
+                        onClick={() => setIsDateRangeModalOpen(true)}
+                        className="group flex items-center gap-2 px-3 py-1 hover:bg-white/50 rounded-lg transition-colors"
+                    >
+                        <CalendarDaysIcon className="h-5 w-5 text-gray-500 group-hover:text-blue-600 transition-colors" />
+                        <h2 className="text-base font-bold text-gray-900 whitespace-nowrap font-display tracking-tight">
+                            {formatHeaderDate()}
+                        </h2>
+                    </button>
+
+                    <button
+                        onClick={() => changePeriod(1)}
+                        className="p-1.5 hover:bg-white rounded-lg hover:shadow-sm text-gray-600 transition-all active:scale-95"
+                        aria-label="Nächster Zeitraum"
+                    >
+                        <ChevronRightIcon className="h-5 w-5" />
+                    </button>
+                </div>
+
                 {!isFullscreenContext && (
-                    <button onClick={() => setIsFullscreen(true)} className="p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600" title="Vollbild">
+                    <button onClick={() => setIsFullscreen(true)} className="ml-4 p-2 rounded-full hover:bg-gray-100 transition-colors text-gray-600" title="Vollbild">
                         <ArrowsPointingOutIcon className="h-5 w-5" />
                     </button>
                 )}
