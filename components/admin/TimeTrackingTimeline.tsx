@@ -138,19 +138,36 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
             {/* Header Toolbar */}
             <div className="flex items-center justify-between p-4 border-b">
                 <div className="flex items-center space-x-4">
-                    <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                        <button onClick={handlePrevDay} className="p-1 hover:bg-white rounded shadow-sm text-gray-600">
+                    <div className="flex items-center bg-gray-100/80 rounded-xl p-1 shadow-sm border border-gray-200/50">
+                        <button
+                            onClick={handlePrevDay}
+                            className="p-1.5 hover:bg-white rounded-lg hover:shadow-sm text-gray-600 transition-all active:scale-95"
+                            title="Vorheriger Tag"
+                        >
                             <ChevronLeftIcon className="w-5 h-5" />
                         </button>
-                        <button onClick={handleToday} className="px-3 py-1 text-sm font-semibold text-gray-700 hover:text-gray-900">
-                            Heute
-                        </button>
-                        <div className="h-4 w-px bg-gray-300 mx-1"></div>
-                        <button className="px-3 py-1 text-sm font-semibold text-gray-900 flex items-center gap-2">
-                            <CalendarIcon className="w-4 h-4 text-gray-500" />
-                            {currentDate.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
-                        </button>
-                        <button onClick={handleNextDay} className="p-1 hover:bg-white rounded shadow-sm text-gray-600">
+
+                        <div className="flex items-center px-1">
+                            <button
+                                onClick={handleToday}
+                                className="px-3 py-1 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
+                            >
+                                Heute
+                            </button>
+                            <div className="h-4 w-px bg-gray-300 mx-1"></div>
+                            <button className="px-3 py-1 flex items-center gap-2 group">
+                                <CalendarIcon className="w-4 h-4 text-gray-500 group-hover:text-blue-600 transition-colors" />
+                                <span className="text-base font-bold text-gray-900 whitespace-nowrap">
+                                    {currentDate.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
+                                </span>
+                            </button>
+                        </div>
+
+                        <button
+                            onClick={handleNextDay}
+                            className="p-1.5 hover:bg-white rounded-lg hover:shadow-sm text-gray-600 transition-all active:scale-95"
+                            title="Nächster Tag"
+                        >
                             <ChevronRightIcon className="w-5 h-5" />
                         </button>
                     </div>
