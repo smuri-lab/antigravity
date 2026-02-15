@@ -135,13 +135,14 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
     return (
         <div className="flex flex-col h-full bg-white rounded-lg shadow overflow-hidden">
             {/* Header Toolbar */}
-            {/* Header Toolbar */}
             <div className="flex items-center justify-between p-4 border-b">
-                <div className="flex items-center space-x-4">
-                    <div className="flex items-center bg-gray-100/80 rounded-xl p-1 shadow-sm border border-gray-200/50">
+                <div className="w-1/4"></div> {/* Left spacer */}
+
+                <div className="flex-1 flex justify-center">
+                    <div className="flex items-center">
                         <button
                             onClick={handlePrevDay}
-                            className="p-1.5 hover:bg-white rounded-lg hover:shadow-sm text-gray-600 transition-all active:scale-95"
+                            className="p-1.5 hover:bg-gray-50 rounded-lg text-gray-600 transition-all active:scale-95"
                             title="Vorheriger Tag"
                         >
                             <ChevronLeftIcon className="w-5 h-5" />
@@ -155,7 +156,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                                 Heute
                             </button>
                             <div className="h-4 w-px bg-gray-300 mx-1"></div>
-                            <button className="px-3 py-1 flex items-center gap-2 group">
+                            <button className="px-3 py-1 flex items-center gap-2 group hover:bg-gray-50 rounded-lg transition-colors">
                                 <CalendarIcon className="w-4 h-4 text-gray-500 group-hover:text-blue-600 transition-colors" />
                                 <span className="text-base font-bold text-gray-900 whitespace-nowrap">
                                     {currentDate.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
@@ -165,7 +166,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
 
                         <button
                             onClick={handleNextDay}
-                            className="p-1.5 hover:bg-white rounded-lg hover:shadow-sm text-gray-600 transition-all active:scale-95"
+                            className="p-1.5 hover:bg-gray-50 rounded-lg text-gray-600 transition-all active:scale-95"
                             title="Nächster Tag"
                         >
                             <ChevronRightIcon className="w-5 h-5" />
@@ -173,7 +174,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                     </div>
                 </div>
 
-                <div className="flex items-center space-x-2 relative">
+                <div className="w-1/4 flex justify-end items-center space-x-2 relative">
                     <Button variant="ghost" onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="text-gray-500 hover:text-gray-700">
                         <CogIcon className="w-5 h-5" />
                     </Button>

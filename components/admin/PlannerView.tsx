@@ -392,10 +392,10 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
     const renderPlannerTable = (isFullscreenContext = false) => (
         <>
             <div className={`flex justify-center items-center mb-4 sticky left-0 right-0 ${isFullscreenContext ? 'pt-4' : ''}`}>
-                <div className="flex items-center bg-gray-100/80 rounded-xl p-1 shadow-sm border border-gray-200/50">
+                <div className="flex items-center">
                     <button
                         onClick={() => changePeriod(-1)}
-                        className="p-1.5 hover:bg-white rounded-lg hover:shadow-sm text-gray-600 transition-all active:scale-95"
+                        className="p-1.5 hover:bg-gray-50 rounded-lg text-gray-600 transition-all active:scale-95"
                         aria-label="Vorheriger Zeitraum"
                     >
                         <ChevronLeftIcon className="h-5 w-5" />
@@ -403,7 +403,7 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
 
                     <button
                         onClick={() => setIsDateRangeModalOpen(true)}
-                        className="group flex items-center gap-2 px-3 py-1 hover:bg-white/50 rounded-lg transition-colors"
+                        className="group flex items-center gap-2 px-3 py-1 hover:bg-gray-50 rounded-lg transition-colors"
                     >
                         <CalendarDaysIcon className="h-5 w-5 text-gray-500 group-hover:text-blue-600 transition-colors" />
                         <h2 className="text-base font-bold text-gray-900 whitespace-nowrap font-display tracking-tight">
@@ -413,7 +413,7 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
 
                     <button
                         onClick={() => changePeriod(1)}
-                        className="p-1.5 hover:bg-white rounded-lg hover:shadow-sm text-gray-600 transition-all active:scale-95"
+                        className="p-1.5 hover:bg-gray-50 rounded-lg text-gray-600 transition-all active:scale-95"
                         aria-label="Nächster Zeitraum"
                     >
                         <ChevronRightIcon className="h-5 w-5" />

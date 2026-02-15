@@ -982,10 +982,10 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                             </div>
 
                             <div className="flex items-center justify-center w-full xl:w-auto">
-                                <div className="flex items-center bg-gray-100/80 rounded-xl p-1 shadow-sm border border-gray-200/50">
+                                <div className="flex items-center">
                                     <button
                                         onClick={() => shiftView(-1)}
-                                        className="p-1.5 hover:bg-white rounded-lg hover:shadow-sm text-gray-600 transition-all active:scale-95"
+                                        className="p-1.5 hover:bg-gray-50 rounded-lg text-gray-600 transition-all active:scale-95"
                                         title="Zurück"
                                     >
                                         <ChevronLeftIcon className="h-5 w-5" />
@@ -993,7 +993,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
                                     <button
                                         onClick={() => setIsDatePickModalOpen(true)}
-                                        className="group flex items-center gap-2 px-3 py-1 hover:bg-white/50 rounded-lg transition-colors"
+                                        className="group flex items-center gap-2 px-3 py-1 hover:bg-gray-50 rounded-lg transition-colors"
                                     >
                                         <CalendarDaysIcon className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
                                         <h2 className="text-base font-bold text-gray-900 whitespace-nowrap font-display tracking-tight">
@@ -1003,7 +1003,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
                                     <button
                                         onClick={() => shiftView(1)}
-                                        className="p-1.5 hover:bg-white rounded-lg hover:shadow-sm text-gray-600 transition-all active:scale-95"
+                                        className="p-1.5 hover:bg-gray-50 rounded-lg text-gray-600 transition-all active:scale-95"
                                         title="Vor"
                                     >
                                         <ChevronRightIcon className="h-5 w-5" />
