@@ -7,6 +7,7 @@ import { ChevronRightIcon } from '../icons/ChevronRightIcon';
 import { formatHoursAndMinutes } from '../utils';
 import { CogIcon } from '../icons/CogIcon';
 import { XIcon } from '../icons/XIcon';
+import { TrashIcon } from '../icons/TrashIcon';
 import { Select } from '../ui/Select';
 import { CalendarIcon } from '../icons/CalendarIcon';
 import { EmployeeMultiSelectModal } from './EmployeeMultiSelectModal';
@@ -196,7 +197,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
             {/* Timeline Content */}
             <div className="flex flex-1 overflow-hidden">
                 {/* Sidebar - Employees */}
-                <div className="w-40 min-w-[10rem] max-w-[10rem] flex-shrink-0 border-r border-gray-200 overflow-y-auto bg-gray-50/50 shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
+                <div className="w-40 min-w-[10rem] max-w-[10rem] flex-shrink-0 border-r border-gray-200 overflow-y-auto bg-white shadow-[2px_0_5px_rgba(0,0,0,0.02)]">
                     <div
                         className="h-12 border-b border-gray-200 bg-white sticky top-0 z-30 flex items-center justify-between p-3 font-semibold text-gray-800 cursor-pointer hover:bg-gray-50 transition-colors group shadow-sm"
                         onClick={() => setIsFilterModalOpen(true)}
@@ -205,15 +206,15 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                         <AdjustmentsHorizontalIcon className={`h-5 w-5 ${visibleEmployeeIds.length !== employees.length ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600'}`} />
                     </div>
                     {filteredEmployees.map(emp => (
-                        <div key={emp.id} className="h-16 border-b flex items-center px-3 hover:bg-white transition-colors">
+                        <div key={emp.id} className="h-16 border-b flex items-center px-3 hover:bg-gray-50 transition-colors group">
                             <div className="flex-1 min-w-0">
                                 <div className="text-base font-normal text-gray-900 truncate leading-tight">
                                     {emp.firstName} {emp.lastName}
                                 </div>
-                                <div className="text-xs text-gray-400 truncate">
-                                    {/* Optional summary info could go here, e.g. "8:00h" */}
-                                </div>
                             </div>
+                            <button className="p-1.5 text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">
+                                <TrashIcon className="h-4 w-4" />
+                            </button>
                         </div>
                     ))}
                 </div>
