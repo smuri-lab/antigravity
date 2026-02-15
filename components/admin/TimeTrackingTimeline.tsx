@@ -223,7 +223,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                     {/* Time Scale Header */}
                     <div ref={scrollContainerRef} className="flex-1 w-full h-full flex flex-col">
                         {/* Header Row */}
-                        <div className="h-10 border-b bg-gray-50 flex w-full sticky top-0 z-20">
+                        <div className="h-12 border-b border-gray-200 bg-white flex w-full sticky top-0 z-20">
                             {timelineSlots.slice(0, -1).map((time, index) => (
                                 <div key={index} className="flex-1 border-r border-gray-200 text-xs text-gray-500 flex items-center justify-center font-medium min-w-0">
 
@@ -251,7 +251,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                                     });
 
                                     return (
-                                        <div key={emp.id} className="h-14 border-b relative group hover:bg-gray-50/30 transition-colors w-full">
+                                        <div key={emp.id} className="h-16 border-b relative group hover:bg-gray-50/30 transition-colors w-full">
                                             {empEntries.map(entry => {
                                                 const style = getPositionStyle(entry.start, entry.end);
                                                 if (style.display === 'none') return null;
