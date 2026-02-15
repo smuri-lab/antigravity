@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { TimeTrackingTimeline } from './TimeTrackingTimeline';
 import type { TimeEntry, Employee, Customer, Activity, Holiday, AbsenceRequest, TimeBalanceAdjustment, CompanySettings, HolidaysByYear, WeeklySchedule } from '../../types';
 import { AbsenceType, TimeBalanceAdjustmentType, TargetHoursModel } from '../../types';
 import { Card } from '../ui/Card';
@@ -11,6 +12,8 @@ import { ChevronRightIcon } from '../icons/ChevronRightIcon';
 import { ArrowUturnLeftIcon } from '../icons/ArrowUturnLeftIcon';
 import { PlusIcon } from '../icons/PlusIcon';
 import { calculateBalance, formatHoursAndMinutes, calculateAbsenceDaysInMonth, calculateAnnualVacationTaken, getContractDetailsForDate, calculateAnnualSickDays, exportTimesheet, getAbsenceTypeDetails, exportTimesheetAsPdf, exportDatev } from '../utils/index';
+import { UsersIcon } from '../icons/UsersIcon';
+import { ClockIcon } from '../icons/ClockIcon';
 import { TimesheetExportModal } from './TimesheetExportModal';
 import { Select } from '../ui/Select';
 import { ManualEntryFormModal } from './ManualEntryFormModal';
@@ -40,6 +43,7 @@ interface TimeTrackingManagementProps {
     onUpdateTimeBalanceAdjustment: (adjustment: TimeBalanceAdjustment) => void;
     onDeleteTimeBalanceAdjustment: (id: number) => void;
     companySettings: CompanySettings;
+    onUpdateCompanySettings: (settings: CompanySettings) => void;
 }
 
 const months = ["Januar", "Februar", "März", "April", "Mai", "Juni", "Juli", "August", "September", "Oktober", "November", "Dezember"];
@@ -71,8 +75,10 @@ export const TimeTrackingManagement: React.FC<TimeTrackingManagementProps> = ({
     onDeleteAbsenceRequest,
     onUpdateTimeBalanceAdjustment,
     onDeleteTimeBalanceAdjustment,
-    companySettings
+    companySettings,
+    onUpdateCompanySettings
 }) => {
+    const [viewMode, setViewMode] = useState<'list' | 'timeline'>('list');
     const [activeEmployeeId, setActiveEmployeeId] = useState<number | null>(null);
     const [viewDate, setViewDate] = useState(new Date());
     const [entryToEdit, setEntryToEdit] = useState<TimeEntry | null>(null);
@@ -637,41 +643,73 @@ export const TimeTrackingManagement: React.FC<TimeTrackingManagementProps> = ({
 
     return (
         <div className="space-y-6">
-            <Card>
-                <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4 gap-4">
-                    <div>
-                        <h2 className="text-xl font-bold">Mitarbeiter-Übersicht</h2>
-                        <p className="text-sm text-gray-500 mt-1">Klicken Sie auf einen Mitarbeiter, um die monatliche Detailansicht zu öffnen.</p>
+            <div className="flex justify-end mb-4">
+                <div className="bg-white p-1 rounded-lg border shadow-sm flex">
+                    <button
+                        onClick={() => setViewMode('list')}
+                        className={`px-3 py-1.5 rounded-md flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'list' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                    >
+                        <UsersIcon className="h-4 w-4" />
+                        Liste
+                    </button>
+                    <button
+                        onClick={() => setViewMode('timeline')}
+                        className={`px-3 py-1.5 rounded-md flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'timeline' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                    >
+                        <ClockIcon className="h-4 w-4" />
+                        Timeline
+                    </button>
+                </div>
+            </div>
+
+            {viewMode === 'timeline' ? (
+                <TimeTrackingTimeline
+                    employees={employees}
+                    timeEntries={timeEntries}
+                    customers={customers}
+                    activities={activities}
+                    currentDate={viewDate}
+                    onDateChange={setViewDate}
+                    companySettings={companySettings}
+                    onUpdateSettings={onUpdateCompanySettings}
+                />
+            ) : (
+                <Card>
+                    <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4 gap-4">
+                        <div>
+                            <h2 className="text-xl font-bold">Mitarbeiter-Übersicht</h2>
+                            <p className="text-sm text-gray-500 mt-1">Klicken Sie auf einen Mitarbeiter, um die monatliche Detailansicht zu öffnen.</p>
+                        </div>
+                        <Button onClick={() => setIsExportModalOpen(true)} className="bg-green-600 hover:bg-green-700 flex items-center justify-center gap-2 flex-shrink-0">
+                            <DocumentArrowDownIcon className="h-5 w-5" />
+                            Stundenzettel exportieren
+                        </Button>
                     </div>
-                    <Button onClick={() => setIsExportModalOpen(true)} className="bg-green-600 hover:bg-green-700 flex items-center justify-center gap-2 flex-shrink-0">
-                        <DocumentArrowDownIcon className="h-5 w-5" />
-                        Stundenzettel exportieren
-                    </Button>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="min-w-full bg-white">
-                        <thead className="bg-gray-50">
-                            <tr>
-                                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mitarbeiter</th>
-                                <th className="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Stundenkonto (Ende Vormonat)</th>
-                                <th className="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Resturlaub (Jahr)</th>
-                                <th className="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Krankheitstage (Jahr)</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-gray-200">
-                            {employeeOverviewStats.map(stat => (
-                                <tr key={stat.id} onClick={() => handleSelectEmployee(stat.id)} className="cursor-pointer hover:bg-gray-50 transition-colors">
-                                    <td className="py-4 px-4 whitespace-nowrap font-normal">{stat.name}</td>
-                                    <td className={`py-4 px-4 whitespace-nowrap text-right font-semibold ${stat.timeBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatHoursAndMinutes(stat.timeBalance, timeFormat)}</td>
-                                    <td className="py-4 px-4 whitespace-nowrap text-right">{stat.vacationRemaining} Tage</td>
-                                    <td className="py-4 px-4 whitespace-nowrap text-right">{stat.sickDaysTaken} Tage</td>
+                    <div className="overflow-x-auto">
+                        <table className="min-w-full bg-white">
+                            <thead className="bg-gray-50">
+                                <tr>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mitarbeiter</th>
+                                    <th className="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Stundenkonto (Ende Vormonat)</th>
+                                    <th className="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Resturlaub (Jahr)</th>
+                                    <th className="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Krankheitstage (Jahr)</th>
                                 </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                    {employeeOverviewStats.length === 0 && (<p className="text-center text-gray-500 py-4">Keine aktiven Mitarbeiter gefunden.</p>)}
-                </div>
-            </Card>
+                            </thead>
+                            <tbody className="divide-y divide-gray-200">
+                                {employeeOverviewStats.map(stat => (
+                                    <tr key={stat.id} onClick={() => handleSelectEmployee(stat.id)} className="cursor-pointer hover:bg-gray-50 transition-colors">
+                                        <td className="py-4 px-4 whitespace-nowrap font-normal">{stat.name}</td>
+                                        <td className={`py-4 px-4 whitespace-nowrap text-right font-semibold ${stat.timeBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatHoursAndMinutes(stat.timeBalance, timeFormat)}</td>
+                                        <td className="py-4 px-4 whitespace-nowrap text-right">{stat.vacationRemaining} Tage</td>
+                                        <td className="py-4 px-4 whitespace-nowrap text-right">{stat.sickDaysTaken} Tage</td>
+                                    </tr>
+                                ))}
+                            </tbody>
+                        </table>
+                        {employeeOverviewStats.length === 0 && (<p className="text-center text-gray-500 py-4">Keine aktiven Mitarbeiter gefunden.</p>)}
+                    </div>
+                </Card>
+            )}
 
             {isExportModalOpen && (<TimesheetExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} onConfirm={handleConfirmExport} employees={employees} />)}
         </div>

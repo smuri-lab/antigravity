@@ -221,6 +221,9 @@ export interface CompanySettings {
   // Shift Planner Settings
   shiftPlannerStartHour?: number;
   shiftPlannerEndHour?: number;
+  // Time Tracking Settings
+  timeTrackingStartHour?: number;
+  timeTrackingEndHour?: number;
   // Configuration which categories are needed
   timeCategoryMode?: 'both' | 'customer' | 'activity';
 }
