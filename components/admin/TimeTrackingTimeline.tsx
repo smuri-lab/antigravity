@@ -11,6 +11,9 @@ import { Select } from '../ui/Select';
 import { CalendarIcon } from '../icons/CalendarIcon';
 import { EmployeeMultiSelectModal } from './EmployeeMultiSelectModal';
 import { AdjustmentsHorizontalIcon } from '../icons/AdjustmentsHorizontalIcon';
+import { TrashIcon } from '../icons/TrashIcon';
+import { PlusIcon } from '../icons/PlusIcon';
+import { CalendarDaysIcon } from '../icons/CalendarDaysIcon';
 
 interface TimeTrackingTimelineProps {
     employees: Employee[];
@@ -135,61 +138,43 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
         <div className="flex flex-col h-full bg-white rounded-lg shadow overflow-hidden">
             {/* Header Toolbar */}
             {/* Header Toolbar */}
-            <div className="flex items-center justify-between p-4 border-b">
-                <div className="flex items-center space-x-4">
-                    <div className="flex items-center bg-gray-100 rounded-lg p-1">
-                        <button onClick={handlePrevDay} className="p-1 hover:bg-white rounded shadow-sm text-gray-600">
-                            <ChevronLeftIcon className="w-5 h-5" />
-                        </button>
-                        <button onClick={handleToday} className="px-3 py-1 text-sm font-semibold text-gray-700 hover:text-gray-900">
-                            Heute
-                        </button>
-                        <div className="h-4 w-px bg-gray-300 mx-1"></div>
-                        <button className="px-3 py-1 text-sm font-semibold text-gray-900 flex items-center gap-2">
-                            <CalendarIcon className="w-4 h-4 text-gray-500" />
-                            {currentDate.toLocaleDateString('de-DE', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}
-                        </button>
-                        <button onClick={handleNextDay} className="p-1 hover:bg-white rounded shadow-sm text-gray-600">
-                            <ChevronRightIcon className="w-5 h-5" />
-                        </button>
-                    </div>
+            <div className="flex flex-col xl:flex-row items-center justify-between p-4 gap-4 border-b">
+                {/* Actions / Filter */}
+                <div className="flex items-center gap-2 w-full xl:w-auto">
+                    <Button onClick={() => { }} className="bg-indigo-600 hover:bg-indigo-700 flex items-center gap-2 text-sm px-4 py-2">
+                        <PlusIcon className="h-4 w-4" />
+                        <span>Zeit erfassen</span>
+                    </Button>
                 </div>
 
-                <div className="flex items-center space-x-2 relative">
-                    <Button variant="ghost" onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="text-gray-500 hover:text-gray-700">
-                        <CogIcon className="w-5 h-5" />
-                    </Button>
+                {/* Date Navigation */}
+                <div className="flex items-center justify-center gap-4 w-full xl:w-auto">
+                    <button onClick={handlePrevDay} className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <ChevronLeftIcon className="h-5 w-5 text-gray-600" />
+                    </button>
+                    <button onClick={handleToday} className="flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-gray-50 transition-colors group">
+                        <CalendarDaysIcon className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
+                        <h2 className="text-lg font-bold text-gray-800 whitespace-nowrap tracking-tight">
+                            {currentDate.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit' })},
+                            <span className="ml-1 text-gray-500 font-medium">08:00 Uhr</span>
+                        </h2>
+                    </button>
+                    <button onClick={handleNextDay} className="p-2 rounded-full hover:bg-gray-100 transition-colors">
+                        <ChevronRightIcon className="h-5 w-5 text-gray-600" />
+                    </button>
+                </div>
 
-                    {isSettingsOpen && (
-                        <div className="absolute top-10 right-0 w-64 bg-white border rounded-lg shadow-xl z-50 p-4">
-                            <div className="flex justify-between items-center mb-3">
-                                <h3 className="font-semibold text-sm">Ansichtseinstellungen</h3>
-                                <button onClick={() => setIsSettingsOpen(false)} className="text-gray-400 hover:text-gray-600">
-                                    <XIcon className="w-4 h-4" />
-                                </button>
-                            </div>
-                            <div className="space-y-3">
-                                <Select
-                                    label="Startzeit"
-                                    value={startHour}
-                                    onChange={(e) => handleSaveSettings(Number(e.target.value), endHour)}
-                                >
-                                    {Array.from({ length: 24 }, (_, i) => (
-                                        <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
-                                    ))}
-                                </Select>
-                                <Select
-                                    label="Endzeit"
-                                    value={endHour}
-                                    onChange={(e) => handleSaveSettings(startHour, Number(e.target.value))}
-                                >
-                                    {Array.from({ length: 24 }, (_, i) => (
-                                        <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
-                                    ))}
-                                </Select>
-                            </div>
-                        </div>
-                    )}
+                {/* View Switcher Placeholder (matching ShiftPlanner) */}
+                <div className="flex bg-gray-100 p-1 rounded-lg w-full xl:w-auto justify-center">
+                    <button className="px-3 py-1.5 text-sm font-medium rounded-md bg-white text-blue-600 shadow-sm flex-1 xl:flex-initial">
+                        Stunden
+                    </button>
+                    <button className="px-3 py-1.5 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 flex-1 xl:flex-initial">
+                        Woche
+                    </button>
+                    <button className="px-3 py-1.5 text-sm font-medium rounded-md text-gray-600 hover:text-gray-900 flex-1 xl:flex-initial">
+                        Monat
+                    </button>
                 </div>
             </div>
 
@@ -205,15 +190,15 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                         <AdjustmentsHorizontalIcon className={`h-5 w-5 ${visibleEmployeeIds.length !== employees.length ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600'}`} />
                     </div>
                     {filteredEmployees.map(emp => (
-                        <div key={emp.id} className="h-16 border-b flex items-center px-3 hover:bg-white transition-colors">
+                        <div key={emp.id} className="h-16 border-b flex items-center px-3 hover:bg-white transition-colors group">
                             <div className="flex-1 min-w-0">
                                 <div className="text-base font-normal text-gray-900 truncate leading-tight">
                                     {emp.firstName} {emp.lastName}
                                 </div>
-                                <div className="text-xs text-gray-400 truncate">
-                                    {/* Optional summary info could go here, e.g. "8:00h" */}
-                                </div>
                             </div>
+                            <button className="opacity-0 group-hover:opacity-100 p-1.5 rounded-full hover:bg-gray-100 text-gray-400 hover:text-red-600 transition-all">
+                                <TrashIcon className="h-4 w-4" />
+                            </button>
                         </div>
                     ))}
                 </div>
@@ -223,13 +208,16 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                     {/* Time Scale Header */}
                     <div ref={scrollContainerRef} className="flex-1 w-full h-full flex flex-col">
                         {/* Header Row */}
-                        <div className="h-12 border-b border-gray-200 bg-white flex w-full sticky top-0 z-20">
-                            {timelineSlots.slice(0, -1).map((time, index) => (
-                                <div key={index} className="flex-1 border-r border-gray-200 text-xs text-gray-500 flex items-center justify-center font-medium min-w-0">
-
-                                    <span className="truncate px-1">{time.getHours().toString().padStart(2, '0')}</span>
-                                </div>
-                            ))}
+                        <div className="h-12 border-b border-gray-200 flex w-full sticky top-0 z-20">
+                            {timelineSlots.slice(0, -1).map((time, index) => {
+                                const displayHour = time.getHours().toString().padStart(2, '0');
+                                return (
+                                    <div key={index} className="flex-1 border-r border-gray-200 text-xs text-gray-500 flex flex-col items-center justify-center font-medium min-w-0 bg-gray-50/30 relative">
+                                        <span className="truncate px-1">{displayHour}:00</span>
+                                        <div className="absolute bottom-0 h-1 w-px bg-gray-300 left-1/2"></div>
+                                    </div>
+                                );
+                            })}
                         </div>
 
                         {/* Employee Rows - Wrapper for scrolling content if needed, but width is 100% */}
