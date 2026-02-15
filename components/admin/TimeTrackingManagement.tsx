@@ -78,7 +78,7 @@ export const TimeTrackingManagement: React.FC<TimeTrackingManagementProps> = ({
     companySettings,
     onUpdateCompanySettings
 }) => {
-    const [viewMode, setViewMode] = useState<'list' | 'timeline'>('list');
+    const [viewMode, setViewMode] = useState<'list' | 'timeline'>('timeline');
     const [activeEmployeeId, setActiveEmployeeId] = useState<number | null>(null);
     const [viewDate, setViewDate] = useState(new Date());
     const [entryToEdit, setEntryToEdit] = useState<TimeEntry | null>(null);
@@ -643,23 +643,29 @@ export const TimeTrackingManagement: React.FC<TimeTrackingManagementProps> = ({
 
     return (
         <div className="space-y-6">
-            <div className="flex justify-end mb-4">
-                <div className="bg-white p-1 rounded-lg border shadow-sm flex">
-                    <button
-                        onClick={() => setViewMode('list')}
-                        className={`px-3 py-1.5 rounded-md flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'list' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'}`}
-                    >
-                        <UsersIcon className="h-4 w-4" />
-                        Liste
-                    </button>
+            <div className="border-b border-gray-200">
+                <nav className="-mb-px flex space-x-6" aria-label="Tabs">
                     <button
                         onClick={() => setViewMode('timeline')}
-                        className={`px-3 py-1.5 rounded-md flex items-center gap-2 text-sm font-medium transition-colors ${viewMode === 'timeline' ? 'bg-blue-50 text-blue-700' : 'text-gray-600 hover:bg-gray-50'}`}
+                        className={`${viewMode === 'timeline'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
                     >
-                        <ClockIcon className="h-4 w-4" />
+                        <ClockIcon className="h-5 w-5" />
                         Timeline
                     </button>
-                </div>
+                    <button
+                        onClick={() => setViewMode('list')}
+                        className={`${viewMode === 'list'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
+                    >
+                        <UsersIcon className="h-5 w-5" />
+                        Liste
+                    </button>
+                </nav>
             </div>
 
             {viewMode === 'timeline' ? (
