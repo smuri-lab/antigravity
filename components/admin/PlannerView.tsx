@@ -412,14 +412,14 @@ export const PlannerView: React.FC<PlannerViewProps> = (props) => {
                 <table className="min-w-full border-collapse table-fixed">
                     <thead className="sticky top-0 bg-white z-10 shadow-sm">
                         <tr>
-                            <th rowSpan={2} className="sticky left-0 bg-white border-b border-r border-gray-200 w-48 z-20 align-middle">
-                                <button onClick={() => setIsDisplayOptionsModalOpen(true)} className="w-full flex items-center justify-between text-left text-base font-semibold group py-3 px-2 hover:bg-gray-50 transition-colors">
+                            <th rowSpan={2} className="sticky left-0 bg-white border-b border-r border-gray-200 w-48 z-20 align-bottom pb-2">
+                                <button onClick={() => setIsDisplayOptionsModalOpen(true)} className="w-full flex items-center justify-between text-left text-base font-semibold group py-1 px-2 hover:bg-gray-50 transition-colors">
                                     <span>Mitarbeiter</span>
                                     <AdjustmentsHorizontalIcon className="h-5 w-5 text-gray-400 group-hover:text-blue-600 transition-colors" />
                                 </button>
                             </th>
                             {weeks.map(week => (
-                                <th key={`${week.year}-${week.week}`} colSpan={week.days.length} className="py-2 px-1 border-b border-l border-gray-200 text-center text-sm font-semibold text-gray-700">
+                                <th key={`${week.year}-${week.week}`} colSpan={week.days.length} className="py-2 px-1 border-b border-l border-gray-200 text-center text-sm font-semibold text-gray-700 whitespace-nowrap">
                                     KW {week.week}
                                 </th>
                             ))}
