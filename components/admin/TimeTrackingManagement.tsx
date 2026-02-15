@@ -695,7 +695,7 @@ export const TimeTrackingManagement: React.FC<TimeTrackingManagementProps> = ({
                         <table className="min-w-full bg-white">
                             <thead className="bg-gray-50">
                                 <tr>
-                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Mitarbeiter</th>
+                                    <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider w-48 min-w-[12rem]">Mitarbeiter</th>
                                     <th className="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Stundenkonto (Ende Vormonat)</th>
                                     <th className="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Resturlaub (Jahr)</th>
                                     <th className="py-3 px-4 text-right text-xs font-medium text-gray-500 uppercase tracking-wider">Krankheitstage (Jahr)</th>
@@ -704,7 +704,7 @@ export const TimeTrackingManagement: React.FC<TimeTrackingManagementProps> = ({
                             <tbody className="divide-y divide-gray-200">
                                 {employeeOverviewStats.map(stat => (
                                     <tr key={stat.id} onClick={() => handleSelectEmployee(stat.id)} className="cursor-pointer hover:bg-gray-50 transition-colors">
-                                        <td className="py-4 px-4 whitespace-nowrap font-normal">{stat.name}</td>
+                                        <td className="py-4 px-4 whitespace-nowrap font-normal w-48 min-w-[12rem] truncate">{stat.name}</td>
                                         <td className={`py-4 px-4 whitespace-nowrap text-right font-semibold ${stat.timeBalance >= 0 ? 'text-green-600' : 'text-red-600'}`}>{formatHoursAndMinutes(stat.timeBalance, timeFormat)}</td>
                                         <td className="py-4 px-4 whitespace-nowrap text-right">{stat.vacationRemaining} Tage</td>
                                         <td className="py-4 px-4 whitespace-nowrap text-right">{stat.sickDaysTaken} Tage</td>
