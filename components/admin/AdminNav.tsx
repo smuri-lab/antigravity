@@ -73,9 +73,9 @@ export const AdminNav: React.FC<AdminNavProps> = ({ activeView, setActiveView, c
 
   const mainNavItems: NavItemData[] = [
     { label: t('nav.dashboard'), view: AdminViewType.Dashboard, icon: LayoutDashboardIcon },
+    { label: t('nav.time_tracking', 'Zeiterfassung'), view: AdminViewType.TimeTracking, icon: ClockIcon },
     { label: t('nav.planner'), view: AdminViewType.Planner, icon: SunIcon, badge: pendingRequestsCount },
     { label: t('nav.shift_planner', 'Schichtplan'), view: AdminViewType.ShiftPlanner, icon: CalendarDaysIcon },
-    { label: t('nav.time_tracking', 'Zeiterfassung'), view: AdminViewType.TimeTracking, icon: ClockIcon },
     {
       label: "Stammdaten",
       view: AdminViewType.Employees, // Clicking Stammdaten defaults to Employees
