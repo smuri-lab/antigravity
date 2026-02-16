@@ -4,6 +4,9 @@ import { AdminViewType, type Customer, type Activity, type CompanySettings, type
 import { CustomerManagement } from './CustomerManagement';
 import { ActivityManagement } from './ActivityManagement';
 import { EmployeeManagement } from './EmployeeManagement';
+import { UsersIcon } from '../icons/UsersIcon';
+import { BriefcaseIcon } from '../icons/BriefcaseIcon';
+import { AdjustmentsHorizontalIcon } from '../icons/AdjustmentsHorizontalIcon';
 
 interface VerwaltungViewProps {
   initialView: AdminViewType;
@@ -49,9 +52,9 @@ export const VerwaltungView: React.FC<VerwaltungViewProps> = (props) => {
   const activityLabel = props.companySettings.activityLabel || 'Zeitkategorie 2';
 
   const tabs = [
-    { id: 'employees', label: 'Mitarbeiter' },
-    { id: 'customers', label: customerLabel },
-    { id: 'activities', label: activityLabel },
+    { id: 'employees', label: 'Mitarbeiter', icon: UsersIcon },
+    { id: 'customers', label: customerLabel, icon: BriefcaseIcon },
+    { id: 'activities', label: activityLabel, icon: AdjustmentsHorizontalIcon },
   ];
 
   return (
@@ -63,11 +66,12 @@ export const VerwaltungView: React.FC<VerwaltungViewProps> = (props) => {
               key={tab.id}
               onClick={() => handleTabChange(tab.id as any)}
               className={`${activeTab === tab.id
-                  ? 'border-blue-500 text-blue-600'
-                  : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
-                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base`}
+                ? 'border-blue-500 text-blue-600'
+                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
               aria-current={activeTab === tab.id ? 'page' : undefined}
             >
+              <tab.icon className="h-5 w-5" />
               {tab.label}
             </button>
           ))}
