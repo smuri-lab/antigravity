@@ -11,6 +11,8 @@ import { ChevronLeftIcon } from '../icons/ChevronLeftIcon';
 import { ChevronRightIcon } from '../icons/ChevronRightIcon';
 import { ArrowUturnLeftIcon } from '../icons/ArrowUturnLeftIcon';
 import { PlusIcon } from '../icons/PlusIcon';
+import { ReportsView } from './ReportsView';
+import { ChartBarIcon } from '../icons/ChartBarIcon';
 import { calculateBalance, formatHoursAndMinutes, calculateAbsenceDaysInMonth, calculateAnnualVacationTaken, getContractDetailsForDate, calculateAnnualSickDays, exportTimesheet, getAbsenceTypeDetails, exportTimesheetAsPdf, exportDatev } from '../utils/index';
 import { UsersIcon } from '../icons/UsersIcon';
 import { ClockIcon } from '../icons/ClockIcon';
@@ -78,7 +80,7 @@ export const TimeTrackingManagement: React.FC<TimeTrackingManagementProps> = ({
     companySettings,
     onUpdateCompanySettings
 }) => {
-    const [viewMode, setViewMode] = useState<'list' | 'timeline'>('timeline');
+    const [viewMode, setViewMode] = useState<'list' | 'timeline' | 'reports'>('timeline');
     const [activeEmployeeId, setActiveEmployeeId] = useState<number | null>(null);
     const [viewDate, setViewDate] = useState(new Date());
     const [entryToEdit, setEntryToEdit] = useState<TimeEntry | null>(null);
@@ -663,7 +665,17 @@ export const TimeTrackingManagement: React.FC<TimeTrackingManagementProps> = ({
                             } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
                     >
                         <UsersIcon className="h-5 w-5" />
-                        Liste
+                        Übersicht
+                    </button>
+                    <button
+                        onClick={() => setViewMode('reports')}
+                        className={`${viewMode === 'reports'
+                            ? 'border-blue-500 text-blue-600'
+                            : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                            } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base flex items-center gap-2`}
+                    >
+                        <ChartBarIcon className="h-5 w-5" />
+                        Auswertung
                     </button>
                 </nav>
             </div>
@@ -679,7 +691,7 @@ export const TimeTrackingManagement: React.FC<TimeTrackingManagementProps> = ({
                     companySettings={companySettings}
                     onUpdateSettings={onUpdateCompanySettings}
                 />
-            ) : (
+            ) : viewMode === 'list' ? (
                 <Card>
                     <div className="flex flex-col sm:flex-row justify-between sm:items-center mb-4 gap-4">
                         <div>
@@ -715,6 +727,16 @@ export const TimeTrackingManagement: React.FC<TimeTrackingManagementProps> = ({
                         {employeeOverviewStats.length === 0 && (<p className="text-center text-gray-500 py-4">Keine aktiven Mitarbeiter gefunden.</p>)}
                     </div>
                 </Card>
+            ) : (
+                <div className="mt-4">
+                    <ReportsView
+                        timeEntries={timeEntries}
+                        customers={customers}
+                        activities={activities}
+                        companySettings={companySettings}
+                        employees={employees}
+                    />
+                </div>
             )}
 
             {isExportModalOpen && (<TimesheetExportModal isOpen={isExportModalOpen} onClose={() => setIsExportModalOpen(false)} onConfirm={handleConfirmExport} employees={employees} />)}

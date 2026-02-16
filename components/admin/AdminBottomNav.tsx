@@ -70,10 +70,10 @@ export const AdminBottomNav: React.FC<AdminBottomNavProps> = ({ activeView, setA
           badge={pendingRequestsCount}
         />
         <NavItem
-          label={t('nav.reports', 'Berichte')}
-          isActive={activeView === AdminViewType.Reports}
-          onClick={() => setActiveView(AdminViewType.Reports)}
-          Icon={ChartBarIcon}
+          label={t('nav.timeTracking', 'Zeiterfassung')}
+          isActive={activeView === AdminViewType.TimeTracking}
+          onClick={() => setActiveView(AdminViewType.TimeTracking)}
+          Icon={ClockIcon}
         />
         <NavItem
           label={t('nav.admin', 'Stammdaten')}

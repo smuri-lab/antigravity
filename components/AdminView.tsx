@@ -120,14 +120,6 @@ export const AdminView: React.FC<AdminViewProps> = (props) => {
         />;
       case AdminViewType.TimeTracking:
         return <TimeTrackingManagement {...props} />;
-      case AdminViewType.Reports:
-        return <ReportsView
-          timeEntries={props.timeEntries}
-          customers={props.customers}
-          activities={props.activities}
-          companySettings={props.companySettings}
-          employees={props.employees}
-        />;
       case AdminViewType.Employees:
       case AdminViewType.Customers:
       case AdminViewType.Activities:
