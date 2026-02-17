@@ -730,6 +730,17 @@ const App: React.FC = () => {
     }
   };
 
+  // Ensure ShiftPlanner settings are initialized (Migration for existing users)
+  useEffect(() => {
+    if (companySettings.shiftPlannerStartHour === undefined || companySettings.shiftPlannerEndHour === undefined) {
+      setCompanySettings({
+        ...companySettings,
+        shiftPlannerStartHour: companySettings.shiftPlannerStartHour ?? 6,
+        shiftPlannerEndHour: companySettings.shiftPlannerEndHour ?? 22,
+      });
+    }
+  }, [companySettings, setCompanySettings]);
+
   return (
     <div className="fixed inset-0 w-full h-full flex flex-row overflow-hidden bg-gray-50 animate-fade-in">
       <div className="flex-1 flex flex-col relative h-full w-full min-w-0">

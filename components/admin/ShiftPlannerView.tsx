@@ -179,19 +179,34 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
 
     // --- PLANNER TAB STATE ---
-    const settingStartHour = companySettings.shiftPlannerStartHour ?? 6;
-    const settingEndHour = companySettings.shiftPlannerEndHour ?? 22;
+    // Use local state for immediately responsive UI
+    const [localStartHour, setLocalStartHour] = useState(companySettings.shiftPlannerStartHour ?? 6);
+    const [localEndHour, setLocalEndHour] = useState(companySettings.shiftPlannerEndHour ?? 22);
+
+    // Sync local state when props change (external updates)
+    useEffect(() => {
+        setLocalStartHour(companySettings.shiftPlannerStartHour ?? 6);
+        setLocalEndHour(companySettings.shiftPlannerEndHour ?? 22);
+    }, [companySettings.shiftPlannerStartHour, companySettings.shiftPlannerEndHour]);
+
+    const settingStartHour = localStartHour;
+    const settingEndHour = localEndHour;
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const handleSaveSettings = (newStart: number, newEnd: number) => {
+        // Immediate local update
+        setLocalStartHour(newStart);
+        setLocalEndHour(newEnd);
+
         if (onUpdateSettings) {
             onUpdateSettings({
                 ...companySettings,
                 shiftPlannerStartHour: newStart,
                 shiftPlannerEndHour: newEnd
             });
-            setIsSettingsOpen(false);
+            // Do NOT close the menu automatically - allows setting both start and end comfortably
+            // setIsSettingsOpen(false);
         }
     };
 
