@@ -1,5 +1,6 @@
 
 import React, { useState, useMemo, useCallback, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Employee, Shift, Customer, Activity, CompanySettings, AbsenceRequest, ShiftTemplate, RotationTemplate, EmployeeGroup } from '../../types';
 import { AbsenceType } from '../../types';
 import { Card } from '../ui/Card';
@@ -9,6 +10,7 @@ import { ChevronRightIcon } from '../icons/ChevronRightIcon';
 import { PlusIcon } from '../icons/PlusIcon';
 import { TrashIcon } from '../icons/TrashIcon';
 import { ShiftFormModal } from './ShiftFormModal';
+import { Select } from '../ui/Select';
 import { CalendarDaysIcon } from '../icons/CalendarDaysIcon';
 import { CalendarModal } from '../ui/CalendarModal';
 import { AdjustmentsHorizontalIcon } from '../icons/AdjustmentsHorizontalIcon';
@@ -59,6 +61,7 @@ interface ShiftPlannerViewProps {
     addEmployeeGroup: (group: Omit<EmployeeGroup, 'id' | 'createdAt'>) => void;
     updateEmployeeGroup: (group: EmployeeGroup) => void;
     deleteEmployeeGroup: (id: string) => void;
+    onUpdateSettings?: (settings: CompanySettings) => void;
 }
 
 // Helper to check if a shift overlaps with the visible time window
@@ -159,7 +162,8 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     employeeGroups = [],
     addEmployeeGroup = () => { },
     updateEmployeeGroup = () => { },
-    deleteEmployeeGroup = () => { }
+    deleteEmployeeGroup = () => { },
+    onUpdateSettings
 }) => {
     // Verify prop is correctly passed
     console.log('ShiftPlannerView: deleteShiftsByEmployee prop:', deleteShiftsByEmployee);
@@ -176,6 +180,19 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     // --- PLANNER TAB STATE ---
     const settingStartHour = companySettings.shiftPlannerStartHour ?? 6;
     const settingEndHour = companySettings.shiftPlannerEndHour ?? 22;
+
+    const [isSettingsOpen, setIsSettingsOpen] = useState(false);
+
+    const handleSaveSettings = (newStart: number, newEnd: number) => {
+        if (onUpdateSettings) {
+            onUpdateSettings({
+                ...companySettings,
+                shiftPlannerStartHour: newStart,
+                shiftPlannerEndHour: newEnd
+            });
+            setIsSettingsOpen(false);
+        }
+    };
 
     // View Mode State
     const [viewMode, setViewMode] = useState<ViewMode>('week'); // Default to Week view for better overview
@@ -986,7 +1003,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                     <button
                                         onClick={() => shiftView(-1)}
                                         className="p-1.5 hover:bg-gray-50 rounded-lg text-gray-600 transition-all active:scale-95"
-                                        title="Zurück"
+                                        title={t('shift_planner.prev', 'Zurück')}
                                     >
                                         <ChevronLeftIcon className="h-5 w-5" />
                                     </button>
@@ -1004,7 +1021,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                     <button
                                         onClick={() => shiftView(1)}
                                         className="p-1.5 hover:bg-gray-50 rounded-lg text-gray-600 transition-all active:scale-95"
-                                        title="Vor"
+                                        title={t('shift_planner.next', 'Vor')}
                                     >
                                         <ChevronRightIcon className="h-5 w-5" />
                                     </button>
@@ -1017,20 +1034,58 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                     onClick={() => setViewMode('timeline')}
                                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all flex-1 xl:flex-initial ${viewMode === 'timeline' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
                                 >
-                                    Stunden
+                                    {t('shift_planner.hours', 'Stunden')}
                                 </button>
                                 <button
                                     onClick={() => setViewMode('week')}
                                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all flex-1 xl:flex-initial ${viewMode === 'week' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
                                 >
-                                    Woche
+                                    {t('shift_planner.week', 'Woche')}
                                 </button>
                                 <button
                                     onClick={() => setViewMode('month')}
                                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all flex-1 xl:flex-initial ${viewMode === 'month' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
                                 >
-                                    Monat
+                                    {t('shift_planner.month', 'Monat')}
                                 </button>
+                            </div>
+
+                            {/* Settings Dropdown */}
+                            <div className="relative ml-2">
+                                <Button variant="ghost" onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="text-gray-500 hover:text-gray-700 h-full aspect-square p-2 bg-gray-100 hover:bg-gray-200 border-none rounded-lg">
+                                    <CogIcon className="w-5 h-5" />
+                                </Button>
+
+                                {isSettingsOpen && (
+                                    <div className="absolute top-12 right-0 w-64 bg-white border rounded-lg shadow-xl z-50 p-4 animate-fade-in">
+                                        <div className="flex justify-between items-center mb-3">
+                                            <h3 className="font-semibold text-sm">{t('shift_planner.view_settings', 'Ansichtseinstellungen')}</h3>
+                                            <button onClick={() => setIsSettingsOpen(false)} className="text-gray-400 hover:text-gray-600">
+                                                <XIcon className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                        <div className="space-y-3">
+                                            <Select
+                                                label={t('shift_planner.start_time', 'Startzeit')}
+                                                value={settingStartHour}
+                                                onChange={(e) => handleSaveSettings(Number(e.target.value), settingEndHour)}
+                                            >
+                                                {Array.from({ length: 24 }, (_, i) => (
+                                                    <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
+                                                ))}
+                                            </Select>
+                                            <Select
+                                                label={t('shift_planner.end_time', 'Endzeit')}
+                                                value={settingEndHour}
+                                                onChange={(e) => handleSaveSettings(settingStartHour, Number(e.target.value))}
+                                            >
+                                                {Array.from({ length: 24 }, (_, i) => (
+                                                    <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
+                                                ))}
+                                            </Select>
+                                        </div>
+                                    </div>
+                                )}
                             </div>
                         </div>
 

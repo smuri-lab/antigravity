@@ -1,4 +1,5 @@
 import React, { useState, useMemo, useRef, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { Employee, TimeEntry, Customer, Activity, CompanySettings } from '../../types';
 import { Button } from '../ui/Button';
 import { Card } from '../ui/Card';
@@ -34,6 +35,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
     companySettings,
     onUpdateSettings
 }) => {
+    const { t } = useTranslation();
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
     const [isFilterModalOpen, setIsFilterModalOpen] = useState(false);
     const [visibleEmployeeIds, setVisibleEmployeeIds] = useState<number[]>(() => employees.filter(e => e.isActive).map(e => e.id));
@@ -143,7 +145,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                         <button
                             onClick={handlePrevDay}
                             className="p-1.5 hover:bg-gray-50 rounded-lg text-gray-600 transition-all active:scale-95"
-                            title="Vorheriger Tag"
+                            title={t('timeline.prev_day', 'Vorheriger Tag')}
                         >
                             <ChevronLeftIcon className="w-5 h-5" />
                         </button>
@@ -153,7 +155,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                                 onClick={handleToday}
                                 className="px-3 py-1 text-sm font-bold text-blue-600 hover:text-blue-700 transition-colors"
                             >
-                                Heute
+                                {t('timeline.today', 'Heute')}
                             </button>
                             <div className="h-4 w-px bg-gray-300 mx-1"></div>
                             <button className="px-3 py-1 flex items-center gap-2 group hover:bg-gray-50 rounded-lg transition-colors">
@@ -167,7 +169,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                         <button
                             onClick={handleNextDay}
                             className="p-1.5 hover:bg-gray-50 rounded-lg text-gray-600 transition-all active:scale-95"
-                            title="Nächster Tag"
+                            title={t('timeline.next_day', 'Nächster Tag')}
                         >
                             <ChevronRightIcon className="w-5 h-5" />
                         </button>
@@ -182,14 +184,14 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                     {isSettingsOpen && (
                         <div className="absolute top-10 right-0 w-64 bg-white border rounded-lg shadow-xl z-50 p-4">
                             <div className="flex justify-between items-center mb-3">
-                                <h3 className="font-semibold text-sm">Ansichtseinstellungen</h3>
+                                <h3 className="font-semibold text-sm">{t('timeline.view_settings', 'Ansichtseinstellungen')}</h3>
                                 <button onClick={() => setIsSettingsOpen(false)} className="text-gray-400 hover:text-gray-600">
                                     <XIcon className="w-4 h-4" />
                                 </button>
                             </div>
                             <div className="space-y-3">
                                 <Select
-                                    label="Startzeit"
+                                    label={t('timeline.start_time', 'Startzeit')}
                                     value={startHour}
                                     onChange={(e) => handleSaveSettings(Number(e.target.value), endHour)}
                                 >
@@ -198,7 +200,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                                     ))}
                                 </Select>
                                 <Select
-                                    label="Endzeit"
+                                    label={t('timeline.end_time', 'Endzeit')}
                                     value={endHour}
                                     onChange={(e) => handleSaveSettings(startHour, Number(e.target.value))}
                                 >
@@ -220,7 +222,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                         className="h-12 border-b border-gray-200 bg-white sticky top-0 z-30 flex items-center justify-between p-3 text-base font-semibold text-gray-900 cursor-pointer hover:bg-gray-50 transition-colors group shadow-sm"
                         onClick={() => setIsFilterModalOpen(true)}
                     >
-                        <span>Mitarbeiter</span>
+                        <span>{t('timeline.employees', 'Mitarbeiter')}</span>
                         <AdjustmentsHorizontalIcon className={`h-5 w-5 ${visibleEmployeeIds.length !== employees.length ? 'text-blue-600' : 'text-gray-400 group-hover:text-blue-600'}`} />
                     </div>
                     {filteredEmployees.map(emp => (
@@ -305,7 +307,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                                 })}
                                 {filteredEmployees.length === 0 && (
                                     <div className="p-8 text-center text-gray-500">
-                                        Keine Mitarbeiter gefunden.
+                                        {t('timeline.no_employees', 'Keine Mitarbeiter gefunden.')}
                                     </div>
                                 )}
                             </div>
@@ -324,7 +326,7 @@ export const TimeTrackingTimeline: React.FC<TimeTrackingTimelineProps> = ({
                         setVisibleEmployeeIds(ids.map(Number));
                         setIsFilterModalOpen(false);
                     }}
-                    title="Mitarbeiter filtern"
+                    title={t('timeline.filter_employees', 'Mitarbeiter filtern')}
                 />
             )}
         </div>

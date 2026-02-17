@@ -926,8 +926,8 @@ const App: React.FC = () => {
               <div className="fixed bottom-20 sm:bottom-4 left-1/2 -translate-x-1/2 w-full max-w-md sm:w-auto p-4 bg-green-100 text-green-800 rounded-lg flex items-center gap-3 shadow-lg z-50 animate-toast-in">
                 <CheckCircleIcon className="h-6 w-6 text-green-500 flex-shrink-0" />
                 <div>
-                  <p className="font-semibold">Antrag eingereicht</p>
-                  <p className="text-sm">Ihr Antrag wurde erfolgreich zur Prüfung übermittelt.</p>
+                  <p className="font-semibold">{t('common.success', 'Erfolg')}</p>
+                  <p className="text-sm">{t('common.request_submitted', 'Ihr Antrag wurde erfolgreich zur Prüfung übermittelt.')}</p>
                 </div>
               </div>
             )}
@@ -935,8 +935,8 @@ const App: React.FC = () => {
               <div className="fixed bottom-20 sm:bottom-4 left-1/2 -translate-x-1/2 w-full max-w-md sm:w-auto p-4 bg-green-100 text-green-800 rounded-lg flex items-center gap-3 shadow-lg z-50 animate-toast-in">
                 <CheckCircleIcon className="h-6 w-6 text-green-500 flex-shrink-0" />
                 <div>
-                  <p className="font-semibold">Arbeitszeit gespeichert</p>
-                  <p className="text-sm">Der Eintrag wurde erfolgreich hinzugefügt.</p>
+                  <p className="font-semibold">{t('common.success', 'Erfolg')}</p>
+                  <p className="text-sm">{t('common.time_entry_saved', 'Der Eintrag wurde erfolgreich hinzugefügt.')}</p>
                 </div>
               </div>
             )}
@@ -944,7 +944,7 @@ const App: React.FC = () => {
               <div className="fixed bottom-20 sm:bottom-4 left-1/2 -translate-x-1/2 w-full max-w-md sm:w-auto p-4 bg-blue-100 text-blue-800 rounded-lg flex items-center gap-3 shadow-lg z-50 animate-toast-in">
                 <CheckCircleIcon className="h-6 w-6 text-blue-500 flex-shrink-0" />
                 <div>
-                  <p className="font-semibold">NFC-Scan erfolgreich</p>
+                  <p className="font-semibold">{t('common.nfc_scan_success', 'NFC-Scan erfolgreich')}</p>
                   <p className="text-sm">{nfcSuccessMessage}</p>
                 </div>
               </div>

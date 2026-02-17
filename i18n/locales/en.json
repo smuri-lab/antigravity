@@ -1,0 +1,115 @@
+{
+    "common": {
+        "loading": "Loading...",
+        "save": "Save",
+        "cancel": "Cancel",
+        "delete": "Delete",
+        "edit": "Edit",
+        "back": "Back",
+        "logout": "Logout",
+        "login": "Login",
+        "register": "Register",
+        "email": "Email",
+        "password": "Password",
+        "username": "Username"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "planner": "Planner",
+        "shift_planner": "Shift Planner",
+        "time_tracking": "Time Tracking",
+        "absences": "Absences",
+        "utilization": "Utilization",
+        "reports": "Reports",
+        "admin": "Administration",
+        "settings": "Settings",
+        "profile": "Profile"
+    },
+    "dashboard": {
+        "welcome": "Hello, {{name}}",
+        "overtime_trend": "Overtime Trend (6 Months)",
+        "team_utilization": "Team Utilization",
+        "hours": "Hours",
+        "no_data": "No data available"
+    },
+    "admin": {
+        "customers": "Customers",
+        "employees": "Employees",
+        "activities": "Activities"
+    },
+    "timeline": {
+        "view_settings": "View Settings",
+        "start_time": "Start Time",
+        "end_time": "End Time",
+        "employees": "Employees",
+        "today": "Today",
+        "prev_day": "Previous Day",
+        "next_day": "Next Day",
+        "no_employees": "No employees found",
+        "filter_employees": "Filter Employees"
+    },
+    "shift_planner": {
+        "view_settings": "View Settings",
+        "start_time": "Start Time",
+        "end_time": "End Time",
+        "employees": "Employees",
+        "hours": "Hours",
+        "week": "Week",
+        "month": "Month",
+        "prev": "Back",
+        "next": "Forward",
+        "date_range": "Date Range"
+    },
+    "system_configuration": "System Configuration",
+    "system_configuration_desc": "Technical settings and rules for the time tracking system.",
+    "success_saved": "System settings saved successfully!",
+    "tabs": {
+        "general": "General",
+        "time_tracking": "Time Tracking",
+        "employees": "Employees"
+    },
+    "general": {
+        "state_label": "State for Holidays",
+        "state_desc": "Select your state to correctly calculate public holidays.",
+        "time_format_label": "Time Format for Display & Input",
+        "time_format_desc": "Define whether durations are displayed in decimal hours (e.g. 8.50h) or in hours and minutes (e.g. 8h 30min).",
+        "admin_view": "Admin View",
+        "employee_view": "Employee View",
+        "shift_planner_grid": "Shift Planner Grid",
+        "shift_planner_grid_desc": "Define the visible time range in the shift planner.",
+        "start_time": "Start Time",
+        "end_time": "End Time"
+    },
+    "time_tracking": {
+        "category_label": "Time Category Naming",
+        "category_desc": "Name the time categories to match your company's terminology (e.g. change 'Customer' to 'Project').",
+        "label_cat1": "Label for Time Category 1",
+        "label_cat2": "Label for Time Category 2",
+        "label_nfc": "Label for NFC Tag ID",
+        "required_fields": "Required Fields",
+        "required_fields_desc": "Which details are mandatory for time tracking?",
+        "mode_both": "Both ({{cat1}} & {{cat2}}) - Default",
+        "mode_cat1": "Only Category 1 ({{cat1}}) - e.g. for service providers",
+        "mode_cat2": "Only Category 2 ({{cat2}}) - e.g. for gastronomy",
+        "methods_label": "Available Time Tracking Methods",
+        "methods_desc": "Define whether employees can only manually enter times or also use the time clock.",
+        "method_all": "Time Clock & Manual Input",
+        "method_manual": "Manual Input Only",
+        "edit_lock_label": "Editability of Time Entries",
+        "edit_lock_desc": "Define how long employees can edit or delete their own time entries. As an Admin, you can always edit all entries.",
+        "lock_unlimited": "No lock period (always editable)",
+        "lock_current_month": "Editable in current month",
+        "lock_previous_week": "Editable in current & previous week",
+        "lock_same_day": "Editable only on same day"
+    },
+    "employee_settings": {
+        "vacation_label": "Vacation Requests",
+        "vacation_desc": "Enables requesting half-day vacations.",
+        "allow_half_day": "Allow half-day vacations",
+        "export_label": "Timesheet Export",
+        "export_desc": "Allows employees to export their own timesheets.",
+        "allow_export": "Activate export function for employees"
+    },
+    "profile_tab": "Profile & Account",
+    "system_tab": "Technical"
+}

@@ -1,5 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import type { CompanySettings, Employee } from '../../types';
 import { Card } from '../ui/Card';
 import { Select } from '../ui/Select';
@@ -62,6 +63,7 @@ const hoursOptions = Array.from({ length: 25 }, (_, i) => ({ value: i, label: `$
 const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdateEmployee' | 'initialTab'>> = ({
     selectedState, onStateChange, timeTrackingMethod, onTimeTrackingMethodChange, companySettings, onUpdateCompanySettings
 }) => {
+    const { t } = useTranslation();
     const [localSelectedState, setLocalSelectedState] = useState(selectedState);
     const [localTimeTrackingMethod, setLocalTimeTrackingMethod] = useState(timeTrackingMethod);
     const [localSettings, setLocalSettings] = useState(companySettings);
@@ -107,7 +109,7 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
 
     const handleSave = () => {
         if ((localSettings.shiftPlannerStartHour ?? 0) >= (localSettings.shiftPlannerEndHour ?? 24)) {
-            setAlertConfig({ title: 'Zeitraum ungültig', message: 'Die Startzeit des Schichtplaners muss vor der Endzeit liegen.' });
+            setAlertConfig({ title: t('common.error', 'Fehler'), message: t('settings.error_time_range', 'Die Startzeit des Schichtplaners muss vor der Endzeit liegen.') });
             return;
         }
 
@@ -118,26 +120,26 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
             customerLabel: localSettings.customerLabel || 'Zeitkategorie 1',
             activityLabel: localSettings.activityLabel || 'Zeitkategorie 2',
         });
-        setSuccessMessage('Systemeinstellungen erfolgreich gespeichert!');
+        setSuccessMessage(t('settings.success_saved', 'Systemeinstellungen erfolgreich gespeichert!'));
         window.scrollTo(0, 0);
         setTimeout(() => setSuccessMessage(null), 3000);
     };
 
     const tabs = [
-        { id: 'general', label: 'Allgemein' },
-        { id: 'timeTracking', label: 'Zeiterfassung' },
-        { id: 'employeeSettings', label: 'Mitarbeiter' },
+        { id: 'general', label: t('settings.tabs.general', 'Allgemein') },
+        { id: 'timeTracking', label: t('settings.tabs.time_tracking', 'Zeiterfassung') },
+        { id: 'employeeSettings', label: t('settings.tabs.employees', 'Mitarbeiter') },
     ];
 
-    const customerLabel = localSettings.customerLabel || 'Zeitkategorie 1';
-    const activityLabel = localSettings.activityLabel || 'Zeitkategorie 2';
+    const customerLabel = localSettings.customerLabel || t('settings.time_tracking.label_cat1', 'Zeitkategorie 1');
+    const activityLabel = localSettings.activityLabel || t('settings.time_tracking.label_cat2', 'Zeitkategorie 2');
 
     return (
         <Card>
             <div className="flex justify-between items-center mb-6">
                 <div>
-                    <h2 className="text-xl font-bold">Systemkonfiguration</h2>
-                    <p className="text-sm text-gray-500">Technische Einstellungen und Regeln für das Zeiterfassungssystem.</p>
+                    <h2 className="text-xl font-bold">{t('settings.system_configuration', 'Systemkonfiguration')}</h2>
+                    <p className="text-sm text-gray-500">{t('settings.system_configuration_desc', 'Technische Einstellungen und Regeln für das Zeiterfassungssystem.')}</p>
                 </div>
             </div>
 
@@ -154,8 +156,8 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                             key={tab.id}
                             onClick={() => setActiveTab(tab.id as any)}
                             className={`${activeTab === tab.id
-                                    ? 'border-blue-500 text-blue-600'
-                                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
+                                ? 'border-blue-500 text-blue-600'
+                                : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300'
                                 } whitespace-nowrap py-4 px-1 border-b-2 font-medium text-base`}
                             aria-current={activeTab === tab.id ? 'page' : undefined}
                         >
@@ -169,8 +171,8 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                 {activeTab === 'general' && (
                     <div className="space-y-8 animate-fade-in">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-800 mb-1">Bundesland für Feiertage</h3>
-                            <p className="text-sm text-gray-500 mb-4">Wählen Sie Ihr Bundesland, um die gesetzlichen Feiertage korrekt zu berechnen.</p>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-1">{t('settings.general.state_label', 'Bundesland für Feiertage')}</h3>
+                            <p className="text-sm text-gray-500 mb-4">{t('settings.general.state_desc', 'Wählen Sie Ihr Bundesland, um die gesetzlichen Feiertage korrekt zu berechnen.')}</p>
                             <Select
                                 value={localSelectedState}
                                 onChange={(e) => setLocalSelectedState(e.target.value)}
@@ -183,11 +185,11 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                         </div>
 
                         <div className="pt-8 border-t">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-1">Zeitformat für Anzeige & Eingabe</h3>
-                            <p className="text-sm text-gray-500 mb-4">Legen Sie fest, ob Zeitdauern in Dezimalstunden (z.B. 8,50h) oder in Stunden und Minuten (z.B. 8h 30min) angezeigt werden.</p>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-1">{t('settings.general.time_format_label', 'Zeitformat für Anzeige & Eingabe')}</h3>
+                            <p className="text-sm text-gray-500 mb-4">{t('settings.general.time_format_desc', 'Legen Sie fest, ob Zeitdauern in Dezimalstunden (z.B. 8,50h) oder in Stunden und Minuten (z.B. 8h 30min) angezeigt werden.')}</p>
                             <div className="space-y-6">
                                 <div>
-                                    <h4 className="font-semibold text-gray-700 mb-2">Admin-Ansicht</h4>
+                                    <h4 className="font-semibold text-gray-700 mb-2">{t('settings.general.admin_view', 'Admin-Ansicht')}</h4>
                                     <RadioGroup
                                         name="adminTimeFormat"
                                         options={[
@@ -199,7 +201,7 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                                     />
                                 </div>
                                 <div>
-                                    <h4 className="font-semibold text-gray-700 mb-2">Mitarbeiter-Ansicht</h4>
+                                    <h4 className="font-semibold text-gray-700 mb-2">{t('settings.general.employee_view', 'Mitarbeiter-Ansicht')}</h4>
                                     <RadioGroup
                                         name="employeeTimeFormat"
                                         options={[
@@ -214,11 +216,11 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                         </div>
 
                         <div className="pt-8 border-t">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-1">Schichtplaner Zeitraster</h3>
-                            <p className="text-sm text-gray-500 mb-4">Definieren Sie den sichtbaren Zeitbereich im Schichtplaner.</p>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-1">{t('settings.general.shift_planner_grid', 'Schichtplaner Zeitraster')}</h3>
+                            <p className="text-sm text-gray-500 mb-4">{t('settings.general.shift_planner_grid_desc', 'Definieren Sie den sichtbaren Zeitbereich im Schichtplaner.')}</p>
                             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                                 <Select
-                                    label="Startzeit"
+                                    label={t('settings.general.start_time', 'Startzeit')}
                                     value={localSettings.shiftPlannerStartHour ?? 0}
                                     onChange={(e) => handleShiftPlannerHourChange('shiftPlannerStartHour', e.target.value)}
                                 >
@@ -227,7 +229,7 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                                     ))}
                                 </Select>
                                 <Select
-                                    label="Endzeit"
+                                    label={t('settings.general.end_time', 'Endzeit')}
                                     value={localSettings.shiftPlannerEndHour ?? 24}
                                     onChange={(e) => handleShiftPlannerHourChange('shiftPlannerEndHour', e.target.value)}
                                 >
@@ -243,23 +245,24 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                 {activeTab === 'timeTracking' && (
                     <div className="space-y-8 animate-fade-in">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-800 mb-1">Zeitkategorien Benennung</h3>
-                            <p className="text-sm text-gray-500 mb-4">Benennen Sie die Zeitkategorien, um sie an die Terminologie Ihres Unternehmens anzupassen (z.B. 'Kunde' in 'Projekt' ändern).</p>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-1">{t('settings.time_tracking.category_label', 'Zeitkategorien Benennung')}</h3>
+                            <p className="text-sm text-gray-500 mb-4">{t('settings.time_tracking.category_desc', "Benennen Sie die Zeitkategorien, um sie an die Terminologie Ihres Unternehmens anzupassen (z.B. 'Kunde' in 'Projekt' ändern).")}</p>
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <Input name="customerLabel" label="Bezeichnung für Zeitkategorie 1" value={localSettings.customerLabel || ''} onChange={handleLabelInputChange} placeholder="z.B. Kunde, Projekt..." />
-                                <Input name="activityLabel" label="Bezeichnung für Zeitkategorie 2" value={localSettings.activityLabel || ''} onChange={handleLabelInputChange} placeholder="z.B. Tätigkeit, Aufgabe..." />
+                                <Input name="customerLabel" label={t('settings.time_tracking.label_cat1', 'Bezeichnung für Zeitkategorie 1')} value={localSettings.customerLabel || ''} onChange={handleLabelInputChange} placeholder="z.B. Kunde, Projekt..." />
+                                <Input name="activityLabel" label={t('settings.time_tracking.label_cat2', 'Bezeichnung für Zeitkategorie 2')} value={localSettings.activityLabel || ''} onChange={handleLabelInputChange} placeholder="z.B. Tätigkeit, Aufgabe..." />
+                                <Input name="nfcTagIdLabel" label={t('settings.time_tracking.label_nfc', 'Bezeichnung für NFC-Tag ID')} value={localSettings.nfcTagIdLabel || ''} onChange={handleLabelInputChange} placeholder="z.B. NFC-TAG ID, Chip-Nummer..." />
                             </div>
                         </div>
 
                         <div className="pt-8 border-t">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-1">Benötigte Erfassungsfelder</h3>
-                            <p className="text-sm text-gray-500 mb-4">Welche Angaben sind bei der Zeiterfassung zwingend erforderlich?</p>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-1">{t('settings.time_tracking.required_fields', 'Benötigte Erfassungsfelder')}</h3>
+                            <p className="text-sm text-gray-500 mb-4">{t('settings.time_tracking.required_fields_desc', 'Welche Angaben sind bei der Zeiterfassung zwingend erforderlich?')}</p>
                             <RadioGroup
                                 name="timeCategoryMode"
                                 options={[
-                                    { value: 'both', label: `Beide (${customerLabel} & ${activityLabel}) - Standard` },
-                                    { value: 'customer', label: `Nur Kategorie 1 (${customerLabel}) - z.B. für Dienstleister` },
-                                    { value: 'activity', label: `Nur Kategorie 2 (${activityLabel}) - z.B. für Gastronomie` },
+                                    { value: 'both', label: t('settings.time_tracking.mode_both', `Beide (${customerLabel} & ${activityLabel}) - Standard`, { cat1: customerLabel, cat2: activityLabel }) },
+                                    { value: 'customer', label: t('settings.time_tracking.mode_cat1', `Nur Kategorie 1 (${customerLabel}) - z.B. für Dienstleister`, { cat1: customerLabel }) },
+                                    { value: 'activity', label: t('settings.time_tracking.mode_cat2', `Nur Kategorie 2 (${activityLabel}) - z.B. für Gastronomie`, { cat2: activityLabel }) },
                                 ]}
                                 selectedValue={localSettings.timeCategoryMode || 'both'}
                                 onChange={handleTimeCategoryModeChange}
@@ -267,22 +270,30 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                         </div>
 
                         <div className="pt-8 border-t">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-1">Verfügbare Zeiterfassungsmethoden</h3>
-                            <p className="text-sm text-gray-500 mb-4">Legen Sie fest, ob Mitarbeiter nur manuell Zeiten eintragen oder auch die Stempeluhr nutzen können.</p>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-1">{t('settings.time_tracking.methods_label', 'Verfügbare Zeiterfassungsmethoden')}</h3>
+                            <p className="text-sm text-gray-500 mb-4">{t('settings.time_tracking.methods_desc', 'Legen Sie fest, ob Mitarbeiter nur manuell Zeiten eintragen oder auch die Stempeluhr nutzen können.')}</p>
                             <RadioGroup
                                 name="timeTrackingMethod"
-                                options={timeTrackingOptions}
+                                options={[
+                                    { value: 'all', label: t('settings.time_tracking.method_all', 'Stempeluhr & Manuelle Eingabe') },
+                                    { value: 'manual', label: t('settings.time_tracking.method_manual', 'Nur Manuelle Eingabe') },
+                                ]}
                                 selectedValue={localTimeTrackingMethod}
                                 onChange={(value) => setLocalTimeTrackingMethod(value as 'all' | 'manual')}
                             />
                         </div>
 
                         <div className="pt-8 border-t">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-1">Bearbeitbarkeit von Zeiteinträgen</h3>
-                            <p className="text-sm text-gray-500 mb-4">Legen Sie fest, wie lange Mitarbeiter ihre eigenen Zeiteinträge bearbeiten oder löschen können. Als Admin können Sie immer alle Einträge bearbeiten.</p>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-1">{t('settings.time_tracking.edit_lock_label', 'Bearbeitbarkeit von Zeiteinträgen')}</h3>
+                            <p className="text-sm text-gray-500 mb-4">{t('settings.time_tracking.edit_lock_desc', 'Legen Sie fest, wie lange Mitarbeiter ihre eigenen Zeiteinträge bearbeiten oder löschen können. Als Admin können Sie immer alle Einträge bearbeiten.')}</p>
                             <RadioGroup
                                 name="editLockRule"
-                                options={editabilityOptions}
+                                options={[
+                                    { value: 'unlimited', label: t('settings.time_tracking.lock_unlimited', 'Keine Sperrfrist (immer bearbeitbar)') },
+                                    { value: 'currentMonth', label: t('settings.time_tracking.lock_current_month', 'Bearbeitbar im laufenden Monat') },
+                                    { value: 'previousWeek', label: t('settings.time_tracking.lock_previous_week', 'Bearbeitbar in aktueller & letzter Woche') },
+                                    { value: 'sameDay', label: t('settings.time_tracking.lock_same_day', 'Bearbeitbar nur am selben Tag') },
+                                ]}
                                 selectedValue={localSettings.editLockRule || 'currentMonth'}
                                 onChange={handleLockRuleChange}
                             />
@@ -293,10 +304,10 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                 {activeTab === 'employeeSettings' && (
                     <div className="space-y-8 animate-fade-in">
                         <div>
-                            <h3 className="text-lg font-semibold text-gray-800 mb-1">Urlaubsanträge</h3>
-                            <p className="text-sm text-gray-500 mb-4">Aktiviert die Beantragung von halbtägigem Urlaub.</p>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-1">{t('settings.employee_settings.vacation_label', 'Urlaubsanträge')}</h3>
+                            <p className="text-sm text-gray-500 mb-4">{t('settings.employee_settings.vacation_desc', 'Aktiviert die Beantragung von halbtägigem Urlaub.')}</p>
                             <div className="flex items-center justify-between p-3 border rounded-md">
-                                <label className="text-sm font-medium text-gray-700">Halbtägigen Urlaub erlauben</label>
+                                <label className="text-sm font-medium text-gray-700">{t('settings.employee_settings.allow_half_day', 'Halbtägigen Urlaub erlauben')}</label>
                                 <ToggleSwitch
                                     checked={localSettings.allowHalfDayVacations ?? false}
                                     onChange={handleAllowHalfDayVacationsToggle}
@@ -305,10 +316,10 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                         </div>
 
                         <div className="pt-8 border-t">
-                            <h3 className="text-lg font-semibold text-gray-800 mb-1">Stundenzettel-Export</h3>
-                            <p className="text-sm text-gray-500 mb-4">Ermöglicht Mitarbeitern den Export eigener Stundenzettel.</p>
+                            <h3 className="text-lg font-semibold text-gray-800 mb-1">{t('settings.employee_settings.export_label', 'Stundenzettel-Export')}</h3>
+                            <p className="text-sm text-gray-500 mb-4">{t('settings.employee_settings.export_desc', 'Ermöglicht Mitarbeitern den Export eigener Stundenzettel.')}</p>
                             <div className="flex items-center justify-between p-3 border rounded-md">
-                                <label className="text-sm font-medium text-gray-700">Export-Funktion für Mitarbeiter aktivieren</label>
+                                <label className="text-sm font-medium text-gray-700">{t('settings.employee_settings.allow_export', 'Export-Funktion für Mitarbeiter aktivieren')}</label>
                                 <ToggleSwitch
                                     checked={localSettings.employeeCanExport ?? true}
                                     onChange={handleExportToggle}
@@ -321,7 +332,7 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
 
             <div className="flex justify-end pt-8 mt-8 border-t">
                 <Button onClick={handleSave} className="bg-blue-600 hover:bg-blue-700">
-                    Einstellungen Speichern
+                    {t('common.save', 'Speichern')}
                 </Button>
             </div>
 
@@ -353,8 +364,8 @@ export const SettingsView: React.FC<SettingsViewProps> = (props) => {
                     <button
                         onClick={() => setMainTab('profile')}
                         className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${mainTab === 'profile'
-                                ? 'bg-blue-600 text-white shadow-md'
-                                : 'text-gray-600 hover:bg-gray-50'
+                            ? 'bg-blue-600 text-white shadow-md'
+                            : 'text-gray-600 hover:bg-gray-50'
                             }`}
                     >
                         <UserCircleIcon className="h-5 w-5" />
@@ -363,8 +374,8 @@ export const SettingsView: React.FC<SettingsViewProps> = (props) => {
                     <button
                         onClick={() => setMainTab('system')}
                         className={`flex items-center gap-2 px-6 py-2.5 rounded-lg text-sm font-semibold transition-all duration-200 ${mainTab === 'system'
-                                ? 'bg-blue-600 text-white shadow-md'
-                                : 'text-gray-600 hover:bg-gray-50'
+                            ? 'bg-blue-600 text-white shadow-md'
+                            : 'text-gray-600 hover:bg-gray-50'
                             }`}
                     >
                         <CogIcon className="h-5 w-5" />

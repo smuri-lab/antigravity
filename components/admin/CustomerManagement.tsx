@@ -19,6 +19,7 @@ export const CustomerManagement: React.FC<CustomerManagementProps> = ({ customer
   const [customerToEdit, setCustomerToEdit] = useState<Customer | null>(null);
 
   const customerLabel = companySettings.customerLabel || 'Kunde';
+  const nfcTagIdLabel = companySettings.nfcTagIdLabel || 'NFC-TAG ID';
 
   const handleOpenModal = (customer?: Customer) => {
     setCustomerToEdit(customer || null);
@@ -49,12 +50,12 @@ export const CustomerManagement: React.FC<CustomerManagementProps> = ({ customer
             Anlegen
           </Button>
         </div>
-        
+
         <div className="overflow-x-auto">
           <table className="min-w-full bg-white">
             <thead className="bg-gray-50">
               <tr>
-                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">NFC-Tag ID</th>
+                <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">{nfcTagIdLabel}</th>
                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Beschreibung (Zeiterfassung)</th>
                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Firma</th>
                 <th className="py-3 px-4 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">Ansprechpartner</th>
@@ -65,7 +66,7 @@ export const CustomerManagement: React.FC<CustomerManagementProps> = ({ customer
                 customers.map(c => (
                   <tr key={c.id} onClick={() => handleOpenModal(c)} className="cursor-pointer hover:bg-gray-50 transition-colors">
                     <td className="py-4 px-4 whitespace-nowrap font-mono text-xs">{c.nfcTagId || '-'}</td>
-                    <td 
+                    <td
                       className="py-4 px-4 whitespace-nowrap font-normal"
                       title={`Bearbeiten: ${c.name}`}
                     >
@@ -86,7 +87,7 @@ export const CustomerManagement: React.FC<CustomerManagementProps> = ({ customer
           </table>
         </div>
       </Card>
-      
+
       {isModalOpen && (
         <CustomerFormModal
           isOpen={isModalOpen}

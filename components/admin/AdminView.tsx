@@ -110,6 +110,7 @@ export const AdminView: React.FC<AdminViewProps> = (props) => {
           addEmployeeGroup={props.addEmployeeGroup}
           updateEmployeeGroup={props.updateEmployeeGroup}
           deleteEmployeeGroup={props.deleteEmployeeGroup}
+          onUpdateSettings={props.onUpdateCompanySettings}
         />;
       case AdminViewType.TimeTracking:
         return <TimeTrackingManagement {...props} />;

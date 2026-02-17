@@ -145,7 +145,7 @@ export const CustomerFormModal: React.FC<CustomerFormModalProps> = ({ isOpen, on
                 <Input name="name" label="Beschreibung (für Zeiterfassung)" value={formData.name} onChange={handleChange} required placeholder="z.B. Projekt A - Baustelle 1" />
                 <Input name="companyName" label="Firma" value={formData.companyName} onChange={handleChange} />
                 <Input name="contactPerson" label="Ansprechpartner" value={formData.contactPerson || ''} onChange={handleChange} />
-                <Input name="nfcTagId" label="NFC-Tag ID (Optional)" value={formData.nfcTagId || ''} onChange={handleChange} placeholder="z.B. kunde-001-standort-a" />
+                <Input name="nfcTagId" label={`${companySettings.nfcTagIdLabel || 'NFC-Tag ID'} (Optional)`} value={formData.nfcTagId || ''} onChange={handleChange} placeholder="z.B. kunde-001-standort-a" />
               </fieldset>
 
               <fieldset className="space-y-4 p-4 border rounded-lg">

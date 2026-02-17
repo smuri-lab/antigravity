@@ -216,6 +216,7 @@ export interface CompanySettings {
   allowHalfDayVacations?: boolean;
   customerLabel?: string;
   activityLabel?: string;
+  nfcTagIdLabel?: string;
   adminTimeFormat?: 'decimal' | 'hoursMinutes';
   employeeTimeFormat?: 'decimal' | 'hoursMinutes';
   // Shift Planner Settings

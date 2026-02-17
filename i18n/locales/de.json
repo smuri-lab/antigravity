@@ -1,0 +1,115 @@
+{
+    "common": {
+        "loading": "Laden...",
+        "save": "Speichern",
+        "cancel": "Abbrechen",
+        "delete": "Löschen",
+        "edit": "Bearbeiten",
+        "back": "Zurück",
+        "logout": "Abmelden",
+        "login": "Anmelden",
+        "register": "Registrieren",
+        "email": "E-Mail",
+        "password": "Passwort",
+        "username": "Benutzername"
+    },
+    "nav": {
+        "dashboard": "Dashboard",
+        "planner": "Planer",
+        "shift_planner": "Schichtplan",
+        "time_tracking": "Zeiterfassung",
+        "absences": "Abwesenheiten",
+        "utilization": "Auslastung",
+        "reports": "Auswertungen",
+        "admin": "Stammdaten",
+        "settings": "Einstellungen",
+        "profile": "Profil"
+    },
+    "dashboard": {
+        "welcome": "Hallo, {{name}}",
+        "overtime_trend": "Überstunden-Trend (6 Monate)",
+        "team_utilization": "Team-Auslastung",
+        "hours": "Stunden",
+        "no_data": "Keine Daten vorhanden"
+    },
+    "admin": {
+        "customers": "Kunden",
+        "employees": "Mitarbeiter",
+        "activities": "Tätigkeiten"
+    },
+    "timeline": {
+        "view_settings": "Ansichtseinstellungen",
+        "start_time": "Startzeit",
+        "end_time": "Endzeit",
+        "employees": "Mitarbeiter",
+        "today": "Heute",
+        "prev_day": "Vorheriger Tag",
+        "next_day": "Nächster Tag",
+        "no_employees": "Keine Mitarbeiter gefunden",
+        "filter_employees": "Mitarbeiter filtern"
+    },
+    "shift_planner": {
+        "view_settings": "Ansichtseinstellungen",
+        "start_time": "Startzeit",
+        "end_time": "Endzeit",
+        "employees": "Mitarbeiter",
+        "hours": "Stunden",
+        "week": "Woche",
+        "month": "Monat",
+        "prev": "Zurück",
+        "next": "Vor",
+        "date_range": "Zeitraum"
+    },
+    "system_configuration": "Systemkonfiguration",
+    "system_configuration_desc": "Technische Einstellungen und Regeln für das Zeiterfassungssystem.",
+    "success_saved": "Systemeinstellungen erfolgreich gespeichert!",
+    "tabs": {
+        "general": "Allgemein",
+        "time_tracking": "Zeiterfassung",
+        "employees": "Mitarbeiter"
+    },
+    "general": {
+        "state_label": "Bundesland für Feiertage",
+        "state_desc": "Wählen Sie Ihr Bundesland, um die gesetzlichen Feiertage korrekt zu berechnen.",
+        "time_format_label": "Zeitformat für Anzeige & Eingabe",
+        "time_format_desc": "Legen Sie fest, ob Zeitdauern in Dezimalstunden (z.B. 8,50h) oder in Stunden und Minuten (z.B. 8h 30min) angezeigt werden.",
+        "admin_view": "Admin-Ansicht",
+        "employee_view": "Mitarbeiter-Ansicht",
+        "shift_planner_grid": "Schichtplaner Zeitraster",
+        "shift_planner_grid_desc": "Definieren Sie den sichtbaren Zeitbereich im Schichtplaner.",
+        "start_time": "Startzeit",
+        "end_time": "Endzeit"
+    },
+    "time_tracking": {
+        "category_label": "Zeitkategorien Benennung",
+        "category_desc": "Benennen Sie die Zeitkategorien, um sie an die Terminologie Ihres Unternehmens anzupassen (z.B. 'Kunde' in 'Projekt' ändern).",
+        "label_cat1": "Bezeichnung für Zeitkategorie 1",
+        "label_cat2": "Bezeichnung für Zeitkategorie 2",
+        "label_nfc": "Bezeichnung für NFC-Tag ID",
+        "required_fields": "Benötigte Erfassungsfelder",
+        "required_fields_desc": "Welche Angaben sind bei der Zeiterfassung zwingend erforderlich?",
+        "mode_both": "Beide ({{cat1}} & {{cat2}}) - Standard",
+        "mode_cat1": "Nur Kategorie 1 ({{cat1}}) - z.B. für Dienstleister",
+        "mode_cat2": "Nur Kategorie 2 ({{cat2}}) - z.B. für Gastronomie",
+        "methods_label": "Verfügbare Zeiterfassungsmethoden",
+        "methods_desc": "Legen Sie fest, ob Mitarbeiter nur manuell Zeiten eintragen oder auch die Stempeluhr nutzen können.",
+        "method_all": "Stempeluhr & Manuelle Eingabe",
+        "method_manual": "Nur Manuelle Eingabe",
+        "edit_lock_label": "Bearbeitbarkeit von Zeiteinträgen",
+        "edit_lock_desc": "Legen Sie fest, wie lange Mitarbeiter ihre eigenen Zeiteinträge bearbeiten oder löschen können. Als Admin können Sie immer alle Einträge bearbeiten.",
+        "lock_unlimited": "Keine Sperrfrist (immer bearbeitbar)",
+        "lock_current_month": "Bearbeitbar im laufenden Monat",
+        "lock_previous_week": "Bearbeitbar in aktueller & letzter Woche",
+        "lock_same_day": "Bearbeitbar nur am selben Tag"
+    },
+    "employee_settings": {
+        "vacation_label": "Urlaubsanträge",
+        "vacation_desc": "Aktiviert die Beantragung von halbtägigem Urlaub.",
+        "allow_half_day": "Halbtägigen Urlaub erlauben",
+        "export_label": "Stundenzettel-Export",
+        "export_desc": "Ermöglicht Mitarbeitern den Export eigener Stundenzettel.",
+        "allow_export": "Export-Funktion für Mitarbeiter aktivieren"
+    },
+    "profile_tab": "Profil & Account",
+    "system_tab": "Technisches"
+}
