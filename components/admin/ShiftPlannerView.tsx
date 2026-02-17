@@ -165,6 +165,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     deleteEmployeeGroup = () => { },
     onUpdateSettings
 }) => {
+    const { t } = useTranslation();
     // Verify prop is correctly passed
     console.log('ShiftPlannerView: deleteShiftsByEmployee prop:', deleteShiftsByEmployee);
     console.log('ShiftPlannerView: Is default function?', deleteShiftsByEmployee.toString().includes('{ }'));
