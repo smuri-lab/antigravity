@@ -1031,6 +1031,49 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
 
                             {/* VIEW MODE SWITCHER */}
                             <div className="flex bg-gray-100 p-1 rounded-lg w-full xl:w-auto justify-center">
+                                {viewMode === 'timeline' && (
+                                    <div className="relative mr-1">
+                                        <button
+                                            onClick={() => setIsSettingsOpen(!isSettingsOpen)}
+                                            className="h-full aspect-square p-1.5 text-gray-500 hover:text-gray-900 hover:bg-white rounded-md transition-all"
+                                            title={t('shift_planner.view_settings', 'Ansichtseinstellungen')}
+                                        >
+                                            <CogIcon className="w-5 h-5" />
+                                        </button>
+
+                                        {isSettingsOpen && (
+                                            <div className="absolute top-10 left-0 w-64 bg-white border rounded-lg shadow-xl z-50 p-4 animate-fade-in text-left">
+                                                <div className="flex justify-between items-center mb-3">
+                                                    <h3 className="font-semibold text-sm">{t('shift_planner.view_settings', 'Ansichtseinstellungen')}</h3>
+                                                    <button onClick={() => setIsSettingsOpen(false)} className="text-gray-400 hover:text-gray-600">
+                                                        <XIcon className="w-4 h-4" />
+                                                    </button>
+                                                </div>
+                                                <div className="space-y-3">
+                                                    <Select
+                                                        label={t('shift_planner.start_time', 'Startzeit')}
+                                                        value={settingStartHour}
+                                                        onChange={(e) => handleSaveSettings(Number(e.target.value), settingEndHour)}
+                                                    >
+                                                        {Array.from({ length: 24 }, (_, i) => (
+                                                            <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
+                                                        ))}
+                                                    </Select>
+                                                    <Select
+                                                        label={t('shift_planner.end_time', 'Endzeit')}
+                                                        value={settingEndHour}
+                                                        onChange={(e) => handleSaveSettings(settingStartHour, Number(e.target.value))}
+                                                    >
+                                                        {Array.from({ length: 24 }, (_, i) => (
+                                                            <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
+                                                        ))}
+                                                    </Select>
+                                                </div>
+                                            </div>
+                                        )}
+                                    </div>
+                                )}
+
                                 <button
                                     onClick={() => setViewMode('timeline')}
                                     className={`px-3 py-1.5 text-sm font-medium rounded-md transition-all flex-1 xl:flex-initial ${viewMode === 'timeline' ? 'bg-white text-blue-600 shadow-sm' : 'text-gray-600 hover:text-gray-900'}`}
@@ -1049,44 +1092,6 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                 >
                                     {t('shift_planner.month', 'Monat')}
                                 </button>
-                            </div>
-
-                            {/* Settings Dropdown */}
-                            <div className="relative ml-2">
-                                <Button variant="ghost" onClick={() => setIsSettingsOpen(!isSettingsOpen)} className="text-gray-500 hover:text-gray-700 h-full aspect-square p-2 bg-gray-100 hover:bg-gray-200 border-none rounded-lg">
-                                    <CogIcon className="w-5 h-5" />
-                                </Button>
-
-                                {isSettingsOpen && (
-                                    <div className="absolute top-12 right-0 w-64 bg-white border rounded-lg shadow-xl z-50 p-4 animate-fade-in">
-                                        <div className="flex justify-between items-center mb-3">
-                                            <h3 className="font-semibold text-sm">{t('shift_planner.view_settings', 'Ansichtseinstellungen')}</h3>
-                                            <button onClick={() => setIsSettingsOpen(false)} className="text-gray-400 hover:text-gray-600">
-                                                <XIcon className="w-4 h-4" />
-                                            </button>
-                                        </div>
-                                        <div className="space-y-3">
-                                            <Select
-                                                label={t('shift_planner.start_time', 'Startzeit')}
-                                                value={settingStartHour}
-                                                onChange={(e) => handleSaveSettings(Number(e.target.value), settingEndHour)}
-                                            >
-                                                {Array.from({ length: 24 }, (_, i) => (
-                                                    <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
-                                                ))}
-                                            </Select>
-                                            <Select
-                                                label={t('shift_planner.end_time', 'Endzeit')}
-                                                value={settingEndHour}
-                                                onChange={(e) => handleSaveSettings(settingStartHour, Number(e.target.value))}
-                                            >
-                                                {Array.from({ length: 24 }, (_, i) => (
-                                                    <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
-                                                ))}
-                                            </Select>
-                                        </div>
-                                    </div>
-                                )}
                             </div>
                         </div>
 
