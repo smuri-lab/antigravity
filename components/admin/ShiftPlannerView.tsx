@@ -179,12 +179,23 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
 
     // --- PLANNER TAB STATE ---
-    const settingStartHour = companySettings.shiftPlannerStartHour ?? 6;
-    const settingEndHour = companySettings.shiftPlannerEndHour ?? 22;
+    // Use local state for immediate UI feedback, sync with props
+    const [localStartHour, setLocalStartHour] = useState(companySettings.shiftPlannerStartHour ?? 6);
+    const [localEndHour, setLocalEndHour] = useState(companySettings.shiftPlannerEndHour ?? 22);
+
+    // Sync local state when props change (e.g. initial load or external update)
+    useEffect(() => {
+        setLocalStartHour(companySettings.shiftPlannerStartHour ?? 6);
+        setLocalEndHour(companySettings.shiftPlannerEndHour ?? 22);
+    }, [companySettings.shiftPlannerStartHour, companySettings.shiftPlannerEndHour]);
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const handleSaveSettings = (newStart: number, newEnd: number) => {
+        // Immediate local update
+        setLocalStartHour(newStart);
+        setLocalEndHour(newEnd);
+
         if (onUpdateSettings) {
             onUpdateSettings({
                 ...companySettings,
@@ -207,10 +218,10 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const [viewMode, setViewMode] = useState<ViewMode>('week'); // Default to Week view for better overview
 
     const visibleDurationHours = useMemo(() => {
-        let duration = settingEndHour - settingStartHour;
+        let duration = localEndHour - localStartHour;
         if (duration <= 0) duration += 24;
         return duration || 12;
-    }, [settingStartHour, settingEndHour]);
+    }, [localStartHour, localEndHour]);
 
     const NAVIGATION_STEP_HOURS = 3;
 
@@ -370,7 +381,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const handleJumpToDate = (d: Date) => {
         const newStart = new Date(d);
         if (viewMode === 'timeline') {
-            newStart.setHours(settingStartHour, 0, 0, 0);
+            newStart.setHours(localStartHour, 0, 0, 0);
         } else if (viewMode === 'week') {
             const day = newStart.getDay();
             const diff = newStart.getDate() - day + (day === 0 ? -6 : 1);
@@ -1045,8 +1056,8 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                     <div className="space-y-3">
                                                         <Select
                                                             label={t('shift_planner.start_time', 'Startzeit')}
-                                                            value={settingStartHour.toString()}
-                                                            onChange={(e) => handleSaveSettings(Number(e.target.value), settingEndHour)}
+                                                            value={localStartHour.toString()}
+                                                            onChange={(e) => handleSaveSettings(Number(e.target.value), localEndHour)}
                                                         >
                                                             {Array.from({ length: 24 }, (_, i) => (
                                                                 <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
@@ -1054,8 +1065,8 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                         </Select>
                                                         <Select
                                                             label={t('shift_planner.end_time', 'Endzeit')}
-                                                            value={settingEndHour.toString()}
-                                                            onChange={(e) => handleSaveSettings(settingStartHour, Number(e.target.value))}
+                                                            value={localEndHour.toString()}
+                                                            onChange={(e) => handleSaveSettings(localStartHour, Number(e.target.value))}
                                                         >
                                                             {Array.from({ length: 24 }, (_, i) => (
                                                                 <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
