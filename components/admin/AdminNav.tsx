@@ -72,10 +72,10 @@ export const AdminNav: React.FC<AdminNavProps> = ({ activeView, setActiveView, c
   const pendingRequestsCount = absenceRequests.filter(r => r.status === 'pending').length;
 
   const mainNavItems: NavItemData[] = [
-    { label: t('nav.dashboard'), view: AdminViewType.Dashboard, icon: LayoutDashboardIcon },
+    { label: t('nav.dashboard', 'Dashboard'), view: AdminViewType.Dashboard, icon: LayoutDashboardIcon },
     { label: t('nav.time_tracking', 'Zeiterfassung'), view: AdminViewType.TimeTracking, icon: ClockIcon },
-    { label: t('nav.planner'), view: AdminViewType.Planner, icon: SunIcon, badge: pendingRequestsCount },
-    { label: t('nav.shift_planner', 'Schichtplan'), view: AdminViewType.ShiftPlanner, icon: CalendarDaysIcon },
+    { label: t('nav.planner', 'Planer'), view: AdminViewType.Planner, icon: SunIcon, badge: pendingRequestsCount },
+    { label: t('nav.shift_planner', 'Schichtplaner'), view: AdminViewType.ShiftPlanner, icon: CalendarDaysIcon },
     {
       label: "Stammdaten",
       view: AdminViewType.Employees, // Clicking Stammdaten defaults to Employees

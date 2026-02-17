@@ -16,7 +16,7 @@
     "nav": {
         "dashboard": "Dashboard",
         "planner": "Planer",
-        "shift_planner": "Schichtplan",
+        "shift_planner": "Schichtplaner",
         "time_tracking": "Zeiterfassung",
         "absences": "Abwesenheiten",
         "utilization": "Auslastung",
