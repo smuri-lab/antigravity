@@ -185,18 +185,21 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const handleSaveSettings = (newStart: number, newEnd: number) => {
-        console.log('handleSaveSettings called:', { newStart, newEnd });
         if (onUpdateSettings) {
-            console.log('Calling onUpdateSettings');
             onUpdateSettings({
                 ...companySettings,
                 shiftPlannerStartHour: newStart,
                 shiftPlannerEndHour: newEnd
             });
-            // Do not close the menu appropriately to allow setting both values
-            // setIsSettingsOpen(false); 
-        } else {
-            console.warn('onUpdateSettings is missing');
+
+            // Immediately update the view start time if in timeline mode
+            if (viewMode === 'timeline') {
+                setViewStartDateTime(prev => {
+                    const d = new Date(prev);
+                    d.setHours(newStart, 0, 0, 0);
+                    return d;
+                });
+            }
         }
     };
 
@@ -216,18 +219,6 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
         // Default to start of current week
         return getStartOfWeek(new Date());
     });
-
-    // Ensure logic adjusts viewStartDateTime based on mode when switching
-    // Ensure logic adjusts viewStartDateTime based on mode when switching
-    useEffect(() => {
-        if (viewMode === 'timeline') {
-            setViewStartDateTime(prev => {
-                const d = new Date(prev);
-                d.setHours(settingStartHour, 0, 0, 0);
-                return d;
-            });
-        }
-    }, [viewMode, settingStartHour]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDatePickModalOpen, setIsDatePickModalOpen] = useState(false);
@@ -1051,24 +1042,26 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                     </button>
                                                 </div>
                                                 <div className="space-y-3">
-                                                    <Select
-                                                        label={t('shift_planner.start_time', 'Startzeit')}
-                                                        value={settingStartHour}
-                                                        onChange={(e) => handleSaveSettings(Number(e.target.value), settingEndHour)}
-                                                    >
-                                                        {Array.from({ length: 24 }, (_, i) => (
-                                                            <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
-                                                        ))}
-                                                    </Select>
-                                                    <Select
-                                                        label={t('shift_planner.end_time', 'Endzeit')}
-                                                        value={settingEndHour}
-                                                        onChange={(e) => handleSaveSettings(settingStartHour, Number(e.target.value))}
-                                                    >
-                                                        {Array.from({ length: 24 }, (_, i) => (
-                                                            <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
-                                                        ))}
-                                                    </Select>
+                                                    <div className="space-y-3">
+                                                        <Select
+                                                            label={t('shift_planner.start_time', 'Startzeit')}
+                                                            value={settingStartHour.toString()}
+                                                            onChange={(e) => handleSaveSettings(Number(e.target.value), settingEndHour)}
+                                                        >
+                                                            {Array.from({ length: 24 }, (_, i) => (
+                                                                <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
+                                                            ))}
+                                                        </Select>
+                                                        <Select
+                                                            label={t('shift_planner.end_time', 'Endzeit')}
+                                                            value={settingEndHour.toString()}
+                                                            onChange={(e) => handleSaveSettings(settingStartHour, Number(e.target.value))}
+                                                        >
+                                                            {Array.from({ length: 24 }, (_, i) => (
+                                                                <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
+                                                            ))}
+                                                        </Select>
+                                                    </div>
                                                 </div>
                                             </div>
                                         )}
