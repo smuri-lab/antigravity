@@ -185,13 +185,18 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const handleSaveSettings = (newStart: number, newEnd: number) => {
+        console.log('handleSaveSettings called:', { newStart, newEnd });
         if (onUpdateSettings) {
+            console.log('Calling onUpdateSettings');
             onUpdateSettings({
                 ...companySettings,
                 shiftPlannerStartHour: newStart,
                 shiftPlannerEndHour: newEnd
             });
-            setIsSettingsOpen(false);
+            // Do not close the menu appropriately to allow setting both values
+            // setIsSettingsOpen(false); 
+        } else {
+            console.warn('onUpdateSettings is missing');
         }
     };
 
