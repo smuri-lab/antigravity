@@ -179,38 +179,19 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const [selectedGroupIds, setSelectedGroupIds] = useState<string[]>([]);
 
     // --- PLANNER TAB STATE ---
-    // Use local state for immediate UI feedback, sync with props
-    const [localStartHour, setLocalStartHour] = useState(companySettings.shiftPlannerStartHour ?? 6);
-    const [localEndHour, setLocalEndHour] = useState(companySettings.shiftPlannerEndHour ?? 22);
-
-    // Sync local state when props change (e.g. initial load or external update)
-    useEffect(() => {
-        setLocalStartHour(companySettings.shiftPlannerStartHour ?? 6);
-        setLocalEndHour(companySettings.shiftPlannerEndHour ?? 22);
-    }, [companySettings.shiftPlannerStartHour, companySettings.shiftPlannerEndHour]);
+    const settingStartHour = companySettings.shiftPlannerStartHour ?? 6;
+    const settingEndHour = companySettings.shiftPlannerEndHour ?? 22;
 
     const [isSettingsOpen, setIsSettingsOpen] = useState(false);
 
     const handleSaveSettings = (newStart: number, newEnd: number) => {
-        // Immediate local update
-        setLocalStartHour(newStart);
-        setLocalEndHour(newEnd);
-
         if (onUpdateSettings) {
             onUpdateSettings({
                 ...companySettings,
                 shiftPlannerStartHour: newStart,
                 shiftPlannerEndHour: newEnd
             });
-
-            // Immediately update the view start time if in timeline mode
-            if (viewMode === 'timeline') {
-                setViewStartDateTime(prev => {
-                    const d = new Date(prev);
-                    d.setHours(newStart, 0, 0, 0);
-                    return d;
-                });
-            }
+            setIsSettingsOpen(false);
         }
     };
 
@@ -218,10 +199,10 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const [viewMode, setViewMode] = useState<ViewMode>('week'); // Default to Week view for better overview
 
     const visibleDurationHours = useMemo(() => {
-        let duration = localEndHour - localStartHour;
+        let duration = settingEndHour - settingStartHour;
         if (duration <= 0) duration += 24;
         return duration || 12;
-    }, [localStartHour, localEndHour]);
+    }, [settingStartHour, settingEndHour]);
 
     const NAVIGATION_STEP_HOURS = 3;
 
@@ -230,6 +211,26 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
         // Default to start of current week
         return getStartOfWeek(new Date());
     });
+
+    // Ensure logic adjusts viewStartDateTime based on mode when switching or settings change
+    useEffect(() => {
+        if (viewMode === 'timeline') {
+            setViewStartDateTime(prev => {
+                const d = new Date(prev);
+                d.setHours(settingStartHour, 0, 0, 0);
+                return d;
+            });
+        } else if (viewMode === 'week') {
+            setViewStartDateTime(prev => getStartOfWeek(prev));
+        } else if (viewMode === 'month') {
+            setViewStartDateTime(prev => {
+                const d = new Date(prev);
+                d.setDate(1);
+                d.setHours(0, 0, 0, 0);
+                return d;
+            });
+        }
+    }, [viewMode, settingStartHour]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [isDatePickModalOpen, setIsDatePickModalOpen] = useState(false);
@@ -381,7 +382,7 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     const handleJumpToDate = (d: Date) => {
         const newStart = new Date(d);
         if (viewMode === 'timeline') {
-            newStart.setHours(localStartHour, 0, 0, 0);
+            newStart.setHours(settingStartHour, 0, 0, 0);
         } else if (viewMode === 'week') {
             const day = newStart.getDay();
             const diff = newStart.getDate() - day + (day === 0 ? -6 : 1);
@@ -1056,8 +1057,8 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                     <div className="space-y-3">
                                                         <Select
                                                             label={t('shift_planner.start_time', 'Startzeit')}
-                                                            value={localStartHour.toString()}
-                                                            onChange={(e) => handleSaveSettings(Number(e.target.value), localEndHour)}
+                                                            value={settingStartHour.toString()}
+                                                            onChange={(e) => handleSaveSettings(Number(e.target.value), settingEndHour)}
                                                         >
                                                             {Array.from({ length: 24 }, (_, i) => (
                                                                 <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
@@ -1065,8 +1066,8 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
                                                         </Select>
                                                         <Select
                                                             label={t('shift_planner.end_time', 'Endzeit')}
-                                                            value={localEndHour.toString()}
-                                                            onChange={(e) => handleSaveSettings(localStartHour, Number(e.target.value))}
+                                                            value={settingEndHour.toString()}
+                                                            onChange={(e) => handleSaveSettings(settingStartHour, Number(e.target.value))}
                                                         >
                                                             {Array.from({ length: 24 }, (_, i) => (
                                                                 <option key={i} value={i}>{i.toString().padStart(2, '0')}:00</option>
