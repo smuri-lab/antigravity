@@ -218,19 +218,15 @@ export const ShiftPlannerView: React.FC<ShiftPlannerViewProps> = ({
     });
 
     // Ensure logic adjusts viewStartDateTime based on mode when switching
+    // Ensure logic adjusts viewStartDateTime based on mode when switching
     useEffect(() => {
-        setViewStartDateTime(prev => {
-            const d = new Date(prev);
-            if (viewMode === 'timeline') {
+        if (viewMode === 'timeline') {
+            setViewStartDateTime(prev => {
+                const d = new Date(prev);
                 d.setHours(settingStartHour, 0, 0, 0);
-            } else if (viewMode === 'week') {
-                return getStartOfWeek(d);
-            } else if (viewMode === 'month') {
-                d.setDate(1); // Start of month
-                d.setHours(0, 0, 0, 0);
-            }
-            return d;
-        });
+                return d;
+            });
+        }
     }, [viewMode, settingStartHour]);
 
     const [isModalOpen, setIsModalOpen] = useState(false);
