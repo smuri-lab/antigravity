@@ -57,9 +57,47 @@ function useLocalStorage<T>(key: string, initialValue: T) {
 
 const generateDemoData = () => {
   const timeEntries: TimeEntry[] = [];
+  /* MOCK DATA INITIALIZATION */
   const absenceRequests: AbsenceRequest[] = [];
   const shifts: Shift[] = [];
   let entryIdCounter = 1000;
+
+  // --- MOCK SHIFTS FOR CURRENT USER (Jan Demo) ---
+  // Generate shifts for the current month and next month to ensure visibility in calendar
+  const today = new Date();
+  const currentYear = today.getFullYear();
+  const currentMonth = today.getMonth();
+
+  // Generate shifts for every weekday in current and next month
+  // This ensures we have data regardless of when this is run
+  for (let m = 0; m <= 1; m++) {
+    const targetMonth = currentMonth + m;
+    const daysInMonth = new Date(currentYear, targetMonth + 1, 0).getDate();
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const date = new Date(currentYear, targetMonth, d);
+      const dayOfWeek = date.getDay();
+
+      // Add shifts for Mon-Fri
+      if (dayOfWeek >= 1 && dayOfWeek <= 5) {
+        const start = new Date(date);
+        start.setHours(9, 0, 0, 0); // 09:00
+        const end = new Date(date);
+        end.setHours(17, 0, 0, 0); // 17:00
+
+        shifts.push({
+          id: `mock-shift-${date.getTime()}`,
+          employeeId: 1, // Jan Demo
+          start: start.toISOString(),
+          end: end.toISOString(),
+          label: 'Büro',
+          color: '#3b82f6', // Blue
+          activityId: 'a1', // Assuming activity exists
+          customerId: 'c1'  // Assuming customer exists
+        });
+      }
+    }
+  }
 
   // --- Jan Demo 2025 ---
   const janEmployeeId = 1;
@@ -701,6 +739,7 @@ const App: React.FC = () => {
           currentUser={currentUser}
           timeEntries={userTimeEntries}
           absenceRequests={absenceRequests.filter(r => r.employeeId === currentUser.id)}
+          shifts={shiftsForUser} // Pass shifts to calendar
           customers={customers}
           activities={activities}
           onUpdateTimeEntry={updateTimeEntry}
