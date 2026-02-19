@@ -103,32 +103,6 @@ const generateDemoData = () => {
   const janEmployeeId = 1;
   const janYear = 2025;
 
-  // Shifts for Jan (Current Week + Next Week)
-  const today = new Date();
-  const startOfWeek = new Date(today);
-  startOfWeek.setDate(today.getDate() - today.getDay() + 1); // Monday
-
-  for (let i = 0; i < 14; i++) {
-    const d = new Date(startOfWeek);
-    d.setDate(d.getDate() + i);
-    const day = d.getDay();
-
-    if (day >= 1 && day <= 5) { // Mon-Fri
-      const start = new Date(d);
-      start.setHours(8, 0, 0, 0);
-      const end = new Date(d);
-      end.setHours(16, 30, 0, 0);
-
-      shifts.push({
-        id: `shift-${entryIdCounter++}`,
-        employeeId: janEmployeeId,
-        start: start.toISOString(),
-        end: end.toISOString(),
-        label: 'Frühschicht',
-        color: '#f59e0b' // Orange/Yellowish for Early
-      });
-    }
-  }
 
   absenceRequests.push({
     id: entryIdCounter++,
