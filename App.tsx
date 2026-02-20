@@ -265,6 +265,7 @@ const App: React.FC = () => {
 
   const [timeTrackingMethod, setTimeTrackingMethod] = useLocalStorage<'all' | 'manual'>('timepro-method', 'all');
   const [userAccount] = useState<UserAccount>(INITIAL_USER_ACCOUNT); // Keep as local since it's derived/initial
+  const [calendarEntryModal, setCalendarEntryModal] = useState<{ isOpen: boolean; date: string | null; shift: import('./types').Shift | null }>({ isOpen: false, date: null, shift: null });
   const intervalRef = React.useRef<number | null>(null);
   const mainScrollRef = useRef<HTMLDivElement>(null);
 
@@ -722,6 +723,7 @@ const App: React.FC = () => {
           companySettings={companySettings}
           onEnsureHolidaysForYear={ensureHolidaysForYear}
           onAddAbsenceClick={() => setIsAbsenceRequestModalOpen(true)}
+          onAddTimeEntryForDate={(dateStr, shift) => setCalendarEntryModal({ isOpen: true, date: dateStr, shift })}
         />;
       case View.Overview:
         return <OverviewView
@@ -943,6 +945,21 @@ const App: React.FC = () => {
                 activities={activities}
                 companySettings={companySettings}
                 absenceRequests={absenceRequests.filter(r => r.employeeId === currentUser.id)}
+              />
+            )}
+            {calendarEntryModal.isOpen && currentUser && (
+              <ManualEntryFormModal
+                isOpen={calendarEntryModal.isOpen}
+                onClose={() => setCalendarEntryModal({ isOpen: false, date: null, shift: null })}
+                addTimeEntry={(entry) => addTimeEntry(entry, currentUser.id)}
+                onSuccess={() => { setShowTimeEntrySuccess(true); setCalendarEntryModal({ isOpen: false, date: null, shift: null }); }}
+                timeEntries={timeEntries.filter(entry => entry.employeeId === currentUser.id)}
+                customers={customers}
+                activities={activities}
+                companySettings={companySettings}
+                absenceRequests={absenceRequests.filter(r => r.employeeId === currentUser.id)}
+                initialDate={calendarEntryModal.date}
+                initialShift={calendarEntryModal.shift}
               />
             )}
             {/* Toasts */}

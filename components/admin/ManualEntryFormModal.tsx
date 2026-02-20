@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import ReactDOM from 'react-dom';
-import type { TimeEntry, Customer, Activity, CompanySettings, AbsenceRequest } from '../../types';
+import type { TimeEntry, Customer, Activity, CompanySettings, AbsenceRequest, Shift } from '../../types';
 import { Card } from '../ui/Card';
 import { XIcon } from '../icons/XIcon';
 import { ManualEntryForm } from '../ManualEntryForm';
@@ -16,6 +16,7 @@ interface ManualEntryFormModalProps {
     absenceRequests: AbsenceRequest[];
     onSuccess: () => void;
     initialDate?: string | null;
+    initialShift?: Shift | null;
 }
 
 export const ManualEntryFormModal: React.FC<ManualEntryFormModalProps> = ({
@@ -29,6 +30,7 @@ export const ManualEntryFormModal: React.FC<ManualEntryFormModalProps> = ({
     absenceRequests,
     onSuccess,
     initialDate,
+    initialShift,
 }) => {
     const [isClosing, setIsClosing] = useState(false);
     const [isVisible, setIsVisible] = useState(false);
@@ -76,6 +78,7 @@ export const ManualEntryFormModal: React.FC<ManualEntryFormModalProps> = ({
                         onSuccess={onSuccess}
                         absenceRequests={absenceRequests}
                         initialDate={initialDate}
+                        initialShift={initialShift}
                     />
                 </div>
             </Card>
