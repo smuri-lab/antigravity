@@ -270,6 +270,21 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                         </div>
 
                         <div className="pt-8 border-t">
+                            <h3 className="text-lg font-semibold text-gray-800 mb-1">NFC-Zeiterfassungsmodus</h3>
+                            <p className="text-sm text-gray-500 mb-4">Legt fest, wie beim NFC-Scan Kunde &amp; Tätigkeit zugeordnet werden.</p>
+                            <RadioGroup
+                                name="nfcMode"
+                                options={[
+                                    { value: 'attendance', label: 'Nur Anwesenheit – Kein Kunde/Tätigkeit beim Scan' },
+                                    { value: 'smart', label: 'Smart (Plan-basiert) – Automatisch aus Schichtplan übernehmen' },
+                                    { value: 'manual', label: 'Manuell – Immer abfragen (kommt in v2)' },
+                                ]}
+                                selectedValue={localSettings.nfcMode || 'smart'}
+                                onChange={(value) => setLocalSettings(prev => ({ ...prev, nfcMode: value as 'attendance' | 'smart' | 'manual' }))}
+                            />
+                        </div>
+
+                        <div className="pt-8 border-t">
                             <h3 className="text-lg font-semibold text-gray-800 mb-1">{t('settings.time_tracking.methods_label', 'Verfügbare Zeiterfassungsmethoden')}</h3>
                             <p className="text-sm text-gray-500 mb-4">{t('settings.time_tracking.methods_desc', 'Legen Sie fest, ob Mitarbeiter nur manuell Zeiten eintragen oder auch die Stempeluhr nutzen können.')}</p>
                             <RadioGroup

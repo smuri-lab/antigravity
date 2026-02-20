@@ -364,7 +364,7 @@ const App: React.FC = () => {
               try {
                 const data = JSON.parse(text);
 
-                if (data.customerId && data.activityId) {
+                if (data.customerId || data.activityId || data.startTimer) {
                   if (isRunning) {
                     setNfcSuccessMessage(`Stempeluhr läuft bereits.`);
                     setShowNfcSuccess(true);
@@ -384,16 +384,57 @@ const App: React.FC = () => {
                     return;
                   }
 
-                  setStopwatchCustomerId(data.customerId);
-                  setStopwatchActivityId(data.activityId);
-                  setStartTime(new Date());
-                  setIsRunning(true);
-                  setCurrentView(View.Dashboard);
+                  const nfcMode = companySettings.nfcMode || 'smart';
 
-                  const customerName = customers.find(c => c.id === data.customerId)?.name || data.customerId;
-                  const activityName = activities.find(a => a.id === data.activityId)?.name || data.activityId;
-                  setNfcSuccessMessage(`Zeiterfassung für "${customerName} / ${activityName}" gestartet.`);
-                  setShowNfcSuccess(true);
+                  if (nfcMode === 'attendance') {
+                    // Nur Anwesenheit: Stempeluhr ohne Kunde/Tätigkeit
+                    setStopwatchCustomerId('');
+                    setStopwatchActivityId('');
+                    setStartTime(new Date());
+                    setIsRunning(true);
+                    setCurrentView(View.Dashboard);
+                    setNfcSuccessMessage('Anwesenheit erfasst. Stempeluhr gestartet.');
+                    setShowNfcSuccess(true);
+                  } else {
+                    // Smart oder Fallback: Schicht suchen
+                    let resolvedCustomerId = data.customerId || '';
+                    let resolvedActivityId = data.activityId || '';
+                    let usedShift = false;
+
+                    if (nfcMode === 'smart') {
+                      const now = new Date();
+                      // Look for a shift that covers ±30min around the current time
+                      const activeShift = shifts.find(s =>
+                        s.employeeId === loggedInUser.id &&
+                        new Date(s.start).toLocaleDateString('sv-SE') === todayStr &&
+                        now >= new Date(new Date(s.start).getTime() - 30 * 60 * 1000) &&
+                        now <= new Date(new Date(s.end).getTime() + 30 * 60 * 1000)
+                      );
+                      if (activeShift) {
+                        if (activeShift.customerId) resolvedCustomerId = activeShift.customerId;
+                        if (activeShift.activityId) resolvedActivityId = activeShift.activityId;
+                        usedShift = true;
+                      }
+                    }
+
+                    setStopwatchCustomerId(resolvedCustomerId);
+                    setStopwatchActivityId(resolvedActivityId);
+                    setStartTime(new Date());
+                    setIsRunning(true);
+                    setCurrentView(View.Dashboard);
+
+                    if (usedShift) {
+                      const customerName = customers.find(c => c.id === resolvedCustomerId)?.name || '';
+                      const activityName = activities.find(a => a.id === resolvedActivityId)?.name || '';
+                      const suffix = [customerName, activityName].filter(Boolean).join(' / ');
+                      setNfcSuccessMessage(`Dienst erkannt – Stempeluhr für${suffix ? ` "${suffix}"` : ''} gestartet.`);
+                    } else {
+                      const customerName = customers.find(c => c.id === resolvedCustomerId)?.name || resolvedCustomerId;
+                      const activityName = activities.find(a => a.id === resolvedActivityId)?.name || resolvedActivityId;
+                      setNfcSuccessMessage(`Zeiterfassung für "${customerName} / ${activityName}" gestartet.`);
+                    }
+                    setShowNfcSuccess(true);
+                  }
                 }
               } catch (e) {
                 console.error("Fehler beim Parsen der NFC-Daten als JSON:", e);
@@ -411,7 +452,7 @@ const App: React.FC = () => {
     return () => {
       abortController.abort();
     };
-  }, [loggedInUser, isDisplayingAdminView, isRunning, absenceRequests, customers, activities]);
+  }, [loggedInUser, isDisplayingAdminView, isRunning, absenceRequests, customers, activities, shifts, companySettings]);
 
 
   useEffect(() => {

@@ -227,4 +227,6 @@ export interface CompanySettings {
   timeTrackingEndHour?: number;
   // Configuration which categories are needed
   timeCategoryMode?: 'both' | 'customer' | 'activity';
+  // NFC Time Entry Mode
+  nfcMode?: 'attendance' | 'smart' | 'manual';
 }
