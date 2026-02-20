@@ -662,16 +662,14 @@ export const CalendarView: React.FC<CalendarViewProps> = (props) => {
                             {entriesForSelectedDay.length === 0 && absencesForSelectedDayList.length === 0 && shiftsForSelectedDay.length === 0 && !holidayForSelectedDay && <p className="text-center text-gray-500 py-4">Keine Einträge für diesen Tag.</p>}
                         </div>
                     </Card>
-                    <button
+                    <Button
+                        variant="secondary"
                         onClick={() => onAddTimeEntryForDate(selectedDateString!, shiftsForSelectedDay[0] ?? null)}
-                        className={`w-full mt-2 py-3 rounded-xl border-2 border-dashed font-semibold text-sm transition-all duration-200 flex items-center justify-center gap-2 ${shiftsForSelectedDay.length > 0
-                                ? 'border-blue-300 text-blue-600 hover:bg-blue-50'
-                                : 'border-gray-200 text-gray-400 hover:border-gray-300 hover:text-gray-500'
-                            }`}
+                        className="w-full mt-2"
                     >
-                        <span className="text-lg leading-none">+</span>
-                        {shiftsForSelectedDay.length > 0 ? 'Zeiteintrag aus Dienst erstellen' : 'Zeiteintrag hinzufügen'}
-                    </button>
+                        <span className="text-base leading-none">+</span>
+                        Zeiteintrag hinzufügen
+                    </Button>
                 </div>
             )}
 
