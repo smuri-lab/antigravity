@@ -90,6 +90,9 @@ export const ManualEntryForm: React.FC<ManualEntryFormProps> = ({ addTimeEntry, 
 
   // Logic to set Start Time based on previous entries
   useEffect(() => {
+    // Skip auto-fill if a shift is pre-filling the times
+    if (initialShift) return;
+
     const entriesForDate = timeEntries.filter(entry =>
       new Date(entry.start).toLocaleDateString('sv-SE') === date
     );
@@ -127,7 +130,7 @@ export const ManualEntryForm: React.FC<ManualEntryFormProps> = ({ addTimeEntry, 
       setStartTime('08:00');
       setEndTime('17:00');
     }
-  }, [date, timeEntries]);
+  }, [date, timeEntries, initialShift]);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
