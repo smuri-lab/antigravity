@@ -148,16 +148,11 @@ export const AdminView: React.FC<AdminViewProps> = (props) => {
           onUpdateCompanySettings={props.onUpdateCompanySettings}
         />;
       case AdminViewType.Tasks:
-        return <TasksView
-          tasks={props.tasks || []}
-          employees={props.employees}
-          customers={props.customers}
-          activities={props.activities}
-          companySettings={props.companySettings}
-          onAddTask={props.onAddTask}
-          onUpdateTask={props.onUpdateTask}
-          onDeleteTask={props.onDeleteTask}
-        />;
+        return (
+          <div className="p-8 bg-blue-100 rounded text-xl font-bold">
+            TEST: AdminView rendered the Tasks case correctly! If you see this, TasksView is broken.
+          </div>
+        );
       default:
         return null;
     }
