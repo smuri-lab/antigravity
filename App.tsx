@@ -2,7 +2,7 @@
 import React, { useState, useMemo, useCallback, useEffect, useLayoutEffect, useRef } from 'react';
 import { Dashboard } from './components/Dashboard';
 import { CalendarView } from './components/CalendarView';
-import { AdminView } from './components/AdminView';
+import { AdminView } from './components/admin/AdminView';
 import { BottomNav } from './components/BottomNav';
 import type { TimeEntry, AbsenceRequest, UserAccount, Employee, Customer, Activity, Holiday, CompanySettings, TimeBalanceAdjustment, HolidaysByYear, WeeklySchedule, Shift, ShiftTemplate, Task } from './types';
 import { View, EmploymentType, AbsenceType, TargetHoursModel, AdminViewType } from './types';
