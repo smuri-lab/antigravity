@@ -12,12 +12,14 @@ import { ChevronDoubleRightIcon } from '../icons/ChevronDoubleRightIcon';
 import { UserCircleIcon } from '../icons/UserCircleIcon';
 import { CogIcon } from '../icons/CogIcon';
 import { CalendarDaysIcon } from '../icons/CalendarDaysIcon';
+import { ClipboardListIcon } from '../icons/ClipboardListIcon';
 
 interface AdminNavProps {
   activeView: AdminViewType;
   setActiveView: (view: AdminViewType) => void;
   companySettings: CompanySettings;
   absenceRequests: AbsenceRequest[];
+  openTaskCount?: number;
 }
 
 interface NavItemData {
@@ -65,7 +67,7 @@ const NavItem: React.FC<{
 };
 
 
-export const AdminNav: React.FC<AdminNavProps> = ({ activeView, setActiveView, companySettings, absenceRequests }) => {
+export const AdminNav: React.FC<AdminNavProps> = ({ activeView, setActiveView, companySettings, absenceRequests, openTaskCount = 0 }) => {
   const { t } = useTranslation();
   const [isCollapsed, setIsCollapsed] = useState(false);
 
@@ -76,6 +78,7 @@ export const AdminNav: React.FC<AdminNavProps> = ({ activeView, setActiveView, c
     { label: t('nav.time_tracking', 'Zeiterfassung'), view: AdminViewType.TimeTracking, icon: ClockIcon },
     { label: t('nav.planner', 'Planer'), view: AdminViewType.Planner, icon: SunIcon, badge: pendingRequestsCount },
     { label: t('nav.shift_planner', 'Schichtplaner'), view: AdminViewType.ShiftPlanner, icon: CalendarDaysIcon },
+    { label: 'Aufgaben', view: AdminViewType.Tasks, icon: ClipboardListIcon, badge: openTaskCount },
     {
       label: "Stammdaten",
       view: AdminViewType.Employees, // Clicking Stammdaten defaults to Employees

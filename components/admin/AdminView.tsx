@@ -1,6 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
-import type { AbsenceRequest, TimeEntry, Employee, Customer, Activity, Holiday, CompanySettings, TimeBalanceAdjustment, HolidaysByYear, Shift, ShiftTemplate, RotationTemplate, EmployeeGroup } from '../../types';
+import type { AbsenceRequest, TimeEntry, Employee, Customer, Activity, Holiday, CompanySettings, TimeBalanceAdjustment, HolidaysByYear, Shift, ShiftTemplate, RotationTemplate, EmployeeGroup, Task } from '../../types';
 import { AdminViewType } from '../../types';
 import { AdminNav } from './AdminNav';
 import { SettingsView } from './SettingsView';
@@ -11,6 +11,7 @@ import { PlannerView } from './PlannerView';
 import { VerwaltungView } from './VerwaltungView';
 import { ShiftPlannerView } from './ShiftPlannerView';
 import { AdminBottomNav } from './AdminBottomNav';
+import { TasksView } from './TasksView';
 
 interface AdminViewProps {
   loggedInUser: Employee;
@@ -70,6 +71,11 @@ interface AdminViewProps {
   addEmployeeGroup: (group: Omit<EmployeeGroup, 'id' | 'createdAt'>) => void;
   updateEmployeeGroup: (group: EmployeeGroup) => void;
   deleteEmployeeGroup: (id: string) => void;
+  // Tasks
+  tasks: Task[];
+  onAddTask: (task: Omit<Task, 'id' | 'createdAt' | 'status'>) => void;
+  onUpdateTask: (task: Task) => void;
+  onDeleteTask: (id: string) => void;
 }
 
 export const AdminView: React.FC<AdminViewProps> = (props) => {
@@ -138,6 +144,17 @@ export const AdminView: React.FC<AdminViewProps> = (props) => {
           companySettings={props.companySettings}
           onUpdateCompanySettings={props.onUpdateCompanySettings}
         />;
+      case AdminViewType.Tasks:
+        return <TasksView
+          tasks={props.tasks}
+          employees={props.employees}
+          customers={props.customers}
+          activities={props.activities}
+          companySettings={props.companySettings}
+          onAddTask={props.onAddTask}
+          onUpdateTask={props.onUpdateTask}
+          onDeleteTask={props.onDeleteTask}
+        />;
       default:
         return null;
     }
@@ -152,6 +169,7 @@ export const AdminView: React.FC<AdminViewProps> = (props) => {
             setActiveView={setActiveView}
             companySettings={props.companySettings}
             absenceRequests={props.absenceRequests}
+            openTaskCount={props.tasks.filter(t => t.status === 'open').length}
           />
         </div>
         <main className="flex-grow w-full overflow-x-auto pb-16 md:pb-0 md:pt-6">
@@ -162,6 +180,7 @@ export const AdminView: React.FC<AdminViewProps> = (props) => {
         activeView={activeView}
         setActiveView={setActiveView}
         absenceRequests={props.absenceRequests}
+        openTaskCount={props.tasks.filter(t => t.status === 'open').length}
       />
     </div>
   );

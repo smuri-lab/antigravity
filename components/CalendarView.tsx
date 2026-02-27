@@ -1,5 +1,5 @@
 import React, { useState, useMemo, useEffect, useRef, useCallback, useLayoutEffect } from 'react';
-import type { TimeEntry, AbsenceRequest, Customer, Activity, CompanySettings, HolidaysByYear, Employee, Shift } from '../types';
+import type { TimeEntry, AbsenceRequest, Customer, Activity, CompanySettings, HolidaysByYear, Employee, Shift, Task } from '../types';
 import { AbsenceType } from '../types';
 import { EntryDetailModal } from './EntryDetailModal';
 import { Card } from './ui/Card';
@@ -15,6 +15,8 @@ interface CalendarViewProps {
     timeEntries: TimeEntry[];
     absenceRequests: AbsenceRequest[];
     shifts?: Shift[];
+    tasks?: Task[];
+    onCompleteTask?: (taskId: string, employeeId: number) => void;
     customers: Customer[];
     activities: Activity[];
     holidaysByYear: HolidaysByYear;
@@ -102,6 +104,7 @@ interface CalendarDayProps {
     isToday: boolean;
     hasEntry: boolean;
     hasShift: boolean;
+    hasTask: boolean;
     absenceType?: AbsenceType;
     absenceStatus?: 'pending' | 'approved' | 'rejected';
     absenceStart?: string;
@@ -114,7 +117,7 @@ interface CalendarDayProps {
 
 const CalendarDay: React.FC<CalendarDayProps> = React.memo(({
     dayNum, dateString, isCurrentMonth, isSelected, isToday,
-    hasEntry, hasShift, absenceType, absenceStatus, absenceStart, absenceEnd, absenceDayPortion,
+    hasEntry, hasShift, hasTask, absenceType, absenceStatus, absenceStart, absenceEnd, absenceDayPortion,
     isHoliday, isSunday, onSelect
 }) => {
 
@@ -191,6 +194,9 @@ const CalendarDay: React.FC<CalendarDayProps> = React.memo(({
                 {hasEntry && !absenceType && (
                     <div className="w-1.5 h-1.5 bg-green-500 rounded-full"></div>
                 )}
+                {hasTask && !absenceType && (
+                    <div className="w-1.5 h-1.5 bg-purple-500 rounded-full"></div>
+                )}
             </div>
         </div>
     );
@@ -202,6 +208,7 @@ const CalendarDay: React.FC<CalendarDayProps> = React.memo(({
         prev.isToday === next.isToday &&
         prev.hasEntry === next.hasEntry &&
         prev.hasShift === next.hasShift &&
+        prev.hasTask === next.hasTask &&
         prev.absenceType === next.absenceType &&
         prev.absenceStatus === next.absenceStatus &&
         prev.absenceStart === next.absenceStart &&
@@ -216,12 +223,13 @@ interface CalendarMonthGridProps {
     selectedDateString: string | null;
     entriesMap: Map<string, boolean>;
     shiftsMap: Map<string, boolean>;
+    tasksMap: Map<string, boolean>;
     absencesMap: Map<string, AbsenceRequest>;
     holidaysMap: Map<string, boolean>;
     onSelectDate: (dateString: string) => void;
 }
 
-const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = React.memo(({ year, month, selectedDateString, entriesMap, shiftsMap, absencesMap, holidaysMap, onSelectDate }) => {
+const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = React.memo(({ year, month, selectedDateString, entriesMap, shiftsMap, tasksMap, absencesMap, holidaysMap, onSelectDate }) => {
     const daysData = useMemo(() => {
         const startOfMonth = new Date(year, month, 1);
         const endOfMonth = new Date(year, month + 1, 0);
@@ -273,6 +281,7 @@ const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = React.memo(({ year, 
                             isToday={dateStr === TODAY_STR}
                             hasEntry={!isCurrent ? false : entriesMap.has(dateStr)}
                             hasShift={!isCurrent ? false : shiftsMap.has(dateStr)}
+                            hasTask={!isCurrent ? false : tasksMap.has(dateStr)}
                             absenceType={!isCurrent ? undefined : absencesMap.get(dateStr)?.type}
                             absenceStatus={!isCurrent ? undefined : absencesMap.get(dateStr)?.status}
                             absenceStart={!isCurrent ? undefined : absencesMap.get(dateStr)?.startDate}
@@ -292,7 +301,8 @@ const CalendarMonthGrid: React.FC<CalendarMonthGridProps> = React.memo(({ year, 
 
 export const CalendarView: React.FC<CalendarViewProps> = (props) => {
     const {
-        currentUser, timeEntries, absenceRequests, shifts = [], customers, activities,
+        currentUser, timeEntries, absenceRequests, shifts = [], tasks = [], onCompleteTask,
+        customers, activities,
         holidaysByYear, onUpdateTimeEntry, onDeleteTimeEntry, companySettings,
         onEnsureHolidaysForYear, onAddAbsenceClick, onAddTimeEntryForDate
     } = props;
@@ -403,6 +413,17 @@ export const CalendarView: React.FC<CalendarViewProps> = (props) => {
         }
         return { entriesMap: eBoolMap, entriesDataMap: eDataMap, shiftsMap: sBoolMap, shiftsDataMap: sDataMap, absencesMap: aMap, holidaysMap: hMap };
     }, [timeEntries, shifts, absenceRequests, holidaysByYear]);
+
+    // Tasks map: tasks assigned to current user, keyed by dueDate
+    const tasksMap = useMemo(() => {
+        const tMap = new Map<string, boolean>();
+        for (const task of tasks) {
+            if (task.assignedTo.includes(currentUser.id)) {
+                tMap.set(task.dueDate, true);
+            }
+        }
+        return tMap;
+    }, [tasks, currentUser.id]);
 
     const changeMonth = useCallback((offset: number) => {
         setCurrentDate(prev => new Date(prev.getFullYear(), prev.getMonth() + offset, 1));
@@ -615,6 +636,7 @@ export const CalendarView: React.FC<CalendarViewProps> = (props) => {
                             selectedDateString={selectedDateString}
                             entriesMap={entriesMap}
                             shiftsMap={shiftsMap}
+                            tasksMap={tasksMap}
                             absencesMap={absencesMap}
                             holidaysMap={holidaysMap}
                             onSelectDate={handleSelectDate}
@@ -625,6 +647,7 @@ export const CalendarView: React.FC<CalendarViewProps> = (props) => {
                             selectedDateString={selectedDateString}
                             entriesMap={entriesMap}
                             shiftsMap={shiftsMap}
+                            tasksMap={tasksMap}
                             absencesMap={absencesMap}
                             holidaysMap={holidaysMap}
                             onSelectDate={handleSelectDate}
@@ -635,6 +658,7 @@ export const CalendarView: React.FC<CalendarViewProps> = (props) => {
                             selectedDateString={selectedDateString}
                             entriesMap={entriesMap}
                             shiftsMap={shiftsMap}
+                            tasksMap={tasksMap}
                             absencesMap={absencesMap}
                             holidaysMap={holidaysMap}
                             onSelectDate={handleSelectDate}
@@ -662,6 +686,39 @@ export const CalendarView: React.FC<CalendarViewProps> = (props) => {
                             {entriesForSelectedDay.length === 0 && absencesForSelectedDayList.length === 0 && shiftsForSelectedDay.length === 0 && !holidayForSelectedDay && <p className="text-center text-gray-500 py-4">Keine Einträge für diesen Tag.</p>}
                         </div>
                     </Card>
+
+                    {/* Tasks for this day */}
+                    {(() => {
+                        const dayTasks = tasks.filter(t => t.dueDate === selectedDateString && t.assignedTo.includes(currentUser.id));
+                        if (dayTasks.length === 0) return null;
+                        return (
+                            <div className="mt-3">
+                                <h4 className="text-sm font-bold text-gray-600 mb-2 flex items-center gap-1.5">
+                                    <span className="w-2 h-2 rounded-full bg-purple-500 inline-block"></span>
+                                    Aufgaben für diesen Tag
+                                </h4>
+                                <div className="space-y-2">
+                                    {dayTasks.map(task => (
+                                        <div key={task.id} className={`p-3 rounded-lg border flex items-start justify-between gap-3 ${task.status === 'done' ? 'bg-green-50 border-green-200' : 'bg-purple-50 border-purple-200'}`}>
+                                            <div className="flex-grow min-w-0">
+                                                <p className={`font-semibold text-sm ${task.status === 'done' ? 'line-through text-gray-400' : 'text-purple-900'}`}>{task.title}</p>
+                                                {task.description && <p className="text-xs text-gray-500 mt-0.5">{task.description}</p>}
+                                                {task.status === 'done' && <p className="text-xs text-green-600 mt-0.5">✅ Erledigt</p>}
+                                            </div>
+                                            {task.status === 'open' && onCompleteTask && (
+                                                <button
+                                                    onClick={() => onCompleteTask(task.id, currentUser.id)}
+                                                    className="text-xs bg-purple-600 text-white px-3 py-1.5 rounded-lg hover:bg-purple-700 transition-colors flex-shrink-0 font-semibold"
+                                                >
+                                                    Erledigt
+                                                </button>
+                                            )}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        );
+                    })()}
                     <Button
                         variant="secondary"
                         onClick={() => onAddTimeEntryForDate(selectedDateString!, shiftsForSelectedDay[0] ?? null)}

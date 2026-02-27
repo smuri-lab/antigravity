@@ -195,6 +195,7 @@ export enum AdminViewType {
   Activities = 'activities',
   Settings = 'settings',
   Profile = 'profile',
+  Tasks = 'tasks',
 }
 
 export interface Holiday {
@@ -229,4 +230,18 @@ export interface CompanySettings {
   timeCategoryMode?: 'both' | 'customer' | 'activity';
   // NFC Time Entry Mode
   nfcMode?: 'attendance' | 'smart' | 'manual';
+}
+
+export interface Task {
+  id: string;
+  title: string;
+  description?: string;
+  assignedTo: number[];    // Employee IDs
+  dueDate: string;         // YYYY-MM-DD
+  customerId?: string;
+  activityId?: string;
+  status: 'open' | 'done';
+  completedAt?: string;    // ISO timestamp
+  completedBy?: number;    // Employee ID
+  createdAt: string;       // ISO timestamp
 }

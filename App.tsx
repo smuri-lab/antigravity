@@ -4,7 +4,7 @@ import { Dashboard } from './components/Dashboard';
 import { CalendarView } from './components/CalendarView';
 import { AdminView } from './components/AdminView';
 import { BottomNav } from './components/BottomNav';
-import type { TimeEntry, AbsenceRequest, UserAccount, Employee, Customer, Activity, Holiday, CompanySettings, TimeBalanceAdjustment, HolidaysByYear, WeeklySchedule, Shift, ShiftTemplate } from './types';
+import type { TimeEntry, AbsenceRequest, UserAccount, Employee, Customer, Activity, Holiday, CompanySettings, TimeBalanceAdjustment, HolidaysByYear, WeeklySchedule, Shift, ShiftTemplate, Task } from './types';
 import { View, EmploymentType, AbsenceType, TargetHoursModel, AdminViewType } from './types';
 import { INITIAL_CUSTOMERS, INITIAL_ACTIVITIES, INITIAL_USER_ACCOUNT, INITIAL_EMPLOYEES, INITIAL_SHIFT_TEMPLATES, getHolidays, GermanState } from './constants';
 import { LoginScreen } from './components/LoginScreen';
@@ -262,6 +262,7 @@ const App: React.FC = () => {
     deleteShiftsByEmployee,
     rotationPatterns, addRotationPattern, updateRotationPattern, deleteRotationPattern,
     employeeGroups, addEmployeeGroup, updateEmployeeGroup, deleteEmployeeGroup,
+    tasks, addTask, updateTask, deleteTask, completeTask,
   } = useStore();
 
   const [timeTrackingMethod, setTimeTrackingMethod] = useLocalStorage<'all' | 'manual'>('timepro-method', 'all');
@@ -766,6 +767,8 @@ const App: React.FC = () => {
           timeEntries={userTimeEntries}
           absenceRequests={absenceRequests.filter(r => r.employeeId === currentUser.id)}
           shifts={shiftsForUser} // Pass shifts to calendar
+          tasks={tasks.filter(t => t.assignedTo.includes(currentUser.id))}
+          onCompleteTask={completeTask}
           customers={customers}
           activities={activities}
           onUpdateTimeEntry={updateTimeEntry}
@@ -937,6 +940,11 @@ const App: React.FC = () => {
                   addEmployeeGroup={addEmployeeGroup}
                   updateEmployeeGroup={updateEmployeeGroup}
                   deleteEmployeeGroup={deleteEmployeeGroup}
+                  // Tasks
+                  tasks={tasks}
+                  onAddTask={addTask}
+                  onUpdateTask={updateTask}
+                  onDeleteTask={deleteTask}
                 />
               ) : (
                 renderEmployeeView()

@@ -1,5 +1,5 @@
 import { StateCreator } from 'zustand';
-import { TimeEntry, AbsenceRequest, Shift, Employee, Customer, Activity, CompanySettings, ShiftTemplate, TimeBalanceAdjustment, HolidaysByYear, AbsenceType, RotationTemplate, EmployeeGroup } from '../../types';
+import { TimeEntry, AbsenceRequest, Shift, Employee, Customer, Activity, CompanySettings, ShiftTemplate, TimeBalanceAdjustment, HolidaysByYear, AbsenceType, RotationTemplate, EmployeeGroup, Task } from '../../types';
 import { INITIAL_CUSTOMERS, INITIAL_ACTIVITIES, INITIAL_EMPLOYEES, INITIAL_SHIFT_TEMPLATES, INITIAL_USER_ACCOUNT, GermanState } from '../../constants';
 import { applyAutomaticBreaks } from '../../components/utils/calculations';
 
@@ -17,6 +17,7 @@ export interface DataSlice {
     selectedState: GermanState;
     rotationPatterns: RotationTemplate[];
     employeeGroups: EmployeeGroup[];
+    tasks: Task[];
 
     // Actions
     setTimeEntries: (entries: TimeEntry[] | ((prev: TimeEntry[]) => TimeEntry[])) => void;
@@ -32,6 +33,13 @@ export interface DataSlice {
     setSelectedState: (state: GermanState) => void;
     setRotationPatterns: (patterns: RotationTemplate[] | ((prev: RotationTemplate[]) => RotationTemplate[])) => void;
     setEmployeeGroups: (groups: EmployeeGroup[] | ((prev: EmployeeGroup[]) => EmployeeGroup[])) => void;
+
+    // Task Actions
+    addTask: (task: Omit<Task, 'id' | 'createdAt' | 'status'>) => void;
+    updateTask: (updatedTask: Task) => void;
+    deleteTask: (id: string) => void;
+    completeTask: (id: string, employeeId: number) => void;
+    reopenTask: (id: string) => void;
 
     // Advanced Actions
     addTimeEntry: (entry: Omit<TimeEntry, 'id' | 'employeeId'>, employeeId: number) => void;
@@ -89,6 +97,7 @@ export const createDataSlice: StateCreator<DataSlice> = (set) => ({
     selectedState: 'BW',
     rotationPatterns: [],
     employeeGroups: [],
+    tasks: [],
 
     setTimeEntries: (entries) => set((state) => ({
         timeEntries: typeof entries === 'function' ? entries(state.timeEntries) : entries
@@ -223,5 +232,37 @@ export const createDataSlice: StateCreator<DataSlice> = (set) => ({
     })),
     deleteEmployeeGroup: (id) => set((state) => ({
         employeeGroups: state.employeeGroups.filter(g => g.id !== id)
+    })),
+
+    // Task CRUD
+    addTask: (task) => set((state) => ({
+        tasks: [...state.tasks, {
+            ...task,
+            id: crypto.randomUUID(),
+            status: 'open',
+            createdAt: new Date().toISOString(),
+        }]
+    })),
+    updateTask: (updatedTask) => set((state) => ({
+        tasks: state.tasks.map(t => t.id === updatedTask.id ? updatedTask : t)
+    })),
+    deleteTask: (id) => set((state) => ({
+        tasks: state.tasks.filter(t => t.id !== id)
+    })),
+    completeTask: (id, employeeId) => set((state) => ({
+        tasks: state.tasks.map(t => t.id === id ? {
+            ...t,
+            status: 'done',
+            completedAt: new Date().toISOString(),
+            completedBy: employeeId,
+        } : t)
+    })),
+    reopenTask: (id) => set((state) => ({
+        tasks: state.tasks.map(t => t.id === id ? {
+            ...t,
+            status: 'open',
+            completedAt: undefined,
+            completedBy: undefined,
+        } : t)
     })),
 });

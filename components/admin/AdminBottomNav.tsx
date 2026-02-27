@@ -7,11 +7,13 @@ import { SunIcon } from '../icons/SunIcon';
 import { ClockIcon } from '../icons/ClockIcon';
 import { ChartBarIcon } from '../icons/ChartBarIcon';
 import { BriefcaseIcon } from '../icons/BriefcaseIcon';
+import { ClipboardListIcon } from '../icons/ClipboardListIcon';
 
 interface AdminBottomNavProps {
   activeView: AdminViewType;
   setActiveView: (view: AdminViewType) => void;
   absenceRequests: AbsenceRequest[];
+  openTaskCount?: number;
 }
 
 interface NavItemProps {
@@ -44,7 +46,7 @@ const NavItem: React.FC<NavItemProps> = ({ label, isActive, onClick, Icon, badge
   );
 };
 
-export const AdminBottomNav: React.FC<AdminBottomNavProps> = ({ activeView, setActiveView, absenceRequests }) => {
+export const AdminBottomNav: React.FC<AdminBottomNavProps> = ({ activeView, setActiveView, absenceRequests, openTaskCount = 0 }) => {
   const { t } = useTranslation();
   const pendingRequestsCount = absenceRequests.filter(r => r.status === 'pending').length;
 
@@ -74,6 +76,13 @@ export const AdminBottomNav: React.FC<AdminBottomNavProps> = ({ activeView, setA
           onClick={() => setActiveView(AdminViewType.Planner)}
           Icon={SunIcon}
           badge={pendingRequestsCount}
+        />
+        <NavItem
+          label="Aufgaben"
+          isActive={activeView === AdminViewType.Tasks}
+          onClick={() => setActiveView(AdminViewType.Tasks)}
+          Icon={ClipboardListIcon}
+          badge={openTaskCount}
         />
         <NavItem
           label={t('nav.admin', 'Stammdaten')}
