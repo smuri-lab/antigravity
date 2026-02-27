@@ -90,6 +90,9 @@ export const AdminView: React.FC<AdminViewProps> = (props) => {
 
   const renderActiveView = () => {
     switch (activeView) {
+      case AdminViewType.Dashboard:
+        // Dashboard is shown as a specialized component in App.tsx; redirect to Planner
+        return <PlannerView {...props} />;
       case AdminViewType.Planner:
         return <PlannerView {...props} />;
       case AdminViewType.ShiftPlanner:
@@ -146,7 +149,7 @@ export const AdminView: React.FC<AdminViewProps> = (props) => {
         />;
       case AdminViewType.Tasks:
         return <TasksView
-          tasks={props.tasks}
+          tasks={props.tasks || []}
           employees={props.employees}
           customers={props.customers}
           activities={props.activities}
