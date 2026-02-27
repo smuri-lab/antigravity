@@ -17,6 +17,7 @@ import { ActionSheet } from './components/ui/ActionSheet';
 import { AbsenceRequestModal } from './components/AbsenceRequestModal';
 import { CheckCircleIcon } from './components/icons/CheckCircleIcon';
 import { ManualEntryFormModal } from './components/ManualEntryFormModal';
+import { NfcManualSelectModal } from './components/NfcManualSelectModal';
 import { UserCircleIcon } from './components/icons/UserCircleIcon';
 import { CogIcon } from './components/icons/CogIcon';
 import { OverviewView } from './components/OverviewView';
@@ -266,6 +267,7 @@ const App: React.FC = () => {
   const [timeTrackingMethod, setTimeTrackingMethod] = useLocalStorage<'all' | 'manual'>('timepro-method', 'all');
   const [userAccount] = useState<UserAccount>(INITIAL_USER_ACCOUNT); // Keep as local since it's derived/initial
   const [calendarEntryModal, setCalendarEntryModal] = useState<{ isOpen: boolean; date: string | null; shift: import('./types').Shift | null }>({ isOpen: false, date: null, shift: null });
+  const [nfcManualModal, setNfcManualModal] = useState<{ isOpen: boolean; defaultCustomerId: string; defaultActivityId: string }>({ isOpen: false, defaultCustomerId: '', defaultActivityId: '' });
   const intervalRef = React.useRef<number | null>(null);
   const mainScrollRef = useRef<HTMLDivElement>(null);
 
@@ -395,6 +397,14 @@ const App: React.FC = () => {
                     setCurrentView(View.Dashboard);
                     setNfcSuccessMessage('Anwesenheit erfasst. Stempeluhr gestartet.');
                     setShowNfcSuccess(true);
+                  } else if (nfcMode === 'manual') {
+                    // Manuell: Modal öffnen zur Auswahl von Kunde & Tätigkeit
+                    setNfcManualModal({
+                      isOpen: true,
+                      defaultCustomerId: data.customerId || '',
+                      defaultActivityId: data.activityId || '',
+                    });
+                    setCurrentView(View.Dashboard);
                   } else {
                     // Smart oder Fallback: Schicht suchen
                     let resolvedCustomerId = data.customerId || '';
@@ -1001,6 +1011,29 @@ const App: React.FC = () => {
                 absenceRequests={absenceRequests.filter(r => r.employeeId === currentUser.id)}
                 initialDate={calendarEntryModal.date}
                 initialShift={calendarEntryModal.shift}
+              />
+            )}
+            {nfcManualModal.isOpen && currentUser && (
+              <NfcManualSelectModal
+                isOpen={nfcManualModal.isOpen}
+                onClose={() => setNfcManualModal({ isOpen: false, defaultCustomerId: '', defaultActivityId: '' })}
+                onConfirm={(customerId, activityId) => {
+                  setStopwatchCustomerId(customerId);
+                  setStopwatchActivityId(activityId);
+                  setStartTime(new Date());
+                  setIsRunning(true);
+                  setNfcManualModal({ isOpen: false, defaultCustomerId: '', defaultActivityId: '' });
+                  const customerName = customers.find(c => c.id === customerId)?.name || '';
+                  const activityName = activities.find(a => a.id === activityId)?.name || '';
+                  const suffix = [customerName, activityName].filter(Boolean).join(' / ');
+                  setNfcSuccessMessage(`Stempeluhr${suffix ? ` für "${suffix}"` : ''} gestartet.`);
+                  setShowNfcSuccess(true);
+                }}
+                customers={customers}
+                activities={activities}
+                companySettings={companySettings}
+                defaultCustomerId={nfcManualModal.defaultCustomerId}
+                defaultActivityId={nfcManualModal.defaultActivityId}
               />
             )}
             {/* Toasts */}

@@ -277,7 +277,7 @@ const SystemSettings: React.FC<Omit<SettingsViewProps, 'currentUser' | 'onUpdate
                                 options={[
                                     { value: 'attendance', label: 'Nur Anwesenheit – Kein Kunde/Tätigkeit beim Scan' },
                                     { value: 'smart', label: 'Smart (Plan-basiert) – Automatisch aus Schichtplan übernehmen' },
-                                    { value: 'manual', label: 'Manuell – Immer abfragen (kommt in v2)' },
+                                    { value: 'manual', label: 'Manuell – Immer abfragen' },
                                 ]}
                                 selectedValue={localSettings.nfcMode || 'smart'}
                                 onChange={(value) => setLocalSettings(prev => ({ ...prev, nfcMode: value as 'attendance' | 'smart' | 'manual' }))}
