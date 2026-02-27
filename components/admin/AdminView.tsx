@@ -172,7 +172,7 @@ export const AdminView: React.FC<AdminViewProps> = (props) => {
             setActiveView={setActiveView}
             companySettings={props.companySettings}
             absenceRequests={props.absenceRequests}
-            openTaskCount={props.tasks.filter(t => t.status === 'open').length}
+            openTaskCount={(props.tasks || []).filter(t => t.status === 'open').length}
           />
         </div>
         <main className="flex-grow w-full overflow-x-auto pb-16 md:pb-0 md:pt-6">
@@ -183,7 +183,7 @@ export const AdminView: React.FC<AdminViewProps> = (props) => {
         activeView={activeView}
         setActiveView={setActiveView}
         absenceRequests={props.absenceRequests}
-        openTaskCount={props.tasks.filter(t => t.status === 'open').length}
+        openTaskCount={(props.tasks || []).filter(t => t.status === 'open').length}
       />
     </div>
   );
