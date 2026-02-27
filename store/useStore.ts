@@ -18,6 +18,22 @@ export const useStore = create<StoreState>()(
         {
             name: 'timepro-storage',
             storage: createJSONStorage(() => localStorage),
+            version: 2,
+            migrate: (persistedState: any, version: number) => {
+                // Ensure tasks array exists when migrating from older versions
+                if (!persistedState.tasks) {
+                    persistedState.tasks = [];
+                }
+                return persistedState;
+            },
+            merge: (persistedState: any, currentState: StoreState) => ({
+                ...currentState,
+                ...persistedState,
+                // Always ensure these arrays exist and are not undefined
+                tasks: persistedState?.tasks ?? [],
+                rotationPatterns: persistedState?.rotationPatterns ?? [],
+                employeeGroups: persistedState?.employeeGroups ?? [],
+            }),
             // Only persist specific slices if needed, or everything by default
             partialize: (state) => ({
                 // Auth
