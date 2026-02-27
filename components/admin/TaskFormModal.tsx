@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import ReactDOM from 'react-dom';
-import type { Task, Employee, Customer, Activity, CompanySettings } from '../../types';
+import type { Task, Employee, Customer, Activity, CompanySettings, TaskRecurrenceFrequency } from '../../types';
 import { Card } from '../ui/Card';
 import { Input } from '../ui/Input';
 import { Select } from '../ui/Select';
@@ -27,6 +27,10 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
     const [selectedEmployees, setSelectedEmployees] = useState<number[]>(initialTask?.assignedTo || []);
     const [customerId, setCustomerId] = useState(initialTask?.customerId || '');
     const [activityId, setActivityId] = useState(initialTask?.activityId || '');
+    const [recurrenceFrequency, setRecurrenceFrequency] = useState<TaskRecurrenceFrequency | ''>(
+        initialTask?.recurrence?.frequency || ''
+    );
+    const [recurrenceEndDate, setRecurrenceEndDate] = useState(initialTask?.recurrence?.endDate || '');
 
     const customerLabel = companySettings.customerLabel || 'Zeitkategorie 1';
     const activityLabel = companySettings.activityLabel || 'Zeitkategorie 2';
@@ -39,7 +43,17 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
 
     const handleSave = () => {
         if (!title.trim() || !dueDate || selectedEmployees.length === 0) return;
-        onSave({ title: title.trim(), description: description.trim() || undefined, dueDate, assignedTo: selectedEmployees, customerId: customerId || undefined, activityId: activityId || undefined });
+        onSave({
+            title: title.trim(),
+            description: description.trim() || undefined,
+            dueDate,
+            assignedTo: selectedEmployees,
+            customerId: customerId || undefined,
+            activityId: activityId || undefined,
+            recurrence: recurrenceFrequency
+                ? { frequency: recurrenceFrequency, endDate: recurrenceEndDate || undefined }
+                : undefined,
+        });
         onClose();
     };
 
@@ -82,6 +96,30 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                         <option value="">— Kein{activityLabel} —</option>
                         {activities.map(a => <option key={a.id} value={a.id}>{a.name}</option>)}
                     </Select>
+
+                    {/* Recurrence */}
+                    <div className="border-t pt-4 space-y-3">
+                        <label className="block text-sm font-medium text-gray-700">🔁 Wiederholung</label>
+                        <select
+                            value={recurrenceFrequency}
+                            onChange={e => setRecurrenceFrequency(e.target.value as TaskRecurrenceFrequency | '')}
+                            className="w-full text-sm border border-gray-200 rounded-lg px-3 py-2 bg-white text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        >
+                            <option value="">Keine Wiederholung</option>
+                            <option value="daily">Täglich</option>
+                            <option value="weekly">Wöchentlich</option>
+                            <option value="biweekly">Alle 2 Wochen</option>
+                            <option value="monthly">Monatlich</option>
+                        </select>
+                        {recurrenceFrequency && (
+                            <Input
+                                label="Enddatum der Wiederholung (optional)"
+                                type="date"
+                                value={recurrenceEndDate}
+                                onChange={e => setRecurrenceEndDate(e.target.value)}
+                            />
+                        )}
+                    </div>
                 </div>
                 <div className="flex gap-3 pt-4 mt-2 border-t">
                     <Button onClick={onClose} className="flex-1 bg-gray-100 text-gray-700 hover:bg-gray-200">Abbrechen</Button>

@@ -232,6 +232,13 @@ export interface CompanySettings {
   nfcMode?: 'attendance' | 'smart' | 'manual';
 }
 
+export type TaskRecurrenceFrequency = 'daily' | 'weekly' | 'biweekly' | 'monthly';
+
+export interface TaskRecurrence {
+  frequency: TaskRecurrenceFrequency;
+  endDate?: string; // YYYY-MM-DD — no new tasks generated after this date
+}
+
 export interface Task {
   id: string;
   title: string;
@@ -244,4 +251,5 @@ export interface Task {
   completedAt?: string;    // ISO timestamp
   completedBy?: number;    // Employee ID
   createdAt: string;       // ISO timestamp
+  recurrence?: TaskRecurrence; // Optional recurring config
 }

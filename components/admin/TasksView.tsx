@@ -1,5 +1,5 @@
 import React, { useState, useMemo } from 'react';
-import type { Task, Employee, Customer, Activity, CompanySettings } from '../../types';
+import type { Task, Employee, Customer, Activity, CompanySettings, TaskRecurrenceFrequency } from '../../types';
 import { Card } from '../ui/Card';
 import { Button } from '../ui/Button';
 import { ConfirmModal } from '../ui/ConfirmModal';
@@ -19,6 +19,16 @@ interface TasksViewProps {
 const statusColors = {
     open: 'bg-yellow-100 text-yellow-800',
     done: 'bg-green-100 text-green-800',
+};
+
+const recurrenceLabel = (frequency: string) => {
+    switch (frequency) {
+        case 'daily': return 'Täglich';
+        case 'weekly': return 'Wöchentlich';
+        case 'biweekly': return 'Alle 2 Wochen';
+        case 'monthly': return 'Monatlich';
+        default: return frequency;
+    }
 };
 
 export const TasksView: React.FC<TasksViewProps> = ({
@@ -116,14 +126,23 @@ export const TasksView: React.FC<TasksViewProps> = ({
                                                     📅 {dueDate.toLocaleDateString('de-DE', { weekday: 'short', day: '2-digit', month: '2-digit', year: 'numeric' })}
                                                 </span>
                                             </div>
-                                            <h3 className={`font-semibold text-gray-800 ${task.status === 'done' ? 'line-through text-gray-400' : ''}`}>
+                                            <h3 className={`font-semibold text-gray-800 flex items-center gap-1.5 ${task.status === 'done' ? 'line-through text-gray-400' : ''}`}>
                                                 {task.title}
+                                                {task.recurrence && (
+                                                    <span title={recurrenceLabel(task.recurrence.frequency)} className="text-base leading-none">🔁</span>
+                                                )}
                                             </h3>
                                             {task.description && <p className="text-sm text-gray-500 mt-0.5">{task.description}</p>}
                                             <div className="flex flex-wrap gap-x-4 mt-1.5 text-xs text-gray-500">
                                                 <span>👤 {assignedNames}</span>
                                                 {customerName && <span>🏢 {customerName}</span>}
                                                 {activityName && <span>⚙️ {activityName}</span>}
+                                                {task.recurrence && (
+                                                    <span className="text-purple-600 font-medium">
+                                                        🔁 {recurrenceLabel(task.recurrence.frequency)}
+                                                        {task.recurrence.endDate && ` · bis ${new Date(task.recurrence.endDate + 'T12:00:00').toLocaleDateString('de-DE')}`}
+                                                    </span>
+                                                )}
                                                 {task.status === 'done' && task.completedAt && (
                                                     <span>✅ {new Date(task.completedAt).toLocaleDateString('de-DE')}</span>
                                                 )}

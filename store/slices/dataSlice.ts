@@ -249,14 +249,50 @@ export const createDataSlice: StateCreator<DataSlice> = (set) => ({
     deleteTask: (id) => set((state) => ({
         tasks: state.tasks.filter(t => t.id !== id)
     })),
-    completeTask: (id, employeeId) => set((state) => ({
-        tasks: state.tasks.map(t => t.id === id ? {
-            ...t,
-            status: 'done',
+    completeTask: (id, employeeId) => set((state) => {
+        const task = state.tasks.find(t => t.id === id);
+        if (!task) return {};
+
+        const completedTask = {
+            ...task,
+            status: 'done' as const,
             completedAt: new Date().toISOString(),
             completedBy: employeeId,
-        } : t)
-    })),
+        };
+
+        let newTasks = state.tasks.map(t => t.id === id ? completedTask : t);
+
+        // Auto-generate next occurrence for recurring tasks
+        if (task.recurrence) {
+            const { frequency, endDate } = task.recurrence;
+            const currentDue = new Date(task.dueDate + 'T12:00:00');
+
+            // Calculate next due date
+            const nextDue = new Date(currentDue);
+            if (frequency === 'daily') nextDue.setDate(nextDue.getDate() + 1);
+            else if (frequency === 'weekly') nextDue.setDate(nextDue.getDate() + 7);
+            else if (frequency === 'biweekly') nextDue.setDate(nextDue.getDate() + 14);
+            else if (frequency === 'monthly') nextDue.setMonth(nextDue.getMonth() + 1);
+
+            const nextDueDateStr = nextDue.toLocaleDateString('sv-SE');
+
+            // Only create next task if it doesn't exceed endDate
+            if (!endDate || nextDueDateStr <= endDate) {
+                const nextTask: Task = {
+                    ...task,
+                    id: crypto.randomUUID(),
+                    status: 'open',
+                    createdAt: new Date().toISOString(),
+                    dueDate: nextDueDateStr,
+                    completedAt: undefined,
+                    completedBy: undefined,
+                };
+                newTasks = [...newTasks, nextTask];
+            }
+        }
+
+        return { tasks: newTasks };
+    }),
     reopenTask: (id) => set((state) => ({
         tasks: state.tasks.map(t => t.id === id ? {
             ...t,
