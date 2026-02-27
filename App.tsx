@@ -767,7 +767,7 @@ const App: React.FC = () => {
           timeEntries={userTimeEntries}
           absenceRequests={absenceRequests.filter(r => r.employeeId === currentUser.id)}
           shifts={shiftsForUser} // Pass shifts to calendar
-          tasks={tasks.filter(t => t.assignedTo.includes(currentUser.id))}
+          tasks={(tasks || []).filter(t => t && Array.isArray(t.assignedTo) && t.assignedTo.includes(currentUser.id))}
           onCompleteTask={completeTask}
           customers={customers}
           activities={activities}
