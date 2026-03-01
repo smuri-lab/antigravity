@@ -252,4 +252,5 @@ export interface Task {
   completedBy?: number;    // Employee ID
   createdAt: string;       // ISO timestamp
   recurrence?: TaskRecurrence; // Optional recurring config
+  seriesId?: string;       // Shared ID for all occurrences of a recurring task
 }

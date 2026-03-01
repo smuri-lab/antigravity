@@ -237,19 +237,22 @@ export const createDataSlice: StateCreator<DataSlice> = (set) => ({
     // Task CRUD
     addTask: (task) => set((state) => {
         const createdAt = new Date().toISOString();
+        // All occurrences of a recurring series share one seriesId
+        const seriesId = task.recurrence ? crypto.randomUUID() : undefined;
+
         const firstTask: Task = {
             ...task,
             id: crypto.randomUUID(),
             status: 'open',
             createdAt,
+            seriesId,
         };
 
         const allTasks: Task[] = [firstTask];
 
         // Pre-generate all future occurrences for recurring tasks
-        if (task.recurrence) {
+        if (task.recurrence && seriesId) {
             const { frequency, endDate } = task.recurrence;
-            // Max 1 year ahead if no endDate, to avoid infinite loops
             const maxDate = endDate || (() => {
                 const d = new Date(task.dueDate + 'T12:00:00');
                 d.setFullYear(d.getFullYear() + 1);
@@ -259,7 +262,6 @@ export const createDataSlice: StateCreator<DataSlice> = (set) => ({
             let currentDue = new Date(task.dueDate + 'T12:00:00');
 
             while (true) {
-                // Calculate next occurrence
                 const nextDue = new Date(currentDue);
                 if (frequency === 'daily') nextDue.setDate(nextDue.getDate() + 1);
                 else if (frequency === 'weekly') nextDue.setDate(nextDue.getDate() + 7);
@@ -275,6 +277,7 @@ export const createDataSlice: StateCreator<DataSlice> = (set) => ({
                     status: 'open',
                     createdAt,
                     dueDate: nextDueDateStr,
+                    seriesId,
                 });
 
                 currentDue = nextDue;
@@ -286,8 +289,9 @@ export const createDataSlice: StateCreator<DataSlice> = (set) => ({
     updateTask: (updatedTask) => set((state) => ({
         tasks: state.tasks.map(t => t.id === updatedTask.id ? updatedTask : t)
     })),
+    // deleteTask: deletes just one task OR the entire series (if seriesId passed)
     deleteTask: (id) => set((state) => ({
-        tasks: state.tasks.filter(t => t.id !== id)
+        tasks: state.tasks.filter(t => t.id !== id && t.seriesId !== id)
     })),
     completeTask: (id, employeeId) => set((state) => {
         const task = state.tasks.find(t => t.id === id);

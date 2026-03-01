@@ -43,10 +43,53 @@ export const TasksView: React.FC<TasksViewProps> = ({
     const customerLabel = companySettings.customerLabel || 'Zeitkategorie 1';
     const activityLabel = companySettings.activityLabel || 'Zeitkategorie 2';
 
-    const filteredTasks = useMemo(() => {
+    // For recurring tasks: only show the next upcoming open occurrence per series
+    const displayedTasks = useMemo(() => {
         if (!Array.isArray(tasks)) return [];
-        return tasks
-            .filter(t => t && (filter === 'all' || t.status === filter))
+
+        const today = new Date().toLocaleDateString('sv-SE');
+
+        // Build a map: seriesId -> all tasks in that series
+        const seriesMap = new Map<string, Task[]>();
+        const standalone: Task[] = [];
+
+        for (const t of tasks) {
+            if (!t) continue;
+            if (t.seriesId) {
+                if (!seriesMap.has(t.seriesId)) seriesMap.set(t.seriesId, []);
+                seriesMap.get(t.seriesId)!.push(t);
+            } else {
+                standalone.push(t);
+            }
+        }
+
+        // For each series, pick the representative task:
+        // - next upcoming open task (dueDate >= today), or
+        // - most recent done task if all are done
+        const representatives: (Task & { _seriesTotal?: number; _seriesDone?: number })[] = [];
+        seriesMap.forEach((seriesTasks) => {
+            const openFuture = seriesTasks
+                .filter(t => t.status === 'open' && t.dueDate >= today)
+                .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+            const openPast = seriesTasks
+                .filter(t => t.status === 'open' && t.dueDate < today)
+                .sort((a, b) => a.dueDate.localeCompare(b.dueDate));
+            const done = seriesTasks.filter(t => t.status === 'done');
+
+            const rep = openPast[0] || openFuture[0] || done.sort((a, b) => (b.dueDate).localeCompare(a.dueDate))[0];
+            if (rep) {
+                representatives.push({
+                    ...rep,
+                    _seriesTotal: seriesTasks.length,
+                    _seriesDone: done.length,
+                });
+            }
+        });
+
+        const all = [...standalone, ...representatives];
+
+        return all
+            .filter(t => filter === 'all' || t.status === filter)
             .filter(t => employeeFilter === 'all' || (Array.isArray(t.assignedTo) && t.assignedTo.includes(employeeFilter as number)))
             .sort((a, b) => (a.dueDate || '').localeCompare(b.dueDate || ''));
     }, [tasks, filter, employeeFilter]);
@@ -92,13 +135,13 @@ export const TasksView: React.FC<TasksViewProps> = ({
                 </div>
 
                 {/* Task List */}
-                {filteredTasks.length === 0 ? (
+                {displayedTasks.length === 0 ? (
                     <Card>
                         <p className="text-center text-gray-500 py-8">Keine Aufgaben gefunden.</p>
                     </Card>
                 ) : (
                     <div className="space-y-3">
-                        {filteredTasks.map(task => {
+                        {displayedTasks.map(task => {
                             const assignedNames = task.assignedTo
                                 .map(id => employees.find(e => e.id === id))
                                 .filter(Boolean)
@@ -131,6 +174,11 @@ export const TasksView: React.FC<TasksViewProps> = ({
                                                 {task.recurrence && (
                                                     <span title={recurrenceLabel(task.recurrence.frequency)} className="text-base leading-none">🔁</span>
                                                 )}
+                                                {(task as any)._seriesTotal && (
+                                                    <span className="text-xs font-normal bg-purple-100 text-purple-700 px-1.5 py-0.5 rounded-full">
+                                                        {(task as any)._seriesDone}/{(task as any)._seriesTotal} erledigt
+                                                    </span>
+                                                )}
                                             </h3>
                                             {task.description && <p className="text-sm text-gray-500 mt-0.5">{task.description}</p>}
                                             <div className="flex flex-wrap gap-x-4 mt-1.5 text-xs text-gray-500">
@@ -156,7 +204,7 @@ export const TasksView: React.FC<TasksViewProps> = ({
                                                 Bearbeiten
                                             </button>
                                             <button
-                                                onClick={() => setDeletingTaskId(task.id)}
+                                                onClick={() => setDeletingTaskId(task.seriesId || task.id)}
                                                 className="text-xs text-gray-500 hover:text-red-600 font-medium px-2 py-1 rounded hover:bg-red-50 transition-colors"
                                             >
                                                 Löschen
