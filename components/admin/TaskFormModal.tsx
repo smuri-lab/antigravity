@@ -72,8 +72,8 @@ export const TaskFormModal: React.FC<TaskFormModalProps> = ({
                     <Input label="Fälligkeitsdatum *" type="date" value={dueDate} onChange={e => setDueDate(e.target.value)} />
 
                     <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-2">Mitarbeiter zuweisen *</label>
-                        <div className="space-y-1 max-h-40 overflow-y-auto border rounded-lg p-2">
+                        <label className="block text-sm font-medium text-gray-700 mb-1">Mitarbeiter zuweisen *</label>
+                        <div className="space-y-1 max-h-28 overflow-y-auto border rounded-lg p-2">
                             {employees.filter(e => e.isActive).map(emp => (
                                 <label key={emp.id} className="flex items-center gap-2 p-1.5 rounded cursor-pointer hover:bg-gray-50">
                                     <input
