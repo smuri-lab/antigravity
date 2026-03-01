@@ -235,14 +235,54 @@ export const createDataSlice: StateCreator<DataSlice> = (set) => ({
     })),
 
     // Task CRUD
-    addTask: (task) => set((state) => ({
-        tasks: [...state.tasks, {
+    addTask: (task) => set((state) => {
+        const createdAt = new Date().toISOString();
+        const firstTask: Task = {
             ...task,
             id: crypto.randomUUID(),
             status: 'open',
-            createdAt: new Date().toISOString(),
-        }]
-    })),
+            createdAt,
+        };
+
+        const allTasks: Task[] = [firstTask];
+
+        // Pre-generate all future occurrences for recurring tasks
+        if (task.recurrence) {
+            const { frequency, endDate } = task.recurrence;
+            // Max 1 year ahead if no endDate, to avoid infinite loops
+            const maxDate = endDate || (() => {
+                const d = new Date(task.dueDate + 'T12:00:00');
+                d.setFullYear(d.getFullYear() + 1);
+                return d.toLocaleDateString('sv-SE');
+            })();
+
+            let currentDue = new Date(task.dueDate + 'T12:00:00');
+
+            while (true) {
+                // Calculate next occurrence
+                const nextDue = new Date(currentDue);
+                if (frequency === 'daily') nextDue.setDate(nextDue.getDate() + 1);
+                else if (frequency === 'weekly') nextDue.setDate(nextDue.getDate() + 7);
+                else if (frequency === 'biweekly') nextDue.setDate(nextDue.getDate() + 14);
+                else if (frequency === 'monthly') nextDue.setMonth(nextDue.getMonth() + 1);
+
+                const nextDueDateStr = nextDue.toLocaleDateString('sv-SE');
+                if (nextDueDateStr > maxDate) break;
+
+                allTasks.push({
+                    ...task,
+                    id: crypto.randomUUID(),
+                    status: 'open',
+                    createdAt,
+                    dueDate: nextDueDateStr,
+                });
+
+                currentDue = nextDue;
+            }
+        }
+
+        return { tasks: [...state.tasks, ...allTasks] };
+    }),
     updateTask: (updatedTask) => set((state) => ({
         tasks: state.tasks.map(t => t.id === updatedTask.id ? updatedTask : t)
     })),
